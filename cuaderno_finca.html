@@ -75,35 +75,70 @@ select{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/
 .btn-row{display:flex;gap:.6rem;flex-wrap:wrap;margin-top:.8rem;}
 
 /* TRACKER */
-.tracker-top{display:flex;align-items:flex-start;justify-content:space-between;padding:1.4rem 2.5rem .5rem;gap:1rem;flex-wrap:wrap;}
-.tracker-title{font-family:'Playfair Display',serif;font-size:1.15rem;color:var(--ink);}
-.tracker-sub{font-family:'DM Mono',monospace;font-size:.65rem;color:var(--fog);letter-spacing:.1em;text-transform:uppercase;margin-top:.15rem;}
-.legend{display:flex;gap:1.2rem;flex-wrap:wrap;padding:.5rem 2.5rem .8rem;font-family:'DM Mono',monospace;font-size:.67rem;letter-spacing:.08em;text-transform:uppercase;color:var(--fog);}
-.legend-item{display:flex;align-items:center;gap:.4rem;}
-.ldot{width:9px;height:9px;border-radius:50%;}.l-ok{background:#4CAF50;}.l-warn{background:#FFC107;}.l-danger{background:#F44336;}
-.tracker-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(185px,1fr));gap:1rem;padding:.5rem 2.5rem 1.5rem;}
-.parcel-card{border-radius:2px;padding:1.2rem 1.4rem;position:relative;overflow:hidden;transition:transform .2s;cursor:default;}
-.parcel-card:hover{transform:translateY(-2px);}
-.parcel-card.state-ok{background:var(--ok-bg);border:1.5px solid #90C890;}
-.parcel-card.state-warn{background:var(--warn-bg);border:1.5px solid #D4B800;}
-.parcel-card.state-danger{background:var(--danger-bg);border:1.5px solid #E08080;}
-.parcel-card.state-none{background:var(--parchment);border:1.5px dashed #D8CEBA;}
-.parcel-name{font-family:'Playfair Display',serif;font-size:.95rem;color:var(--ink);margin-bottom:.15rem;}
-.parcel-var{font-family:'DM Mono',monospace;font-size:.62rem;color:var(--fog);letter-spacing:.06em;text-transform:uppercase;margin-bottom:.3rem;}
-.parcel-days{font-family:'DM Mono',monospace;font-size:2rem;font-weight:500;line-height:1;margin:.4rem 0 .2rem;}
-.state-ok .parcel-days{color:var(--ok);}.state-warn .parcel-days{color:var(--warn);}.state-danger .parcel-days{color:var(--danger);}.state-none .parcel-days{color:var(--fog);}
-.parcel-label{font-family:'DM Mono',monospace;font-size:.62rem;letter-spacing:.1em;text-transform:uppercase;}
-.state-ok .parcel-label{color:var(--ok);}.state-warn .parcel-label{color:var(--warn);}.state-danger .parcel-label{color:var(--danger);}.state-none .parcel-label{color:var(--fog);}
-.parcel-last{font-size:.75rem;color:var(--fog);margin-top:.6rem;}
-.sdot{position:absolute;top:1rem;right:1rem;width:10px;height:10px;border-radius:50%;}
-.state-ok .sdot{background:#4CAF50;box-shadow:0 0 0 3px rgba(76,175,80,.2);}
-.state-warn .sdot{background:#FFC107;box-shadow:0 0 0 3px rgba(255,193,7,.2);}
-.state-danger .sdot{background:#F44336;box-shadow:0 0 0 3px rgba(244,67,54,.2);animation:pulseRed 1.5s infinite;}
-.state-none .sdot{background:#CCC;}
-@keyframes pulseRed{0%,100%{box-shadow:0 0 0 3px rgba(244,67,54,.2);}50%{box-shadow:0 0 0 8px rgba(244,67,54,.06);}}
-.tracker-log{border-top:1px solid #D8CEBA;padding:0 2.5rem 1.8rem;}
+/* ── SEGUIMENT ─────────────────────────── */
+.tracker-summary{display:grid;grid-template-columns:repeat(3,1fr);gap:0;border-bottom:1px solid #D8CEBA;}
+.summary-box{padding:1.2rem 1.5rem;text-align:center;border-right:1px solid #D8CEBA;}
+.summary-box:last-child{border-right:none;}
+.summary-box.s-ok{background:var(--ok-bg);}
+.summary-box.s-warn{background:var(--warn-bg);}
+.summary-box.s-danger{background:var(--danger-bg);}
+.summary-num{font-family:'DM Mono',monospace;font-size:2.4rem;font-weight:700;line-height:1;}
+.s-ok .summary-num{color:var(--ok);}
+.s-warn .summary-num{color:var(--warn);}
+.s-danger .summary-num{color:var(--danger);}
+.summary-lbl{font-family:'DM Mono',monospace;font-size:.62rem;letter-spacing:.1em;text-transform:uppercase;margin-top:.3rem;}
+.s-ok .summary-lbl{color:var(--ok);}
+.s-warn .summary-lbl{color:var(--warn);}
+.s-danger .summary-lbl{color:var(--danger);}
+.summary-sub{font-size:.75rem;color:var(--fog);margin-top:.15rem;}
+.progress-bar{height:5px;display:flex;}
+.pb-ok{background:#4CAF50;transition:width .5s ease;}
+.pb-warn{background:#FFC107;transition:width .5s ease;}
+.pb-danger{background:#F44336;transition:width .5s ease;}
+.tracker-group{padding:1.2rem 2rem 0;}
+.group-header{display:flex;align-items:center;gap:.7rem;margin-bottom:.8rem;padding:.6rem .8rem;border-radius:2px;}
+.group-header.gh-ok{background:var(--ok-bg);border-left:3px solid #4CAF50;}
+.group-header.gh-warn{background:var(--warn-bg);border-left:3px solid #FFC107;}
+.group-header.gh-danger{background:var(--danger-bg);border-left:3px solid #F44336;}
+.group-header.gh-none{background:var(--parchment);border-left:3px solid #D8CEBA;}
+.group-icon{font-size:1.2rem;}
+.group-title{font-family:'Playfair Display',serif;font-size:1rem;}
+.gh-ok .group-title{color:var(--ok);}
+.gh-warn .group-title{color:var(--warn);}
+.gh-danger .group-title{color:var(--danger);}
+.gh-none .group-title{color:var(--fog);}
+.group-count{font-family:'DM Mono',monospace;font-size:.7rem;letter-spacing:.08em;margin-left:auto;padding:.2rem .6rem;border-radius:10px;}
+.gh-ok .group-count{background:#4CAF50;color:white;}
+.gh-warn .group-count{background:#FFC107;color:var(--ink);}
+.gh-danger .group-count{background:#F44336;color:white;}
+.gh-none .group-count{background:#D8CEBA;color:var(--fog);}
+.group-list{display:flex;flex-direction:column;gap:.4rem;margin-bottom:1.2rem;}
+.prow{display:flex;align-items:center;gap:.8rem;background:white;border-radius:2px;padding:.65rem .9rem;border:1px solid #E8E0D0;transition:transform .15s;}
+.prow:hover{transform:translateX(3px);}
+.prow.pr-ok{border-left:3px solid #4CAF50;}
+.prow.pr-warn{border-left:3px solid #FFC107;}
+.prow.pr-danger{border-left:3px solid #F44336;background:#FFF8F8;}
+.prow.pr-none{border-left:3px solid #D8CEBA;background:var(--parchment);}
+.prow-days{font-family:'DM Mono',monospace;font-size:1.1rem;font-weight:700;min-width:2.5rem;text-align:center;}
+.pr-ok .prow-days{color:var(--ok);}
+.pr-warn .prow-days{color:var(--warn);}
+.pr-danger .prow-days{color:var(--danger);}
+.pr-none .prow-days{color:var(--fog);}
+.prow-info{flex:1;min-width:0;}
+.prow-name{font-size:.88rem;font-weight:500;color:var(--ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.prow-meta{font-family:'DM Mono',monospace;font-size:.62rem;color:var(--fog);letter-spacing:.04em;margin-top:.1rem;}
+.prow-badge{font-family:'DM Mono',monospace;font-size:.6rem;padding:.2rem .5rem;border-radius:2px;white-space:nowrap;}
+.pr-danger .prow-badge{background:var(--danger-bg);color:var(--danger);}
+.prow.sensible-warn{background:#FFF3E0;border-left:3px solid #E65100!important;box-shadow:0 0 0 1px rgba(230,81,0,.15);}
+.prow.sensible-danger{background:#FFF0F0;border-left:3px solid #B71C1C!important;box-shadow:0 0 0 1px rgba(183,28,28,.2);}
+.sensible-badge{font-family:'DM Mono',monospace;font-size:.58rem;padding:.2rem .5rem;border-radius:2px;background:#FF6D00;color:white;white-space:nowrap;letter-spacing:.04em;}
+.sensible-warn  .sensible-badge{background:#E65100;}
+.sensible-danger .sensible-badge{background:#B71C1C;}
+.prow-badges{display:flex;gap:.3rem;align-items:center;flex-wrap:wrap;}
+.tracker-log{border-top:1px solid #D8CEBA;padding:1rem 2rem 1.5rem;margin-top:.5rem;}
 .log-row{display:flex;gap:.8rem;flex-wrap:wrap;align-items:flex-end;}
 .log-row .field{flex:1;min-width:140px;margin-bottom:0;}
+@keyframes pulseRed{0%,100%{box-shadow:0 0 0 3px rgba(244,67,54,.2);}50%{box-shadow:0 0 0 8px rgba(244,67,54,.06);}}
 
 /* HISTORIAL */
 .hist-filters{display:flex;gap:.7rem;flex-wrap:wrap;padding:1.2rem 2.5rem .5rem;align-items:flex-end;}
@@ -141,6 +176,98 @@ footer{text-align:center;margin-top:1.5rem;font-family:'DM Mono',monospace;font-
 @keyframes fadeDown{from{opacity:0;transform:translateY(-20px)}to{opacity:1;transform:translateY(0)}}
 @keyframes fadeUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
 @keyframes sectionIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+
+/* ═══════════════════════════════════════
+   RESPONSIVE — MÒBIL (< 600px)
+═══════════════════════════════════════ */
+@media(max-width:600px){
+
+  /* Cos general */
+  body{padding:1rem .6rem 3rem;}
+  .container{max-width:100%;}
+
+  /* Capçalera */
+  .logo-vine{font-size:2rem;}
+  header{margin-bottom:1.2rem;}
+
+  /* Navegació principal — 3 per fila en mòbil */
+  .main-nav{gap:.3rem;}
+  .main-nav-btn{font-size:.58rem;padding:.6rem .3rem;min-width:60px;}
+  .main-nav-btn .nav-icon{font-size:.9rem;}
+
+  /* Card padding més petit */
+  .card-inner{padding:1.2rem 1rem;}
+  .panel-header{padding:.75rem 1rem;font-size:.65rem;}
+
+  /* Formulari */
+  .row-2,.row-3{grid-template-columns:1fr;}
+  .type-tabs{grid-template-columns:repeat(2,1fr);gap:.4rem;}
+  .tab-btn{font-size:.62rem;padding:.6rem .3rem;}
+  .tab-btn .tab-icon{font-size:1.2rem;}
+  label{font-size:.7rem;}
+  input,select,textarea{font-size:.88rem;padding:.55rem .7rem;}
+  .btn-submit{font-size:.95rem;padding:.85rem;}
+  .parcel-info-bar{font-size:.67rem;}
+
+  /* Seguiment — resum boxes */
+  .tracker-summary{grid-template-columns:repeat(3,1fr);}
+  .summary-box{padding:.75rem .5rem;}
+  .summary-num{font-size:1.8rem;}
+  .summary-lbl{font-size:.55rem;letter-spacing:.05em;}
+  .summary-sub{font-size:.65rem;}
+
+  /* Seguiment — grups */
+  .tracker-group{padding:.8rem .8rem 0;}
+  .group-header{padding:.5rem .7rem;gap:.5rem;}
+  .group-icon{font-size:1rem;}
+  .group-title{font-size:.88rem;}
+  .group-count{font-size:.62rem;padding:.15rem .45rem;}
+
+  /* Seguiment — files de parcelles */
+  .prow{padding:.55rem .7rem;gap:.6rem;align-items:flex-start;flex-wrap:wrap;}
+  .prow:hover{transform:none;}
+  .prow-days{font-size:.95rem;min-width:2.2rem;}
+  .prow-name{font-size:.82rem;white-space:normal;line-height:1.3;}
+  .prow-meta{font-size:.58rem;line-height:1.4;}
+  .prow-badges{gap:.25rem;margin-top:.3rem;}
+  .prow-badge,.sensible-badge{font-size:.55rem;padding:.15rem .4rem;}
+  .tracker-log{padding:.8rem .8rem 1.2rem;}
+  .log-row{gap:.5rem;}
+
+  /* Historial */
+  .hist-filters{padding:.8rem 1rem .5rem;gap:.5rem;}
+  .hist-table-wrap{padding:0 0 1.5rem;overflow-x:auto;}
+  table{font-size:.75rem;}
+  thead th{font-size:.6rem;padding:.5rem .5rem;}
+  tbody td{padding:.45rem .5rem;font-size:.75rem;}
+  .badge-tipo{font-size:.58rem;padding:.1rem .35rem;}
+
+  /* Export */
+  .export-section{padding:1rem;}
+  .export-stats{gap:.5rem;}
+  .stat-box{min-width:70px;padding:.6rem .5rem;}
+  .stat-num{font-size:1.3rem;}
+  .stat-lbl{font-size:.55rem;}
+
+  /* Toast */
+  .toast{font-size:.72rem;padding:.8rem 1.2rem;white-space:normal;text-align:center;max-width:90vw;}
+}
+
+/* ═══════════════════════════════════════
+   TABLET (600px – 768px)
+═══════════════════════════════════════ */
+@media(min-width:601px) and (max-width:768px){
+  body{padding:1.5rem .8rem 3rem;}
+  .card-inner{padding:1.5rem 1.5rem;}
+  .panel-header{padding:.8rem 1.5rem;}
+  .tracker-group{padding:1rem 1.2rem 0;}
+  .hist-filters{padding:1rem 1.5rem .5rem;}
+  .hist-table-wrap{padding:0 1.5rem 1.5rem;}
+  .export-section{padding:1.2rem 1.5rem;}
+  .summary-num{font-size:2rem;}
+  .prow-meta{font-size:.6rem;}
+  .prow-name{font-size:.85rem;}
+}
 </style>
 </head>
 <body>
@@ -291,15 +418,33 @@ footer{text-align:center;margin-top:1.5rem;font-family:'DM Mono',monospace;font-
 <!-- ══ SEGUIMENT ══ -->
 <div class="page" id="page-seguimiento">
   <div class="card">
-    <div class="tracker-top">
-      <div><div class="tracker-title">Dies sense tractament fitosanitari</div><div class="tracker-sub">Per parcel·la · Semàfor de control</div></div>
+
+    <!-- Resum numèric -->
+    <div class="tracker-summary" id="trackerSummary">
+      <div class="summary-box s-danger">
+        <div class="summary-num" id="cnt-danger">—</div>
+        <div class="summary-lbl">🔴 Urgents</div>
+        <div class="summary-sub">&gt; 14 dies</div>
+      </div>
+      <div class="summary-box s-warn">
+        <div class="summary-num" id="cnt-warn">—</div>
+        <div class="summary-lbl">🟡 A vigilar</div>
+        <div class="summary-sub">7 – 14 dies</div>
+      </div>
+      <div class="summary-box s-ok">
+        <div class="summary-num" id="cnt-ok">—</div>
+        <div class="summary-lbl">🟢 Correctes</div>
+        <div class="summary-sub">&lt; 7 dies</div>
+      </div>
     </div>
-    <div class="legend">
-      <div class="legend-item"><div class="ldot l-ok"></div>&lt; 7 dies — OK</div>
-      <div class="legend-item"><div class="ldot l-warn"></div>7–14 dies — Revisar</div>
-      <div class="legend-item"><div class="ldot l-danger"></div>&gt; 14 dies — Urgent!</div>
-    </div>
-    <div class="tracker-grid" id="trackerGrid"></div>
+
+    <!-- Barra de progrés visual -->
+    <div class="progress-bar" id="progressBar"></div>
+
+    <!-- Grups -->
+    <div id="trackerGrid"></div>
+
+    <!-- Registre ràpid -->
     <div class="tracker-log">
       <div class="section-label">Registrar tractament ràpid</div>
       <div class="log-row">
@@ -380,11 +525,33 @@ footer{text-align:center;margin-top:1.5rem;font-family:'DM Mono',monospace;font-
 // ══════════════════════════════════════════════════
 //  DADES DEL PARCEL·LARI
 // ══════════════════════════════════════════════════
-const PARCEL_DATA = [{"nom": "Cabernet Café", "sup": 0.5147, "municipi": "Santa Fe", "varietat": "Cabernet", "codis": "AT695"}, {"nom": "Cabernet Truco", "sup": 0.7809, "municipi": "La Granada", "varietat": "Cabernet", "codis": "AJ029"}, {"nom": "Cal Caramet", "sup": 0.884, "municipi": "Avinyonet", "varietat": "Xarel·lo", "codis": "AB026"}, {"nom": "Carme i Roser Raventós", "sup": 1.9516, "municipi": "Avinyonet", "varietat": "Xarel·lo", "codis": "AA964 / AA965"}, {"nom": "Cau del Torrent", "sup": 0.1716, "municipi": "Subirats", "varietat": "Xarel·lo", "codis": "IN271"}, {"nom": "Chardonnay Bas", "sup": 0.4505, "municipi": "La Granada", "varietat": "Chardonnay", "codis": "AI899"}, {"nom": "Chardonnay Lavern", "sup": 2.7237, "municipi": "Subirats", "varietat": "Chardonnay", "codis": "IE545 / AW402"}, {"nom": "Chardonnay les cabanyes", "sup": 1.1818, "municipi": "La Granada", "varietat": "Chardonnay", "codis": "AJ171"}, {"nom": "Escoda Autopista", "sup": 0.8263, "municipi": "Vilafranca", "varietat": "Xarel·lo", "codis": "BB859"}, {"nom": "Escoda autopista Petita", "sup": 0.088, "municipi": "Vilafranca", "varietat": "Xarel·lo", "codis": "IN288"}, {"nom": "Escoda Poligon", "sup": 1.1184, "municipi": "Avinyonet", "varietat": "Xarel·lo", "codis": "AA935 / AA936 / AA937 / AA938"}, {"nom": "Escoda Vilafranca", "sup": 0.8083, "municipi": "Vilafranca", "varietat": "Xarel·lo", "codis": "BB354"}, {"nom": "Garnatxa negra escuder", "sup": 1.04, "municipi": "Subirats", "varietat": "Garnatxa negra", "codis": "LE263"}, {"nom": "Josep Raventós", "sup": 0.457, "municipi": "Avinyonet", "varietat": "Xarel·lo", "codis": "AA949"}, {"nom": "Josep Via", "sup": 0.7552, "municipi": "Avinyonet", "varietat": "Xarel·lo", "codis": "AA948"}, {"nom": "L'Oliverá", "sup": 0.8106, "municipi": "Castellet", "varietat": "Xarel·lo", "codis": "KC746"}, {"nom": "La Masia", "sup": 2.8772, "municipi": "Castellet", "varietat": "Xarel·lo", "codis": "AD318 / IX548"}, {"nom": "La Salada Masia", "sup": 2.0782, "municipi": "Subirats", "varietat": "Xarel·lo", "codis": "AW505"}, {"nom": "Lavern Xarel·lo Carretera", "sup": 0.8702, "municipi": "Subirats", "varietat": "Xarel·lo", "codis": "AV153"}, {"nom": "Lavern Xarel·lo Vinya Mig", "sup": 1.9037, "municipi": "Subirats", "varietat": "Xarel·lo", "codis": "AV154"}, {"nom": "Les Rovires", "sup": 0.67, "municipi": "Santa Fe", "varietat": "Chardonnay", "codis": "AT719"}, {"nom": "Macabeu altre part riera escuder", "sup": 0.5196, "municipi": "Subirats", "varietat": "Macabeu", "codis": "AW428"}, {"nom": "Macabeu Bas Ave", "sup": 0.3016, "municipi": "Avinyonet", "varietat": "Macabeu", "codis": "AB087"}, {"nom": "Macabeu Josep Maria", "sup": 0.6475, "municipi": "Santa Fe", "varietat": "Macabeu", "codis": "AT594"}, {"nom": "Macabeu Jove Mas Masagué", "sup": 0.4258, "municipi": "Santa Fe", "varietat": "Macabeu", "codis": "JF676"}, {"nom": "Macabeu Lavern", "sup": 2.2971, "municipi": "Subirats", "varietat": "Macabeu", "codis": "AV119 / AV120 / AV128 / AV143 / AW149"}, {"nom": "Macabeu Mas Mesague", "sup": 1.2712, "municipi": "Santa Fe", "varietat": "Macabeu", "codis": "AT634"}, {"nom": "Macabeu Miquel", "sup": 1.9542, "municipi": "Santa Fe", "varietat": "Macabeu", "codis": "IE172 / JI233 / JI235"}, {"nom": "Macabeu Nou Escudé D", "sup": 0.2033, "municipi": "Subirats", "varietat": "Macabeu", "codis": "KA573"}, {"nom": "Macabeu Nou Escudé E", "sup": 0.32, "municipi": "Subirats", "varietat": "Macabeu", "codis": "KA572"}, {"nom": "Macabeu oria jove", "sup": 0.4003, "municipi": "Santa Fe", "varietat": "Macabeu", "codis": "AT593"}, {"nom": "Macabeu Oria Vell", "sup": 1.077, "municipi": "Santa Fe", "varietat": "Macabeu", "codis": "AT639"}, {"nom": "Macabeu Plana Escudé", "sup": 1.8869, "municipi": "Subirats", "varietat": "Macabeu", "codis": "AW447 / AW436 / AW465 / AW449"}, {"nom": "Macabeu Pomers", "sup": 0.4907, "municipi": "Subirats", "varietat": "Macabeu", "codis": "AW982"}, {"nom": "Macabeu Pont Escudé", "sup": 1.393, "municipi": "Subirats", "varietat": "Macabeu", "codis": "IN905"}, {"nom": "Malvasia de sitges escuder", "sup": 0.8908, "municipi": "Subirats", "varietat": "Malvasia", "codis": "LE272"}, {"nom": "Malvasia Santa Fe", "sup": 0.2201, "municipi": "Santa Fe", "varietat": "Malvasia", "codis": "AT640"}, {"nom": "Mas Pardal", "sup": 1.9614, "municipi": "Vilafranca", "varietat": "Xarel·lo", "codis": "JJ894"}, {"nom": "Merlot santa Fe", "sup": 1.0031, "municipi": "Santa Fe", "varietat": "Merlot", "codis": "AI847"}, {"nom": "Modesta Malvasia", "sup": 0.273, "municipi": "Avinyonet", "varietat": "Malvasia", "codis": "AB021"}, {"nom": "Modesta Xarel·lo", "sup": 1.3506, "municipi": "Avinyonet", "varietat": "Xarel·lo", "codis": "AB020"}, {"nom": "Molí de Vent", "sup": 1.0, "municipi": "Vilafranca", "varietat": "Macabeu", "codis": "JV107"}, {"nom": "Moneu Dreta", "sup": 0.25, "municipi": "Subirats", "varietat": "Moneu", "codis": "LC824"}, {"nom": "Moneu Esquerre", "sup": 0.1507, "municipi": "Subirats", "varietat": "Moneu", "codis": "LB828"}, {"nom": "Montargull Xarel·lo dreta abaix", "sup": 0.338, "municipi": "Subirats", "varietat": "Xarel·lo", "codis": "AW472"}, {"nom": "Montargull Xarel·lo Esquerre", "sup": 0.779, "municipi": "Subirats", "varietat": "Xarel·lo", "codis": "AW458"}, {"nom": "Montargull Xarel·lo Esquerre mig", "sup": 0.3176, "municipi": "Subirats", "varietat": "Xarel·lo", "codis": "AW457"}, {"nom": "Muscat Bas", "sup": 0.4942, "municipi": "La Granada", "varietat": "Muscat", "codis": "AI897 / AI898 / IF474"}, {"nom": "Muscat Rectoria", "sup": 1.3913, "municipi": "La Granada", "varietat": "Muscat", "codis": "AI894 / AI895 / AI896 / AI903"}, {"nom": "Oria Jove", "sup": 0.6066, "municipi": "Santa Fe", "varietat": "Macabeu", "codis": "JI234"}, {"nom": "Parellada Escuder", "sup": 0.6131, "municipi": "Subirats", "varietat": "Parellada", "codis": "AW442"}, {"nom": "Parellada Pujols", "sup": 1.2366, "municipi": "Font Rubi", "varietat": "Parellada", "codis": "AI721 / IN111"}, {"nom": "Pla Llorenç", "sup": 0.9238, "municipi": "La Granada", "varietat": "Macabeu", "codis": "AJ038"}, {"nom": "Plana Mas Bertran", "sup": 1.2403, "municipi": "Avinyonet", "varietat": "Xarel·lo", "codis": "AB003"}, {"nom": "Plana Mas Bertran Masia", "sup": 0.836, "municipi": "Avinyonet", "varietat": "Xarel·lo", "codis": "AB016"}, {"nom": "Sobrehort Dot Xarel·lo", "sup": 0.9989, "municipi": "Avinyonet", "varietat": "Xarel·lo", "codis": "AV638"}, {"nom": "Subirat parent santa fe", "sup": 0.5841, "municipi": "Santa Fe", "varietat": "Subirat parent", "codis": "LC819 / LC865"}, {"nom": "Sumoll negre Escudé", "sup": 0.065, "municipi": "Subirats", "varietat": "Sumoll Negre", "codis": "KE952"}, {"nom": "Tigsa", "sup": 0.9071, "municipi": "Vilafranca", "varietat": "Xarel·lo", "codis": "JA932"}, {"nom": "Tofol Xic", "sup": 0.709, "municipi": "Vilafranca", "varietat": "Macabeu", "codis": "BB318"}, {"nom": "Torrent de la Salada", "sup": 1.3282, "municipi": "Subirats", "varietat": "Xarel·lo", "codis": "IA867"}, {"nom": "Trepat Cal Escudé", "sup": 1.6821, "municipi": "Subirats", "varietat": "Trepat", "codis": "AW451 / AW463 / KC096"}, {"nom": "Vinya Hort", "sup": 0.3924, "municipi": "La Granada", "varietat": "Xarel·lo", "codis": "IN269"}, {"nom": "Vinya llarga avinyonet", "sup": 0.4771, "municipi": "La Granada", "varietat": "Xarel·lo", "codis": "JA331"}, {"nom": "Vinya Nova Mas Pardal", "sup": 0.5156, "municipi": "Vilafranca", "varietat": "Xarel·lo", "codis": "BB873"}, {"nom": "Vinya Petita Lavern", "sup": 0.2492, "municipi": "Subirats", "varietat": "Xarel·lo", "codis": "IN287"}, {"nom": "Vinya Pol", "sup": 0.5606, "municipi": "Vilafranca", "varietat": "Macabeu", "codis": "BB329"}, {"nom": "Vinya Torres", "sup": 0.5141, "municipi": "Vilafranca", "varietat": "Macabeu", "codis": "BB323"}, {"nom": "Xarel·lo atre banda riera escuder", "sup": 0.8353, "municipi": "Subirats", "varietat": "Xarel·lo", "codis": "AW426"}, {"nom": "Xarel·lo Carretera", "sup": 1.7216, "municipi": "Subirats", "varietat": "Xarel·lo", "codis": "AV123"}, {"nom": "Xarel·lo Casan", "sup": 1.0238, "municipi": "Santa Fe", "varietat": "Xarel·lo", "codis": "AT635 / JI232"}, {"nom": "Xarel·lo Jove Vinya Llarga", "sup": 0.3773, "municipi": "Santa Fe", "varietat": "Xarel·lo", "codis": "AT633"}, {"nom": "Xarel·lo Les costes", "sup": 0.5012, "municipi": "Santa Fe", "varietat": "Xarel·lo", "codis": "AT674"}, {"nom": "Xarel·lo Miquel Gran", "sup": 0.4784, "municipi": "Subirats", "varietat": "Xarel·lo", "codis": "AV113"}, {"nom": "Xarel·lo Miquel Petita", "sup": 0.0921, "municipi": "Subirats", "varietat": "Xarel·lo", "codis": "AV118"}, {"nom": "Xarel·lo Mort Escuder", "sup": 1.3824, "municipi": "Subirats", "varietat": "Xarel·lo", "codis": "AW429"}, {"nom": "Xarel·lo nou Escudé", "sup": 1.9258, "municipi": "Subirats", "varietat": "Xarel·lo", "codis": "AW975 / AW977 / KD895 / KD896"}, {"nom": "Xarel·lo Pujols", "sup": 0.4419, "municipi": "Font Rubi", "varietat": "Xarel·lo", "codis": "AG341"}, {"nom": "Xarel·lo Reempeltat casan", "sup": 0.7711, "municipi": "Santa Fe", "varietat": "Xarel·lo", "codis": "AT641"}, {"nom": "Xarel·lo Truco", "sup": 0.3369, "municipi": "La Granada", "varietat": "Xarel·lo", "codis": "AJ031"}, {"nom": "Xarel·lo Vermell Oliverà", "sup": 1.0458, "municipi": "Castellet", "varietat": "Xarel·lo Vermell", "codis": "KA617"}, {"nom": "Xarel·lo Vinya Llarga", "sup": 1.5412, "municipi": "Santa Fe", "varietat": "Xarel·lo", "codis": "AT636 / JF677 / JF678"}];
+const PARCEL_DATA = [{"nom": "Cabernet Café", "sup": 0.5147, "municipi": "Santa Fe", "varietat": "Cabernet", "codis": "AT695"}, {"nom": "Cabernet Truco", "sup": 0.7809, "municipi": "La Granada", "varietat": "Cabernet", "codis": "AJ029"}, {"nom": "Cal Caramet", "sup": 0.884, "municipi": "Avinyonet", "varietat": "Xarel·lo", "codis": "AB026"}, {"nom": "Carme i Roser Raventós", "sup": 1.9516, "municipi": "Avinyonet", "varietat": "Xarel·lo", "codis": "AA964 / AA965"}, {"nom": "Cau del Torrent", "sup": 0.1716, "municipi": "Subirats", "varietat": "Xarel·lo", "codis": "IN271"}, {"nom": "Chardonnay Bas", "sup": 0.4505, "municipi": "La Granada", "varietat": "Chardonnay", "codis": "AI899"}, {"nom": "Chardonnay Lavern", "sup": 2.7237, "municipi": "Subirats", "varietat": "Chardonnay", "codis": "IE545 / AW402"}, {"nom": "Chardonnay les cabanyes", "sup": 1.1818, "municipi": "La Granada", "varietat": "Chardonnay", "codis": "AJ171"}, {"nom": "Escoda Autopista", "sup": 0.8263, "municipi": "Vilafranca", "varietat": "Xarel·lo", "codis": "BB859"}, {"nom": "Escoda autopista Petita", "sup": 0.088, "municipi": "Vilafranca", "varietat": "Xarel·lo", "codis": "IN288"}, {"nom": "Escoda Poligon", "sup": 1.1184, "municipi": "Avinyonet", "varietat": "Xarel·lo", "codis": "AA935 / AA936 / AA937 / AA938"}, {"nom": "Escoda Vilafranca", "sup": 0.8083, "municipi": "Vilafranca", "varietat": "Xarel·lo", "codis": "BB354"}, {"nom": "Garnatxa negra escuder", "sup": 1.04, "municipi": "Subirats", "varietat": "Garnatxa negra", "codis": "LE263"}, {"nom": "Josep Raventós", "sup": 0.457, "municipi": "Avinyonet", "varietat": "Xarel·lo", "codis": "AA949"}, {"nom": "Josep Via", "sup": 0.7552, "municipi": "Avinyonet", "varietat": "Xarel·lo", "codis": "AA948"}, {"nom": "L'Oliverà", "sup": 1.8564, "municipi": "Castellet", "varietat": "Xarel·lo", "codis": "KC746 / KA617"}, {"nom": "La Masia", "sup": 2.8772, "municipi": "Castellet", "varietat": "Xarel·lo", "codis": "AD318 / IX548"}, {"nom": "La Salada Masia", "sup": 2.0782, "municipi": "Subirats", "varietat": "Xarel·lo", "codis": "AW505"}, {"nom": "Lavern Xarel·lo Carretera", "sup": 0.8702, "municipi": "Subirats", "varietat": "Xarel·lo", "codis": "AV153"}, {"nom": "Lavern Xarel·lo Vinya Mig", "sup": 1.9037, "municipi": "Subirats", "varietat": "Xarel·lo", "codis": "AV154"}, {"nom": "Les Rovires", "sup": 0.67, "municipi": "Santa Fe", "varietat": "Chardonnay", "codis": "AT719"}, {"nom": "Macabeu altre part riera escuder", "sup": 0.5196, "municipi": "Subirats", "varietat": "Macabeu", "codis": "AW428"}, {"nom": "Macabeu Bas Ave", "sup": 0.3016, "municipi": "Avinyonet", "varietat": "Macabeu", "codis": "AB087"}, {"nom": "Macabeu Josep Maria", "sup": 0.6475, "municipi": "Santa Fe", "varietat": "Macabeu", "codis": "AT594"}, {"nom": "Macabeu Jove Mas Masagué", "sup": 0.4258, "municipi": "Santa Fe", "varietat": "Macabeu", "codis": "JF676"}, {"nom": "Macabeu Lavern", "sup": 2.2971, "municipi": "Subirats", "varietat": "Macabeu", "codis": "AV119 / AV120 / AV128 / AV143 / AW149"}, {"nom": "Macabeu Mas Mesague", "sup": 1.2712, "municipi": "Santa Fe", "varietat": "Macabeu", "codis": "AT634"}, {"nom": "Macabeu Miquel", "sup": 1.9542, "municipi": "Santa Fe", "varietat": "Macabeu", "codis": "IE172 / JI233 / JI235"}, {"nom": "Macabeu Nou Escudé D", "sup": 0.2033, "municipi": "Subirats", "varietat": "Macabeu", "codis": "KA573"}, {"nom": "Macabeu Nou Escudé E", "sup": 0.32, "municipi": "Subirats", "varietat": "Macabeu", "codis": "KA572"}, {"nom": "Macabeu oria jove", "sup": 0.4003, "municipi": "Santa Fe", "varietat": "Macabeu", "codis": "AT593"}, {"nom": "Macabeu Oria Vell", "sup": 1.077, "municipi": "Santa Fe", "varietat": "Macabeu", "codis": "AT639"}, {"nom": "Macabeu Plana Escudé", "sup": 1.8869, "municipi": "Subirats", "varietat": "Macabeu", "codis": "AW447 / AW436 / AW465 / AW449"}, {"nom": "Macabeu Pomers", "sup": 0.4907, "municipi": "Subirats", "varietat": "Macabeu", "codis": "AW982"}, {"nom": "Macabeu Pont Escudé", "sup": 1.393, "municipi": "Subirats", "varietat": "Macabeu", "codis": "IN905"}, {"nom": "Malvasia de sitges escuder", "sup": 0.8908, "municipi": "Subirats", "varietat": "Malvasia", "codis": "LE272"}, {"nom": "Malvasia Santa Fe", "sup": 0.2201, "municipi": "Santa Fe", "varietat": "Malvasia", "codis": "AT640"}, {"nom": "Mas Pardal", "sup": 1.9614, "municipi": "Vilafranca", "varietat": "Xarel·lo", "codis": "JJ894"}, {"nom": "Merlot santa Fe", "sup": 1.0031, "municipi": "Santa Fe", "varietat": "Merlot", "codis": "AI847"}, {"nom": "Modesta Malvasia", "sup": 0.273, "municipi": "Avinyonet", "varietat": "Malvasia", "codis": "AB021"}, {"nom": "Modesta Xarel·lo", "sup": 1.3506, "municipi": "Avinyonet", "varietat": "Xarel·lo", "codis": "AB020"}, {"nom": "Molí de Vent", "sup": 1.0, "municipi": "Vilafranca", "varietat": "Macabeu", "codis": "JV107"}, {"nom": "Moneu Dreta", "sup": 0.25, "municipi": "Subirats", "varietat": "Moneu", "codis": "LC824"}, {"nom": "Moneu Esquerre", "sup": 0.1507, "municipi": "Subirats", "varietat": "Moneu", "codis": "LB828"}, {"nom": "Montargull Xarel·lo dreta abaix", "sup": 0.338, "municipi": "Subirats", "varietat": "Xarel·lo", "codis": "AW472"}, {"nom": "Montargull Xarel·lo Esquerre", "sup": 0.779, "municipi": "Subirats", "varietat": "Xarel·lo", "codis": "AW458"}, {"nom": "Montargull Xarel·lo Esquerre mig", "sup": 0.3176, "municipi": "Subirats", "varietat": "Xarel·lo", "codis": "AW457"}, {"nom": "Muscat Bas", "sup": 0.4942, "municipi": "La Granada", "varietat": "Muscat", "codis": "AI897 / AI898 / IF474"}, {"nom": "Muscat Rectoria", "sup": 1.3913, "municipi": "La Granada", "varietat": "Muscat", "codis": "AI894 / AI895 / AI896 / AI903"}, {"nom": "Oria Jove", "sup": 0.6066, "municipi": "Santa Fe", "varietat": "Macabeu", "codis": "JI234"}, {"nom": "Parellada Escuder", "sup": 0.6131, "municipi": "Subirats", "varietat": "Parellada", "codis": "AW442"}, {"nom": "Parellada Pujols", "sup": 1.2366, "municipi": "Font Rubi", "varietat": "Parellada", "codis": "AI721 / IN111"}, {"nom": "Pla Llorenç", "sup": 0.9238, "municipi": "La Granada", "varietat": "Macabeu", "codis": "AJ038"}, {"nom": "Plana Mas Bertran", "sup": 1.2403, "municipi": "Avinyonet", "varietat": "Xarel·lo", "codis": "AB003"}, {"nom": "Plana Mas Bertran Masia", "sup": 0.836, "municipi": "Avinyonet", "varietat": "Xarel·lo", "codis": "AB016"}, {"nom": "Sobrehort Dot Xarel·lo", "sup": 0.9989, "municipi": "Avinyonet", "varietat": "Xarel·lo", "codis": "AV638"}, {"nom": "Subirat parent santa fe", "sup": 0.5841, "municipi": "Santa Fe", "varietat": "Subirat parent", "codis": "LC819 / LC865"}, {"nom": "Sumoll negre Escudé", "sup": 0.065, "municipi": "Subirats", "varietat": "Sumoll Negre", "codis": "KE952"}, {"nom": "Tigsa", "sup": 0.9071, "municipi": "Vilafranca", "varietat": "Xarel·lo", "codis": "JA932"}, {"nom": "Tofol Xic", "sup": 0.709, "municipi": "Vilafranca", "varietat": "Macabeu", "codis": "BB318"}, {"nom": "Torrent de la Salada", "sup": 1.3282, "municipi": "Subirats", "varietat": "Xarel·lo", "codis": "IA867"}, {"nom": "Trepat Cal Escudé", "sup": 1.6821, "municipi": "Subirats", "varietat": "Trepat", "codis": "AW451 / AW463 / KC096"}, {"nom": "Vinya Hort", "sup": 0.3924, "municipi": "La Granada", "varietat": "Xarel·lo", "codis": "IN269"}, {"nom": "Vinya llarga avinyonet", "sup": 0.4771, "municipi": "La Granada", "varietat": "Xarel·lo", "codis": "JA331"}, {"nom": "Vinya Nova Mas Pardal", "sup": 0.5156, "municipi": "Vilafranca", "varietat": "Xarel·lo", "codis": "BB873"}, {"nom": "Vinya Petita Lavern", "sup": 0.2492, "municipi": "Subirats", "varietat": "Xarel·lo", "codis": "IN287"}, {"nom": "Vinya Pol", "sup": 0.5606, "municipi": "Vilafranca", "varietat": "Macabeu", "codis": "BB329"}, {"nom": "Vinya Torres", "sup": 0.5141, "municipi": "Vilafranca", "varietat": "Macabeu", "codis": "BB323"}, {"nom": "Xarel·lo atre banda riera escuder", "sup": 0.8353, "municipi": "Subirats", "varietat": "Xarel·lo", "codis": "AW426"}, {"nom": "Xarel·lo Carretera", "sup": 1.7216, "municipi": "Subirats", "varietat": "Xarel·lo", "codis": "AV123"}, {"nom": "Xarel·lo Casan", "sup": 1.0238, "municipi": "Santa Fe", "varietat": "Xarel·lo", "codis": "AT635 / JI232"}, {"nom": "Xarel·lo Jove Vinya Llarga", "sup": 0.3773, "municipi": "Santa Fe", "varietat": "Xarel·lo", "codis": "AT633"}, {"nom": "Xarel·lo Les costes", "sup": 0.5012, "municipi": "Santa Fe", "varietat": "Xarel·lo", "codis": "AT674"}, {"nom": "Xarel·lo Miquel Gran", "sup": 0.4784, "municipi": "Subirats", "varietat": "Xarel·lo", "codis": "AV113"}, {"nom": "Xarel·lo Miquel Petita", "sup": 0.0921, "municipi": "Subirats", "varietat": "Xarel·lo", "codis": "AV118"}, {"nom": "Xarel·lo Mort Escuder", "sup": 1.3824, "municipi": "Subirats", "varietat": "Xarel·lo", "codis": "AW429"}, {"nom": "Xarel·lo nou Escudé", "sup": 1.9258, "municipi": "Subirats", "varietat": "Xarel·lo", "codis": "AW975 / AW977 / KD895 / KD896"}, {"nom": "Xarel·lo Pujols", "sup": 0.4419, "municipi": "Font Rubi", "varietat": "Xarel·lo", "codis": "AG341"}, {"nom": "Xarel·lo Reempeltat casan", "sup": 0.7711, "municipi": "Santa Fe", "varietat": "Xarel·lo", "codis": "AT641"}, {"nom": "Xarel·lo Truco", "sup": 0.3369, "municipi": "La Granada", "varietat": "Xarel·lo", "codis": "AJ031"}, {"nom": "Xarel·lo Vinya Llarga", "sup": 1.5412, "municipi": "Santa Fe", "varietat": "Xarel·lo", "codis": "AT636 / JF677 / JF678"}];
+
+// ══════════════════════════════════════════════════
+//  GOOGLE SHEETS SYNC
+// ══════════════════════════════════════════════════
+const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzddnBiSeAd_NWm9QswrLBbb2qA5gmqHYg3kyH3HFhgq4elxN4q88C9Mi6M-iYNvAmg/exec';
+
+function enviarASheets(data) {
+  fetch(SCRIPT_URL, {
+    method: 'POST',
+    mode: 'no-cors',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(data)
+  }).catch(err => console.log('Sheets sync error:', err));
+}
 
 // ══════════════════════════════════════════════════
 //  CONSTANTS
 // ══════════════════════════════════════════════════
+// Varietats sensibles a oïdi/míldiu — ressaltades al seguiment
+const VARIETATS_SENSIBLES = [
+  'Malvasia','Subirat parent','Muscat','Chardonnay',
+  'Sumoll Negre','Cabernet','Garnatxa negra'
+];
+function esSensible(varietat) {
+  return VARIETATS_SENSIBLES.some(v => varietat.toLowerCase().includes(v.toLowerCase()));
+}
 const TIPUS = {
   fitosanitario:{ label:'Tractament Fitosanitari', icon:'🌿', cls:'ph-grape', tab:'active-fitosanitario' },
   labor:        { label:'Labor del Sòl',           icon:'🚜', cls:'ph-leaf',  tab:'active-labor' },
@@ -529,6 +696,9 @@ function guardarPart() {
 
   if(d.tipo==='fitosanitario' && d.parcela) saveTractament(d.parcela, d.fecha);
 
+  // Sincronitza amb Google Sheets (en segon pla)
+  enviarASheets(d);
+
   showToast('✅ Part guardat correctament',false,true);
   resetForm();
   updateExportStats();
@@ -555,25 +725,75 @@ function stateFor(d) {
 }
 
 function renderTracker() {
-  const tr = getTractaments();
+  const tr   = getTractaments();
   const grid = document.getElementById('trackerGrid');
   grid.innerHTML = '';
-  const lbl = { ok:'En termini', warn:'Revisar', danger:'URGENT!', none:'Sense dades' };
 
+  // Classifica parcelles
+  const groups = { danger:[], warn:[], ok:[], none:[] };
   PARCEL_DATA.forEach(p => {
-    const last = tr[p.nom]||null, days=daysSince(last), state=stateFor(days);
-    const dTxt = days===null?'—':days;
-    const lTxt = last?'Últim: '+new Date(last+'T12:00:00').toLocaleDateString('ca-ES',{day:'numeric',month:'short'}):'Sense tractaments';
-    grid.innerHTML += `
-      <div class="parcel-card state-${state}">
-        <div class="sdot"></div>
-        <div class="parcel-name">${p.nom}</div>
-        <div class="parcel-var">${p.varietat} · ${p.sup.toFixed(2)} ha</div>
-        <div class="parcel-days">${dTxt}</div>
-        <div class="parcel-label">${days!==null?dTxt+' dies · ':''}${lbl[state]}</div>
-        <div class="parcel-last">${lTxt}</div>
-      </div>`;
+    const last  = tr[p.nom]||null;
+    const days  = daysSince(last);
+    const state = stateFor(days);
+    const lTxt  = last ? new Date(last+'T12:00:00').toLocaleDateString('ca-ES',{day:'numeric',month:'short',year:'numeric'}) : null;
+    groups[state].push({ ...p, days, last: lTxt });
   });
+
+  // Actualitza comptadors
+  const total = PARCEL_DATA.length;
+  document.getElementById('cnt-danger').textContent = groups.danger.length;
+  document.getElementById('cnt-warn').textContent   = groups.warn.length;
+  document.getElementById('cnt-ok').textContent     = groups.ok.length;
+
+  // Barra de progrés
+  const pb = document.getElementById('progressBar');
+  const pct = s => (groups[s].length / total * 100).toFixed(1);
+  pb.innerHTML = `
+    <div class="pb-danger" style="width:${pct('danger')}%"></div>
+    <div class="pb-warn"   style="width:${pct('warn')}%"></div>
+    <div class="pb-ok"     style="width:${pct('ok')}%"></div>`;
+
+  // Funció per renderitzar un grup
+  function renderGroup(state, icon, title, items) {
+    if(state !== 'none' && items.length === 0) return '';
+    const ghCls = 'gh-'+state;
+    const rows = items.map(p => {
+      const dTxt     = p.days === null ? '—' : p.days+'d';
+      const meta     = p.varietat + ' · ' + p.sup.toFixed(2)+' ha · ' + p.municipi;
+      const sensible = (state==='warn'||state==='danger') && esSensible(p.varietat);
+      const lastTxt  = p.last ? 'Últim: '+p.last : 'Sense tractaments';
+      const extraCls = sensible ? ` sensible-${state}` : '';
+      const badges   = [];
+      if(state==='danger') badges.push(`<span class="prow-badge">URGENT</span>`);
+      if(sensible)         badges.push(`<span class="sensible-badge">⚠ Sensible oïdi/míldiu</span>`);
+      const badgesHtml = badges.length ? `<div class="prow-badges">${badges.join('')}</div>` : '';
+      return `
+        <div class="prow pr-${state}${extraCls}">
+          <div class="prow-days">${dTxt}</div>
+          <div class="prow-info">
+            <div class="prow-name">${p.nom}${sensible ? ' 🌡️' : ''}</div>
+            <div class="prow-meta">${meta} · ${lastTxt}</div>
+          </div>
+          ${badgesHtml}
+        </div>`;
+    }).join('');
+
+    return `
+      <div class="tracker-group">
+        <div class="group-header ${ghCls}">
+          <span class="group-icon">${icon}</span>
+          <span class="group-title">${title}</span>
+          <span class="group-count">${items.length}</span>
+        </div>
+        <div class="group-list">${rows || '<div class="prow pr-none"><div class="prow-info"><div class="prow-name" style="color:var(--fog);font-style:italic">Cap parcel·la en aquest estat</div></div></div>'}</div>
+      </div>`;
+  }
+
+  grid.innerHTML =
+    renderGroup('danger','🔴','Urgents — més de 14 dies sense tractar', groups.danger) +
+    renderGroup('warn',  '🟡','A vigilar — entre 7 i 14 dies',          groups.warn)  +
+    renderGroup('ok',    '🟢','Correctes — menys de 7 dies',             groups.ok)   +
+    (groups.none.length ? renderGroup('none','⚪','Sense dades registrades', groups.none) : '');
 }
 
 function logTractament() {
