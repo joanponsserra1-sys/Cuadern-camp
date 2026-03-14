@@ -1,0 +1,1782 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cuaderno de Campo — Viñedo</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=DM+Mono:wght@300;400;500&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --soil:#2C1A0E;--vine:#1A3020;--grape:#4A1942;--must:#7B2D52;
+  --harvest:#C4783A;--leaf:#5A7A3A;--paper:#F5EFE0;--parchment:#EDE4CC;
+  --ink:#1C1007;--fog:#8A7A6A;
+  --ok:#2D6A2D;--warn:#8A6A00;--danger:#8A1A1A;
+  --ok-bg:#E8F5E8;--warn-bg:#FFF8E0;--danger-bg:#FDE8E8;
+  --blue:#1A3A5A;--blue-light:#EEF4FF;--blue-border:#90B4F0;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{background-color:var(--vine);background-image:repeating-linear-gradient(0deg,transparent,transparent 40px,rgba(255,255,255,.015) 40px,rgba(255,255,255,.015) 41px),radial-gradient(ellipse at 20% 50%,rgba(74,25,66,.3) 0%,transparent 60%),radial-gradient(ellipse at 80% 20%,rgba(44,26,14,.4) 0%,transparent 50%);min-height:100vh;font-family:'DM Sans',sans-serif;color:var(--ink);padding:2rem 1rem 4rem;}
+.container{max-width:800px;margin:0 auto;}
+
+header{text-align:center;margin-bottom:2rem;animation:fadeDown .8s ease both;}
+.logo-vine{font-size:2.8rem;margin-bottom:.3rem;filter:drop-shadow(0 2px 8px rgba(0,0,0,.4));}
+header h1{font-family:'Playfair Display',serif;font-size:clamp(1.6rem,4vw,2.4rem);color:var(--paper);letter-spacing:.04em;text-shadow:0 2px 12px rgba(0,0,0,.5);}
+header p{color:var(--parchment);font-size:.85rem;font-family:'DM Mono',monospace;letter-spacing:.12em;text-transform:uppercase;margin-top:.4rem;opacity:.75;}
+.divider{width:60px;height:2px;background:linear-gradient(90deg,transparent,var(--harvest),transparent);margin:1rem auto 0;}
+
+.main-nav{display:flex;gap:.4rem;margin-bottom:1.2rem;animation:fadeUp .8s .1s ease both;flex-wrap:wrap;}
+.main-nav-btn{flex:1;min-width:80px;padding:.7rem .4rem;background:rgba(245,239,224,.1);border:1.5px solid rgba(245,239,224,.2);border-radius:2px;color:rgba(245,239,224,.6);font-family:'DM Mono',monospace;font-size:.63rem;letter-spacing:.07em;text-transform:uppercase;cursor:pointer;transition:all .2s;text-align:center;}
+.main-nav-btn:hover{background:rgba(245,239,224,.18);color:var(--paper);}
+.main-nav-btn.active{background:var(--paper);color:var(--ink);border-color:var(--paper);font-weight:500;}
+.main-nav-btn .nav-icon{display:block;font-size:1rem;margin-bottom:.2rem;}
+
+.page{display:none;}.page.visible{display:block;animation:fadeUp .3s ease both;}
+
+.card{background:var(--paper);border-radius:2px;box-shadow:0 4px 6px rgba(0,0,0,.15),0 20px 60px rgba(0,0,0,.3),inset 0 1px 0 rgba(255,255,255,.6);overflow:hidden;}
+.card+.card{margin-top:1.2rem;}
+.card-inner{padding:2rem 2.5rem;}
+
+.panel-header{display:flex;align-items:center;gap:.8rem;padding:.9rem 2.5rem;font-family:'DM Mono',monospace;font-size:.72rem;letter-spacing:.12em;text-transform:uppercase;color:var(--paper);}
+.ph-grape{background:var(--grape);}.ph-leaf{background:var(--leaf);}.ph-blue{background:#2A5472;}.ph-harvest{background:var(--harvest);}.ph-soil{background:var(--soil);}.ph-config{background:#3A2A5A;}.ph-setup{background:var(--blue);}.ph-ok{background:var(--ok);}
+
+.type-tabs{display:grid;grid-template-columns:repeat(2,1fr);gap:.6rem;margin-bottom:2rem;}
+@media(min-width:500px){.type-tabs{grid-template-columns:repeat(4,1fr);}}
+.tab-btn{background:var(--parchment);border:1.5px solid transparent;border-radius:2px;padding:.7rem .5rem;cursor:pointer;font-family:'DM Mono',monospace;font-size:.68rem;letter-spacing:.08em;text-transform:uppercase;color:var(--fog);text-align:center;transition:all .2s;line-height:1.4;}
+.tab-btn .tab-icon{font-size:1.4rem;display:block;margin-bottom:.25rem;}
+.tab-btn:hover{border-color:var(--harvest);color:var(--soil);background:white;}
+.tab-btn.active-fitosanitario{background:var(--grape);border-color:var(--grape);color:var(--paper);}
+.tab-btn.active-labor{background:var(--leaf);border-color:var(--leaf);color:var(--paper);}
+.tab-btn.active-riego{background:#2A5472;border-color:#2A5472;color:var(--paper);}
+.tab-btn.active-abonado{background:var(--harvest);border-color:var(--harvest);color:var(--paper);}
+
+.section-label{font-family:'DM Mono',monospace;font-size:.65rem;letter-spacing:.15em;text-transform:uppercase;color:var(--fog);margin-bottom:.5rem;margin-top:1.4rem;}
+.row{display:grid;gap:1rem;}.row-2{grid-template-columns:1fr 1fr;}.row-3{grid-template-columns:1fr 1fr 1fr;}
+@media(max-width:500px){.row-2,.row-3{grid-template-columns:1fr;}}
+.field{display:flex;flex-direction:column;gap:.35rem;margin-bottom:1rem;}
+label{font-size:.75rem;font-family:'DM Mono',monospace;letter-spacing:.08em;text-transform:uppercase;color:var(--fog);}
+input,select,textarea{background:white;border:1.5px solid #D8CEBA;border-radius:2px;padding:.65rem .85rem;font-family:'DM Sans',sans-serif;font-size:.92rem;color:var(--ink);transition:border-color .2s,box-shadow .2s;width:100%;appearance:none;-webkit-appearance:none;}
+input:focus,select:focus,textarea:focus{outline:none;border-color:var(--harvest);box-shadow:0 0 0 3px rgba(196,120,58,.12);}
+textarea{resize:vertical;min-height:80px;line-height:1.5;}
+select{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%238A7A6A' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right .85rem center;padding-right:2.5rem;}
+.sep{border:none;border-top:1px solid #D8CEBA;margin:1.5rem 0;}
+.form-section{display:none;}.form-section.visible{display:block;animation:sectionIn .3s ease;}
+
+.btn-submit{width:100%;padding:1rem;background:var(--vine);color:var(--paper);border:none;border-radius:2px;font-family:'Playfair Display',serif;font-size:1.05rem;letter-spacing:.08em;cursor:pointer;transition:all .25s;margin-top:.5rem;}
+.btn-submit:hover{background:var(--soil);transform:translateY(-1px);box-shadow:0 6px 20px rgba(0,0,0,.2);}
+.btn-submit:disabled{opacity:.6;cursor:not-allowed;transform:none;}
+.btn{display:inline-flex;align-items:center;gap:.4rem;border:none;border-radius:2px;padding:.6rem 1.1rem;font-family:'DM Mono',monospace;font-size:.72rem;letter-spacing:.08em;cursor:pointer;transition:all .2s;white-space:nowrap;text-decoration:none;}
+.btn-vine{background:var(--vine);color:var(--paper);}.btn-vine:hover{background:var(--soil);}
+.btn-harvest{background:var(--harvest);color:white;}.btn-harvest:hover{opacity:.88;}
+.btn-grape{background:var(--grape);color:var(--paper);}.btn-grape:hover{background:var(--must);}
+.btn-ok{background:var(--ok);color:white;}.btn-ok:hover{opacity:.88;}
+.btn-blue{background:#4285F4;color:white;}.btn-blue:hover{background:#3367D6;}
+.btn-outline{background:transparent;color:var(--vine);border:1.5px solid var(--vine);}.btn-outline:hover{background:var(--vine);color:var(--paper);}
+.btn-row{display:flex;gap:.6rem;flex-wrap:wrap;margin-top:.8rem;}
+
+/* ── WIZARD DE CONFIGURACIÓN ─────────────────── */
+.wizard{padding:0;}
+.wizard-progress{display:flex;padding:1.5rem 2.5rem 0;gap:0;}
+.wizard-step-dot{display:flex;flex-direction:column;align-items:center;flex:1;position:relative;}
+.wizard-step-dot::before{content:'';position:absolute;top:14px;left:50%;right:-50%;height:2px;background:#D8CEBA;z-index:0;}
+.wizard-step-dot:last-child::before{display:none;}
+.step-circle{width:28px;height:28px;border-radius:50%;background:#D8CEBA;color:var(--fog);font-family:'DM Mono',monospace;font-size:.72rem;display:flex;align-items:center;justify-content:center;position:relative;z-index:1;transition:all .3s;}
+.step-circle.done{background:var(--ok);color:white;}
+.step-circle.active{background:var(--vine);color:var(--paper);box-shadow:0 0 0 4px rgba(26,48,32,.2);}
+.step-name{font-family:'DM Mono',monospace;font-size:.58rem;letter-spacing:.07em;text-transform:uppercase;color:var(--fog);margin-top:.4rem;text-align:center;}
+.step-name.active{color:var(--vine);}
+.step-name.done{color:var(--ok);}
+
+.wizard-panel{display:none;padding:2rem 2.5rem 2.5rem;animation:sectionIn .3s ease;}
+.wizard-panel.active{display:block;}
+
+.wizard-card{background:var(--blue-light);border:1.5px solid var(--blue-border);border-radius:2px;padding:1.4rem 1.6rem;margin:1rem 0;}
+.wizard-card h4{font-family:'DM Mono',monospace;font-size:.75rem;letter-spacing:.1em;text-transform:uppercase;color:var(--blue);margin-bottom:.6rem;}
+.wizard-card p,.wizard-card li{font-size:.86rem;color:#2A3A5A;line-height:1.75;}
+.wizard-card ol,.wizard-card ul{padding-left:1.2rem;margin-top:.4rem;}
+.wizard-card li{margin-bottom:.3rem;}
+.wizard-card code{background:rgba(66,133,244,.12);padding:.1em .4em;border-radius:2px;font-family:'DM Mono',monospace;font-size:.83em;color:#1A3A5A;}
+
+.screenshot-note{background:rgba(196,120,58,.08);border-left:3px solid var(--harvest);padding:.7rem 1rem;border-radius:0 2px 2px 0;font-size:.83rem;color:var(--soil);line-height:1.6;margin:.8rem 0;}
+.screenshot-note strong{color:var(--harvest);}
+
+.field-inline{display:flex;gap:.7rem;align-items:flex-end;}
+.field-inline .field{flex:1;margin-bottom:0;}
+
+.check-row{display:flex;align-items:center;gap:.8rem;padding:.7rem 0;border-bottom:1px solid #D8CEBA;}
+.check-row:last-child{border-bottom:none;}
+.check-icon{font-size:1.2rem;min-width:1.5rem;}
+.check-text{flex:1;font-size:.86rem;color:var(--soil);line-height:1.5;}
+.check-text strong{font-family:'DM Mono',monospace;font-size:.82rem;}
+.check-status{font-family:'DM Mono',monospace;font-size:.68rem;padding:.25rem .6rem;border-radius:2px;}
+.cs-ok{background:var(--ok-bg);color:var(--ok);border:1px solid #90C890;}
+.cs-pending{background:var(--parchment);color:var(--fog);border:1px solid #D8CEBA;}
+.cs-warn{background:var(--warn-bg);color:var(--warn);border:1px solid #D4B800;}
+
+/* ── TRACKER ─────────────────────────────────── */
+.tracker-top{display:flex;align-items:flex-start;justify-content:space-between;padding:1.4rem 2.5rem .5rem;gap:1rem;flex-wrap:wrap;}
+.tracker-title{font-family:'Playfair Display',serif;font-size:1.15rem;color:var(--ink);}
+.tracker-sub{font-family:'DM Mono',monospace;font-size:.65rem;color:var(--fog);letter-spacing:.1em;text-transform:uppercase;margin-top:.15rem;}
+.legend{display:flex;gap:1.2rem;flex-wrap:wrap;padding:.5rem 2.5rem .8rem;font-family:'DM Mono',monospace;font-size:.67rem;letter-spacing:.08em;text-transform:uppercase;color:var(--fog);}
+.legend-item{display:flex;align-items:center;gap:.4rem;}
+.ldot{width:9px;height:9px;border-radius:50%;}.l-ok{background:#4CAF50;}.l-warn{background:#FFC107;}.l-danger{background:#F44336;}
+.tracker-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(185px,1fr));gap:1rem;padding:.5rem 2.5rem 1.5rem;}
+.parcel-card{border-radius:2px;padding:1.2rem 1.4rem;position:relative;overflow:hidden;transition:transform .2s;}
+.parcel-card:hover{transform:translateY(-2px);}
+.parcel-card.state-ok{background:var(--ok-bg);border:1.5px solid #90C890;}
+.parcel-card.state-warn{background:var(--warn-bg);border:1.5px solid #D4B800;}
+.parcel-card.state-danger{background:var(--danger-bg);border:1.5px solid #E08080;}
+.parcel-card.state-none{background:var(--parchment);border:1.5px dashed #D8CEBA;}
+.parcel-name{font-family:'Playfair Display',serif;font-size:1rem;color:var(--ink);margin-bottom:.3rem;}
+.parcel-days{font-family:'DM Mono',monospace;font-size:2.2rem;font-weight:500;line-height:1;margin:.5rem 0 .2rem;}
+.state-ok .parcel-days{color:var(--ok);}.state-warn .parcel-days{color:var(--warn);}.state-danger .parcel-days{color:var(--danger);}.state-none .parcel-days{color:var(--fog);}
+.parcel-label{font-family:'DM Mono',monospace;font-size:.63rem;letter-spacing:.1em;text-transform:uppercase;}
+.state-ok .parcel-label{color:var(--ok);}.state-warn .parcel-label{color:var(--warn);}.state-danger .parcel-label{color:var(--danger);}.state-none .parcel-label{color:var(--fog);}
+.parcel-last{font-size:.76rem;color:var(--fog);margin-top:.7rem;}
+.sdot{position:absolute;top:1rem;right:1rem;width:10px;height:10px;border-radius:50%;}
+.state-ok .sdot{background:#4CAF50;box-shadow:0 0 0 3px rgba(76,175,80,.2);}
+.state-warn .sdot{background:#FFC107;box-shadow:0 0 0 3px rgba(255,193,7,.2);}
+.state-danger .sdot{background:#F44336;box-shadow:0 0 0 3px rgba(244,67,54,.2);animation:pulseRed 1.5s infinite;}
+.state-none .sdot{background:#CCC;}
+@keyframes pulseRed{0%,100%{box-shadow:0 0 0 3px rgba(244,67,54,.2);}50%{box-shadow:0 0 0 8px rgba(244,67,54,.06);}}
+.tracker-log{border-top:1px solid #D8CEBA;padding:0 2.5rem 1.8rem;}
+.log-row{display:flex;gap:.8rem;flex-wrap:wrap;align-items:flex-end;}
+.log-row .field{flex:1;min-width:140px;margin-bottom:0;}
+
+/* ── SCRIPT GEN ──────────────────────────────── */
+.script-box{position:relative;margin:1rem 0;}
+.script-code{background:#1C1007;color:#F5EFE0;padding:1.2rem;border-radius:2px;font-family:'DM Mono',monospace;font-size:.71rem;overflow-x:auto;white-space:pre;line-height:1.65;max-height:400px;overflow-y:auto;}
+.copy-float{position:absolute;top:.6rem;right:.6rem;background:rgba(196,120,58,.9);color:white;border:none;border-radius:2px;padding:.3rem .85rem;font-family:'DM Mono',monospace;font-size:.68rem;cursor:pointer;}
+.copy-float:hover{background:var(--harvest);}
+
+/* ── OAUTH BAR ───────────────────────────────── */
+.oauth-hero{padding:2rem 2.5rem;text-align:center;}
+.oauth-hero h3{font-family:'Playfair Display',serif;font-size:1.2rem;margin-bottom:.5rem;}
+.oauth-hero p{color:var(--fog);font-size:.86rem;line-height:1.7;max-width:460px;margin:0 auto 1.4rem;}
+.oauth-btn{display:inline-flex;align-items:center;gap:.7rem;background:#4285F4;color:white;border:none;border-radius:2px;padding:.85rem 1.8rem;font-family:'DM Sans',sans-serif;font-size:.95rem;font-weight:500;cursor:pointer;transition:all .2s;box-shadow:0 2px 8px rgba(66,133,244,.35);}
+.oauth-btn:hover{background:#3367D6;transform:translateY(-1px);}
+.oauth-btn svg{width:20px;height:20px;}
+.conn-bar{display:flex;align-items:center;gap:.8rem;background:var(--ok-bg);border:1.5px solid #90C890;border-radius:2px;padding:.85rem 1.2rem;margin-bottom:1rem;}
+.conn-dot{width:10px;height:10px;border-radius:50%;background:#4CAF50;box-shadow:0 0 0 3px rgba(76,175,80,.2);}
+.conn-label{font-family:'DM Mono',monospace;font-size:.75rem;letter-spacing:.08em;color:var(--ok);}
+.conn-email{color:var(--fog);font-size:.82rem;margin-left:auto;}
+.sheet-bar{display:flex;align-items:center;gap:.8rem;background:var(--blue-light);border:1.5px solid var(--blue-border);border-radius:2px;padding:.75rem 1.2rem;margin-bottom:1rem;}
+.sheet-bar span{font-family:'DM Mono',monospace;font-size:.72rem;letter-spacing:.06em;color:var(--blue);}
+.sheet-bar a{color:#4285F4;font-size:.8rem;margin-left:auto;text-decoration:none;}
+.sheet-bar a:hover{text-decoration:underline;}
+
+/* ── TRIGGER GUIDE ───────────────────────────── */
+.trigger-guide{background:var(--blue-light);border:1.5px solid var(--blue-border);border-radius:2px;padding:1.2rem 1.5rem;margin-top:1rem;font-size:.85rem;color:var(--blue);line-height:1.8;}
+.trigger-guide strong{font-family:'DM Mono',monospace;}
+.trigger-guide code{background:rgba(66,133,244,.15);padding:.1em .4em;border-radius:2px;font-family:'DM Mono',monospace;font-size:.85em;}
+
+/* ── BADGE ───────────────────────────────────── */
+.badge{display:inline-flex;align-items:center;gap:.4rem;font-family:'DM Mono',monospace;font-size:.68rem;letter-spacing:.08em;padding:.3rem .7rem;border-radius:2px;margin-top:.5rem;}
+.badge-ok{background:var(--ok-bg);color:var(--ok);border:1px solid #90C890;}
+.badge-none{background:var(--parchment);color:var(--fog);border:1px solid #D8CEBA;}
+
+.toast{position:fixed;bottom:2rem;left:50%;transform:translateX(-50%) translateY(100px);background:var(--vine);color:var(--paper);padding:1rem 2rem;border-radius:2px;font-family:'DM Mono',monospace;font-size:.8rem;letter-spacing:.1em;box-shadow:0 8px 32px rgba(0,0,0,.3);transition:transform .4s cubic-bezier(.34,1.56,.64,1);z-index:999;white-space:nowrap;}
+.toast.show{transform:translateX(-50%) translateY(0);}
+.toast.error{background:#7A1A1A;}.toast.success{background:var(--ok);}
+
+footer{text-align:center;margin-top:1.5rem;font-family:'DM Mono',monospace;font-size:.65rem;letter-spacing:.12em;color:rgba(245,239,224,.35);text-transform:uppercase;}
+
+@keyframes fadeDown{from{opacity:0;transform:translateY(-20px)}to{opacity:1;transform:translateY(0)}}
+@keyframes fadeUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+@keyframes sectionIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+</style>
+</head>
+<body>
+<div class="container">
+
+<header>
+  <div class="logo-vine">🍇</div>
+  <h1>Cuaderno de Campo</h1>
+  <p>Viñedo · Registro de Partes de Trabajo</p>
+  <div class="divider"></div>
+</header>
+
+<div class="main-nav">
+  <button class="main-nav-btn active" onclick="showPage('registro')" id="nav-registro"><span class="nav-icon">📋</span>Registrar</button>
+  <button class="main-nav-btn" onclick="showPage('seguimiento')" id="nav-seguimiento"><span class="nav-icon">🗓️</span>Seguimiento</button>
+  <button class="main-nav-btn" onclick="showPage('configuracion')" id="nav-configuracion"><span class="nav-icon">⚙️</span>Ajustes</button>
+  <button class="main-nav-btn" onclick="showPage('setup')" id="nav-setup"><span class="nav-icon">🚀</span>Configuración inicial</button>
+  <button class="main-nav-btn" onclick="showPage('script')" id="nav-script"><span class="nav-icon">📤</span>Generar Script</button>
+</div>
+
+<!-- ════════════════════════════════════════════
+     PAGE: REGISTRO
+════════════════════════════════════════════ -->
+<div class="page visible" id="page-registro">
+
+  <div id="notConnectedBar" class="card" style="margin-bottom:1.2rem;">
+    <div class="oauth-hero">
+      <h3>Primero, conecta con Google Sheets</h3>
+      <p>El formulario guardará cada parte directamente en tu hoja de cálculo. Solo necesitas conectarte una vez con tu cuenta Google.</p>
+      <button class="oauth-btn" onclick="startOAuth()">
+        <svg viewBox="0 0 24 24" fill="none"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z" fill="#FBBC05"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.47 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/></svg>
+        Conectar con Google
+      </button>
+      <p style="font-size:.78rem;color:var(--fog);margin-top:.8rem;font-family:'DM Mono',monospace;">¿Primera vez? Ve a <strong>🚀 Configuración inicial</strong> para guía paso a paso.</p>
+    </div>
+  </div>
+
+  <div id="connectedBar" style="display:none;">
+    <div class="conn-bar">
+      <div class="conn-dot"></div>
+      <span class="conn-label">Conectado a Google Sheets</span>
+      <span class="conn-email" id="userEmail"></span>
+      <button class="btn btn-outline" style="padding:.3rem .7rem;font-size:.65rem;" onclick="disconnect()">Desconectar</button>
+    </div>
+    <div class="sheet-bar" id="sheetBar" style="display:none;">
+      <span>📊 <strong id="sheetName">Viñedo — Cuaderno de Campo</strong></span>
+      <a id="sheetLink" href="#" target="_blank">Abrir en Google Sheets →</a>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-inner" style="padding-bottom:0">
+      <div class="section-label">Tipo de parte</div>
+      <div class="type-tabs">
+        <button class="tab-btn active-fitosanitario" onclick="switchType('fitosanitario')" id="tab-fitosanitario"><span class="tab-icon">🌿</span>Tratamiento<br>Fitosanitario</button>
+        <button class="tab-btn" onclick="switchType('labor')" id="tab-labor"><span class="tab-icon">🚜</span>Labor<br>del Suelo</button>
+        <button class="tab-btn" onclick="switchType('riego')" id="tab-riego"><span class="tab-icon">💧</span>Riego</button>
+        <button class="tab-btn" onclick="switchType('abonado')" id="tab-abonado"><span class="tab-icon">🌱</span>Abonado /<br>Fertilización</button>
+      </div>
+    </div>
+    <div class="panel-header ph-grape" id="panelHeader"><span id="panelIcon">🌿</span><span id="panelTitle">Tratamiento Fitosanitario</span></div>
+    <div class="card-inner">
+      <div class="row row-3">
+        <div class="field"><label>Fecha</label><input type="date" id="fecha" required></div>
+        <div class="field"><label>Parcela / Sector</label>
+            <select id="parcela" onchange="onParcelaChange(this.value)"><option value="">— Seleccionar —</option></select>
+            <div id="parcelaInfo" style="display:none;margin-top:.3rem;background:#EEF4FF;border:1px solid #90B4F0;border-radius:2px;padding:.4rem .7rem;font-family:'DM Mono',monospace;font-size:.72rem;color:#2A4A8A;line-height:1.6"></div>
+          </div>
+        <div class="field"><label>Operario</label><input type="text" id="operario" placeholder="Nombre"></div>
+      </div>
+      <hr class="sep">
+
+      <div class="form-section visible" id="sec-fitosanitario">
+        <div class="section-label">Producto aplicado</div>
+        <div class="row row-2">
+          <div class="field"><label>Nombre del producto</label><input type="text" id="fit-producto" placeholder="Mancozeb, Azufre…"></div>
+          <div class="field"><label>Número de registro</label><input type="text" id="fit-registro" placeholder="ES-00000"></div>
+        </div>
+        <div class="row row-3">
+          <div class="field"><label>Dosis (L o Kg/Ha)</label><input type="number" id="fit-dosis" placeholder="0.00" step="0.01" min="0"></div>
+          <div class="field"><label>Volumen caldo (L/Ha)</label><input type="number" id="fit-caldo" placeholder="300" step="1" min="0"></div>
+          <div class="field"><label>Superficie (Ha)</label><input type="number" id="fit-superficie" placeholder="0.00" step="0.01" min="0"></div>
+        </div>
+        <div class="row row-2">
+          <div class="field"><label>Plaga / Enfermedad objetivo</label>
+            <select id="fit-objetivo"><option value="">— Seleccionar —</option><option>Mildiu</option><option>Oídio</option><option>Botrytis</option><option>Ácaros</option><option>Polilla del racimo</option><option>Cicadela</option><option>Flavescencia dorada</option><option>Herbicida</option><option>Preventivo general</option><option>Otro</option></select>
+          </div>
+          <div class="field"><label>Tipo de aplicación</label>
+            <select id="fit-tipo"><option>Pulverización foliar</option><option>Pulverización suelo</option><option>Tratamiento tronco</option></select>
+          </div>
+        </div>
+        <div class="row row-3">
+          <div class="field"><label>Hora inicio</label><input type="time" id="fit-hora-ini"></div>
+          <div class="field"><label>Hora fin</label><input type="time" id="fit-hora-fin"></div>
+          <div class="field"><label>Plazo seguridad (días)</label><input type="number" id="fit-plazo" placeholder="7" min="0"></div>
+        </div>
+        <div class="section-label" style="margin-top:.5rem">Condiciones meteorológicas</div>
+        <div class="row row-3">
+          <div class="field"><label>Temperatura (°C)</label><input type="number" id="fit-temp" placeholder="20" step="0.5"></div>
+          <div class="field"><label>Humedad relativa (%)</label><input type="number" id="fit-hr" placeholder="60" min="0" max="100"></div>
+          <div class="field"><label>Viento</label><select id="fit-viento"><option>Calma</option><option>Flojo</option><option>Moderado</option><option>Fuerte</option></select></div>
+        </div>
+      </div>
+
+      <div class="form-section" id="sec-labor">
+        <div class="row row-2">
+          <div class="field"><label>Tipo de labor</label>
+            <select id="lab-tipo"><option>Poda de invierno</option><option>Poda en verde / despuntado</option><option>Deshojado</option><option>Aclareo de racimos</option><option>Laboreo / Cultivador</option><option>Desherbado mecánico</option><option>Siega de cubierta vegetal</option><option>Aporque</option><option>Atado / Agobio</option><option>Recolección / Vendimia</option><option>Otro</option></select>
+          </div>
+          <div class="field"><label>Maquinaria / Herramienta</label><input type="text" id="lab-maquina" placeholder="Tractor, podadora…"></div>
+        </div>
+        <div class="row row-3">
+          <div class="field"><label>Hora inicio</label><input type="time" id="lab-hora-ini"></div>
+          <div class="field"><label>Hora fin</label><input type="time" id="lab-hora-fin"></div>
+          <div class="field"><label>Superficie (Ha)</label><input type="number" id="lab-superficie" placeholder="0.00" step="0.01" min="0"></div>
+        </div>
+        <div class="field"><label>Estado fenológico vid</label>
+          <select id="lab-fenologia"><option>— Seleccionar —</option><option>Reposo vegetativo</option><option>Lloro</option><option>Brotación</option><option>2-3 hojas</option><option>Inflorescencias visibles</option><option>Floración</option><option>Cuajado</option><option>Envero</option><option>Maduración</option><option>Post-vendimia</option></select>
+        </div>
+      </div>
+
+      <div class="form-section" id="sec-riego">
+        <div class="row row-2">
+          <div class="field"><label>Tipo de riego</label><select id="rie-tipo"><option>Goteo</option><option>Microaspersión</option><option>Aspersión</option><option>Gravedad / Inundación</option></select></div>
+          <div class="field"><label>Origen del agua</label><select id="rie-origen"><option>Pozo propio</option><option>Comunidad de regantes</option><option>Embalse / Balsa</option><option>Red municipal</option></select></div>
+        </div>
+        <div class="row row-3">
+          <div class="field"><label>Hora inicio</label><input type="time" id="rie-hora-ini"></div>
+          <div class="field"><label>Hora fin</label><input type="time" id="rie-hora-fin"></div>
+          <div class="field"><label>Caudal (m³/h)</label><input type="number" id="rie-caudal" placeholder="0.0" step="0.1" min="0"></div>
+        </div>
+        <div class="row row-2">
+          <div class="field"><label>Volumen total (m³)</label><input type="number" id="rie-volumen" placeholder="0.0" step="0.1" min="0"></div>
+          <div class="field"><label>Superficie (Ha)</label><input type="number" id="rie-superficie" placeholder="0.00" step="0.01" min="0"></div>
+        </div>
+        <div class="field"><label>Motivo del riego</label><select id="rie-motivo"><option>Aporte hídrico de mantenimiento</option><option>Estrés hídrico severo</option><option>Post-trasplante</option><option>Apoyo a tratamiento (fertirrigación)</option><option>Helada (aspersión antihelada)</option></select></div>
+      </div>
+
+      <div class="form-section" id="sec-abonado">
+        <div class="row row-2">
+          <div class="field"><label>Tipo de fertilizante</label>
+            <select id="abo-tipo"><option>Orgánico sólido (compost, estiércol)</option><option>Orgánico líquido</option><option>Mineral (NPK sólido)</option><option>Mineral líquido / fertirriego</option><option>Foliar</option><option>Enmienda cálcica</option><option>Corrector de pH</option></select>
+          </div>
+          <div class="field"><label>Nombre del producto</label><input type="text" id="abo-producto" placeholder="Nombre del abono"></div>
+        </div>
+        <div class="row row-3">
+          <div class="field"><label>Dosis (Kg o L/Ha)</label><input type="number" id="abo-dosis" placeholder="0.0" step="0.1" min="0"></div>
+          <div class="field"><label>Cantidad total (Kg o L)</label><input type="number" id="abo-cantidad" placeholder="0.0" step="0.1" min="0"></div>
+          <div class="field"><label>Superficie (Ha)</label><input type="number" id="abo-superficie" placeholder="0.00" step="0.01" min="0"></div>
+        </div>
+        <div class="field"><label>Forma de aplicación</label><select id="abo-forma"><option>Incorporación al suelo (fresadora)</option><option>Superficie (voleo)</option><option>Localizado en línea</option><option>Fertirrigación</option><option>Pulverización foliar</option></select></div>
+        <div class="section-label">Análisis de suelo de referencia</div>
+        <div class="row row-3">
+          <div class="field"><label>N (% o ppm)</label><input type="number" id="abo-n" placeholder="—" step="0.01"></div>
+          <div class="field"><label>P₂O₅ (% o ppm)</label><input type="number" id="abo-p" placeholder="—" step="0.01"></div>
+          <div class="field"><label>K₂O (% o ppm)</label><input type="number" id="abo-k" placeholder="—" step="0.01"></div>
+        </div>
+      </div>
+
+      <hr class="sep">
+      <div class="field"><label>Observaciones</label><textarea id="observaciones" placeholder="Notas adicionales, incidencias, condiciones especiales…"></textarea></div>
+      <button class="btn-submit" id="btnSubmit" onclick="submitForm()">📋 &nbsp; Registrar Parte en Google Sheets</button>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════════
+     PAGE: SEGUIMIENTO
+════════════════════════════════════════════ -->
+<div class="page" id="page-seguimiento">
+  <div class="card">
+    <div class="tracker-top">
+      <div><div class="tracker-title">Días sin tratamiento fitosanitario</div><div class="tracker-sub">Por parcela · Alertas a las 5:00h por email y WhatsApp</div></div>
+    </div>
+    <div class="legend">
+      <div class="legend-item"><div class="ldot l-ok"></div>&lt; 7 días — En plazo</div>
+      <div class="legend-item"><div class="ldot l-warn"></div>7–14 días — Revisar</div>
+      <div class="legend-item"><div class="ldot l-danger"></div>&gt; 14 días — ¡Urgente!</div>
+    </div>
+    <div class="tracker-grid" id="trackerGrid"></div>
+    <div class="tracker-log">
+      <div class="section-label">Registrar tratamiento rápido</div>
+      <div class="log-row">
+        <div class="field"><label>Parcela</label><select id="log-parcela"><option value="">— Seleccionar —</option></select></div>
+        <div class="field"><label>Fecha</label><input type="date" id="log-fecha"></div>
+        <button class="btn btn-grape" style="margin-bottom:1rem" onclick="logTreatment()">✓ Registrar</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════════
+     PAGE: AJUSTES
+════════════════════════════════════════════ -->
+<div class="page" id="page-configuracion">
+  <div class="card">
+    <div class="panel-header ph-config">⚙️ &nbsp; Ajustes</div>
+    <div class="card-inner">
+
+      <div class="field"><label>Client ID de Google Cloud</label><input type="text" id="cfg-clientId" placeholder="xxxxx.apps.googleusercontent.com"></div>
+      <div id="badge-clientId" class="badge badge-none" style="margin-bottom:1.5rem">● Sin configurar</div>
+
+      <div class="field"><label>Email de destino para alertas</label><input type="email" id="cfg-email" placeholder="tu@email.com"></div>
+      <div id="badge-email" class="badge badge-none" style="margin-bottom:1.5rem">● Sin configurar</div>
+
+      <div class="row row-2">
+        <div class="field"><label>Teléfono WhatsApp (con prefijo)</label><input type="tel" id="cfg-waPhone" placeholder="+34612345678"></div>
+        <div class="field"><label>API Key CallMeBot</label><input type="text" id="cfg-waKey" placeholder="123456"></div>
+      </div>
+      <div id="badge-whatsapp" class="badge badge-none" style="margin-bottom:1.5rem">● Sin configurar</div>
+
+      <div class="field"><label>Parcelas del viñedo (una por línea)</label><textarea id="cfg-parcelas" style="min-height:90px" placeholder="Cabernet Café&#10;Cabernet Truco&#10;Cal Caramet…"></textarea></div>
+
+      <button class="btn btn-vine" onclick="saveAllConfig()">💾 &nbsp; Guardar toda la configuración</button>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════════
+     PAGE: SETUP WIZARD
+════════════════════════════════════════════ -->
+<div class="page" id="page-setup">
+  <div class="card">
+    <div class="panel-header ph-setup">🚀 &nbsp; Guía de configuración inicial</div>
+
+    <!-- Progress -->
+    <div class="wizard-progress" id="wizardProgress">
+      <div class="wizard-step-dot"><div class="step-circle active" id="dot-1">1</div><div class="step-name active" id="sname-1">Google Cloud</div></div>
+      <div class="wizard-step-dot"><div class="step-circle" id="dot-2">2</div><div class="step-name" id="sname-2">Client ID</div></div>
+      <div class="wizard-step-dot"><div class="step-circle" id="dot-3">3</div><div class="step-name" id="sname-3">Conectar</div></div>
+      <div class="wizard-step-dot"><div class="step-circle" id="dot-4">4</div><div class="step-name" id="sname-4">WhatsApp</div></div>
+      <div class="wizard-step-dot"><div class="step-circle" id="dot-5">5</div><div class="step-name" id="sname-5">Script</div></div>
+    </div>
+
+    <!-- STEP 1: Google Cloud Project -->
+    <div class="wizard-panel active" id="wpanel-1">
+      <h3 style="font-family:'Playfair Display',serif;font-size:1.2rem;margin-bottom:.4rem">Paso 1 — Crear proyecto en Google Cloud</h3>
+      <p style="color:var(--fog);font-size:.86rem;line-height:1.7;margin-bottom:1rem">Google Cloud es la plataforma de Google que permite usar sus APIs. Crear un proyecto es gratis y solo se hace una vez.</p>
+
+      <div class="wizard-card">
+        <h4>📋 Instrucciones (5 minutos)</h4>
+        <ol>
+          <li>Abre <strong><a href="https://console.cloud.google.com" target="_blank" style="color:#4285F4">console.cloud.google.com</a></strong> en una pestaña nueva</li>
+          <li>Si es tu primera vez, acepta los términos de servicio</li>
+          <li>Arriba a la izquierda verás un selector de proyectos — haz clic y luego en <strong>"Nuevo proyecto"</strong></li>
+          <li>Ponle un nombre como <code>Vinedo-CampoCuaderno</code> y pulsa <strong>Crear</strong></li>
+          <li>Espera unos segundos hasta que aparezca la notificación de "Proyecto creado"</li>
+          <li>Asegúrate de tener el nuevo proyecto seleccionado en el selector de arriba</li>
+        </ol>
+      </div>
+
+      <div class="screenshot-note">
+        <strong>📍 Dónde estás:</strong> console.cloud.google.com · El selector de proyecto está arriba a la izquierda, junto al logo de Google Cloud.
+      </div>
+
+      <div class="wizard-card">
+        <h4>🔌 Habilitar la Sheets API</h4>
+        <ol>
+          <li>En el menú izquierdo, ve a <strong>APIs y servicios → Biblioteca</strong></li>
+          <li>Busca <code>Google Sheets API</code></li>
+          <li>Haz clic en el resultado y luego en el botón azul <strong>Habilitar</strong></li>
+          <li>Repite para <strong>Google Drive API</strong> (necesaria para crear la hoja)</li>
+        </ol>
+      </div>
+
+      <div class="btn-row">
+        <a href="https://console.cloud.google.com/projectcreate" target="_blank" class="btn btn-blue">Abrir Google Cloud Console →</a>
+        <button class="btn btn-vine" onclick="goStep(2)">Ya tengo el proyecto listo →</button>
+      </div>
+    </div>
+
+    <!-- STEP 2: Create OAuth Credentials -->
+    <div class="wizard-panel" id="wpanel-2">
+      <h3 style="font-family:'Playfair Display',serif;font-size:1.2rem;margin-bottom:.4rem">Paso 2 — Crear credenciales OAuth</h3>
+      <p style="color:var(--fog);font-size:.86rem;line-height:1.7;margin-bottom:1rem">Las credenciales permiten que este HTML se identifique ante Google al conectarse.</p>
+
+      <div class="wizard-card">
+        <h4>🔑 Crear el Client ID</h4>
+        <ol>
+          <li>En Google Cloud, ve a <strong>APIs y servicios → Credenciales</strong></li>
+          <li>Haz clic en <strong>+ Crear credenciales → ID de cliente de OAuth 2.0</strong></li>
+          <li>Si te pide configurar la "Pantalla de consentimiento", haz clic ahí primero:
+            <ul style="margin-top:.3rem">
+              <li>Tipo de usuario: <strong>Externo</strong> → Crear</li>
+              <li>Rellena solo el nombre de la app (p.ej. <code>Cuaderno Viñedo</code>) y tu email</li>
+              <li>Guarda y vuelve a Credenciales</li>
+            </ul>
+          </li>
+          <li>Tipo de aplicación: <strong>Aplicación web</strong></li>
+          <li>Nombre: <code>Cuaderno Campo</code></li>
+          <li>En <strong>"Orígenes autorizados de JavaScript"</strong> añade:<br>
+            <code>null</code> &nbsp;(para archivos locales abiertos desde el disco)
+          </li>
+          <li>Haz clic en <strong>Crear</strong></li>
+          <li>Copia el <strong>Client ID</strong> (termina en <code>.apps.googleusercontent.com</code>)</li>
+        </ol>
+      </div>
+
+      <div class="screenshot-note">
+        <strong>⚠ Importante:</strong> El origen <code>null</code> es necesario porque abres el HTML como archivo local (file://). Sin esto, Google rechazará la conexión.
+      </div>
+
+      <div class="field" style="margin-top:1rem">
+        <label>Pega aquí tu Client ID</label>
+        <div class="field-inline">
+          <div class="field"><input type="text" id="wizard-clientId" placeholder="xxxxx.apps.googleusercontent.com"></div>
+          <button class="btn btn-ok" onclick="saveClientId()">✓ Guardar</button>
+        </div>
+        <div id="badge-wClientId" class="badge badge-none" style="margin-top:.4rem">● Sin configurar</div>
+      </div>
+
+      <div class="btn-row">
+        <button class="btn btn-outline" onclick="goStep(1)">← Volver</button>
+        <a href="https://console.cloud.google.com/apis/credentials" target="_blank" class="btn btn-blue">Abrir Credenciales →</a>
+        <button class="btn btn-vine" onclick="goStep(3)" id="btnStep2Next">Siguiente →</button>
+      </div>
+    </div>
+
+    <!-- STEP 3: Connect Google -->
+    <div class="wizard-panel" id="wpanel-3">
+      <h3 style="font-family:'Playfair Display',serif;font-size:1.2rem;margin-bottom:.4rem">Paso 3 — Conectar con tu cuenta Google</h3>
+      <p style="color:var(--fog);font-size:.86rem;line-height:1.7;margin-bottom:1rem">Pulsa el botón y se abrirá una ventana de Google para autorizarte. La primera vez puede pedir verificación porque la app está en modo desarrollo.</p>
+
+      <div class="wizard-card">
+        <h4>ℹ️ Si ves "Google no ha verificado esta app"</h4>
+        <ol>
+          <li>Es normal — tu app está en modo de prueba</li>
+          <li>Haz clic en <strong>"Opciones avanzadas"</strong> (o el enlace pequeño abajo)</li>
+          <li>Luego en <strong>"Ir a [nombre de tu app] (no seguro)"</strong></li>
+          <li>Acepta los permisos solicitados</li>
+        </ol>
+      </div>
+
+      <div style="text-align:center;margin:1.5rem 0">
+        <button class="oauth-btn" onclick="startOAuthWizard()">
+          <svg viewBox="0 0 24 24" fill="none" style="width:20px;height:20px"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z" fill="#FBBC05"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.47 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/></svg>
+          Conectar con Google
+        </button>
+        <div id="step3Status" style="margin-top:1rem;font-family:'DM Mono',monospace;font-size:.8rem;color:var(--fog)"></div>
+      </div>
+
+      <div class="btn-row">
+        <button class="btn btn-outline" onclick="goStep(2)">← Volver</button>
+        <button class="btn btn-vine" onclick="goStep(4)">Siguiente →</button>
+      </div>
+    </div>
+
+    <!-- STEP 4: WhatsApp CallMeBot -->
+    <div class="wizard-panel" id="wpanel-4">
+      <h3 style="font-family:'Playfair Display',serif;font-size:1.2rem;margin-bottom:.4rem">Paso 4 — Activar WhatsApp (CallMeBot)</h3>
+      <p style="color:var(--fog);font-size:.86rem;line-height:1.7;margin-bottom:1rem">CallMeBot es un servicio gratuito que envía mensajes a WhatsApp. Se activa en 2 minutos desde tu móvil.</p>
+
+      <div class="wizard-card">
+        <h4>📱 Activar desde el móvil (2 minutos)</h4>
+        <ol>
+          <li>Abre WhatsApp en tu móvil</li>
+          <li>Añade este número como contacto: <strong>+34 644 59 76 25</strong></li>
+          <li>Envíale exactamente este mensaje:<br><code>I allow callmebot to send me messages</code></li>
+          <li>En pocos segundos recibirás un mensaje con tu <strong>API Key</strong> (número de 6-7 cifras)</li>
+        </ol>
+      </div>
+
+      <div class="screenshot-note">
+        <strong>📍 Tip:</strong> Si no recibes la API Key en 1 minuto, intenta enviar el mensaje de nuevo. A veces tarda un poco la primera vez.
+      </div>
+
+      <div class="row row-2" style="margin-top:1rem">
+        <div class="field"><label>Tu teléfono WhatsApp (con prefijo)</label><input type="tel" id="wizard-waPhone" placeholder="+34612345678"></div>
+        <div class="field"><label>API Key recibida por WhatsApp</label><input type="text" id="wizard-waKey" placeholder="123456"></div>
+      </div>
+      <div class="field"><label>Email donde recibir las alertas</label><input type="email" id="wizard-email" placeholder="tu@email.com"></div>
+
+      <button class="btn btn-ok" onclick="saveContactConfig()">✓ Guardar datos de contacto</button>
+      <div id="badge-wContact" class="badge badge-none" style="margin-top:.5rem">● Sin configurar</div>
+
+      <div class="btn-row" style="margin-top:1rem">
+        <button class="btn btn-outline" onclick="goStep(3)">← Volver</button>
+        <button class="btn btn-vine" onclick="goStep(5)">Siguiente →</button>
+      </div>
+    </div>
+
+    <!-- STEP 5: Generate & paste script -->
+    <div class="wizard-panel" id="wpanel-5">
+      <h3 style="font-family:'Playfair Display',serif;font-size:1.2rem;margin-bottom:.4rem">Paso 5 — Activar alertas automáticas a las 5:00h</h3>
+      <p style="color:var(--fog);font-size:.86rem;line-height:1.7;margin-bottom:1rem">El formulario ya funciona al 100%. Este paso activa el resumen diario a las 5:00h por email y WhatsApp. Solo hay que pegar el código una vez.</p>
+
+      <div style="background:var(--ok-bg);border:1.5px solid #90C890;border-radius:2px;padding:.9rem 1.2rem;margin-bottom:1rem;font-size:.84rem;color:var(--ok)">
+        ✅ <strong>El formulario ya guarda en Google Sheets sin hacer este paso.</strong><br>
+        Este paso solo activa las alertas automáticas de las 5:00h.
+      </div>
+
+      <!-- Check list -->
+      <div style="margin:1rem 0">
+        <div class="check-row"><span class="check-icon">🔑</span><div class="check-text"><strong>Client ID</strong><br>Credenciales de Google Cloud</div><span class="check-status" id="chk-clientId">pendiente</span></div>
+        <div class="check-row"><span class="check-icon">📧</span><div class="check-text"><strong>Email</strong><br>Destino de alertas</div><span class="check-status" id="chk-email">pendiente</span></div>
+        <div class="check-row"><span class="check-icon">💬</span><div class="check-text"><strong>WhatsApp</strong><br>Teléfono + API Key CallMeBot</div><span class="check-status" id="chk-wa">pendiente</span></div>
+        <div class="check-row"><span class="check-icon">📊</span><div class="check-text"><strong>Google Sheets</strong><br>Hoja de cálculo creada</div><span class="check-status" id="chk-sheet">pendiente</span></div>
+      </div>
+
+      <button class="btn btn-harvest" onclick="generateAndShowScript()" style="margin-bottom:.8rem">⚡ Generar script personalizado</button>
+
+      <div id="scriptArea" style="display:none">
+        <div class="script-box">
+          <button class="copy-float" onclick="copyScript()">Copiar</button>
+          <div class="script-code" id="scriptContent"></div>
+        </div>
+
+        <div class="trigger-guide">
+          <strong>3 pasos para activar (en tu Google Sheets):</strong><br><br>
+          1️⃣ Abre tu Google Sheets → <strong>Extensiones → Apps Script</strong><br>
+          2️⃣ Borra el contenido, pega el código copiado, guarda (Ctrl+S o ⌘+S)<br>
+          3️⃣ Clic en ⏰ <strong>Activadores</strong> (icono reloj, barra lateral izquierda) → <strong>+ Añadir activador</strong><br>
+          &nbsp;&nbsp;&nbsp;&nbsp;· Función: <code>enviarResumenDiario</code><br>
+          &nbsp;&nbsp;&nbsp;&nbsp;· Tipo de evento: <strong>Basado en tiempo</strong><br>
+          &nbsp;&nbsp;&nbsp;&nbsp;· Tipo de tiempo: <strong>Temporizador diario</strong><br>
+          &nbsp;&nbsp;&nbsp;&nbsp;· Hora: <strong>5:00–6:00</strong> → Guardar<br><br>
+          ✅ ¡Listo! Cada mañana a las 5:00h recibirás el resumen por email y WhatsApp.
+        </div>
+      </div>
+
+      <div class="btn-row" style="margin-top:1.2rem">
+        <button class="btn btn-outline" onclick="goStep(4)">← Volver</button>
+        <button class="btn btn-ok" onclick="finishSetup()">🎉 ¡Configuración completada!</button>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════════
+     PAGE: GENERAR SCRIPT
+════════════════════════════════════════════ -->
+<div class="page" id="page-script">
+  <div class="card">
+    <div class="panel-header ph-setup">📤 &nbsp; Generar script de alertas</div>
+    <div class="card-inner">
+      <p style="font-size:.88rem;color:var(--fog);line-height:1.7;margin-bottom:1.2rem">Genera el código Apps Script personalizado con tus datos para copiarlo en tu Google Sheets.</p>
+      <button class="btn btn-harvest" onclick="generateAndShowScript()">⚡ Generar script</button>
+      <div id="scriptAreaMain" style="display:none;margin-top:1rem">
+        <div class="script-box">
+          <button class="copy-float" onclick="copyScriptMain()">Copiar</button>
+          <div class="script-code" id="scriptContentMain"></div>
+        </div>
+        <div class="trigger-guide" style="margin-top:1rem">
+          <strong>Instrucciones:</strong><br>
+          1️⃣ En Google Sheets → <strong>Extensiones → Apps Script</strong> → pega el código → guarda<br>
+          2️⃣ ⏰ <strong>Activadores</strong> → Añadir → función <code>enviarResumenDiario</code> → Diario → <strong>5:00–6:00h</strong>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<footer>Cuaderno de campo · Viñedo · Penedès &nbsp;·&nbsp; Google Sheets + Email + WhatsApp 5:00h</footer>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script src="https://accounts.google.com/gsi/client" async></script>
+<script>
+// ═══════════════════════════════════════════
+//  CONSTANTS & STATE
+// ═══════════════════════════════════════════
+const SCOPES = 'https://www.googleapis.com/auth/spreadsheets https://www.googleapis.com/auth/drive.file';
+const SHEET_TITLE = 'Viñedo — Cuaderno de Campo';
+const DEFAULT_PARCELAS = ["Cabernet Café", "Cabernet Truco", "Cal Caramet", "Carme i Roser Raventós", "Cau del Torrent", "Chardonnay Bas", "Chardonnay Lavern", "Chardonnay les cabanyes", "Escoda Autopista", "Escoda autopista Petita", "Escoda Poligon", "Escoda Vilafranca", "Garnatxa negra escuder", "Josep Raventós", "Josep Via", "L'Oliverá", "La Masia", "La Salada Masia", "Lavern Xarel·lo Carretera", "Lavern Xarel·lo Vinya Mig", "Les Rovires", "Macabeu altre part riera escuder", "Macabeu Bas Ave", "Macabeu Josep Maria", "Macabeu Jove Mas Masagué", "Macabeu Lavern", "Macabeu Mas Mesague", "Macabeu Miquel", "Macabeu Nou Escudé D", "Macabeu Nou Escudé E", "Macabeu oria jove", "Macabeu Oria Vell", "Macabeu Plana Escudé", "Macabeu Pomers", "Macabeu Pont Escudé", "Malvasia de sitges escuder", "Malvasia Santa Fe", "Mas Pardal", "Merlot santa Fe", "Modesta Malvasia", "Modesta Xarel·lo", "Molí de Vent", "Moneu Dreta", "Moneu Esquerre", "Montargull Xarel·lo dreta abaix", "Montargull Xarel·lo Esquerre", "Montargull Xarel·lo Esquerre mig", "Muscat Bas", "Muscat Rectoria", "Oria Jove", "Parellada Escuder", "Parellada Pujols", "Pla Llorenç", "Plana Mas Bertran", "Plana Mas Bertran Masia", "Sobrehort Dot Xarel·lo", "Subirat parent santa fe", "Sumoll negre Escudé", "Tigsa", "Tofol Xic", "Torrent de la Salada", "Trepat Cal Escudé", "Vinya Hort", "Vinya llarga avinyonet", "Vinya Nova Mas Pardal", "Vinya Petita Lavern", "Vinya Pol", "Vinya Torres", "Xarel·lo atre banda riera escuder", "Xarel·lo Carretera", "Xarel·lo Casan", "Xarel·lo Jove Vinya Llarga", "Xarel·lo Les costes", "Xarel·lo Miquel Gran", "Xarel·lo Miquel Petita", "Xarel·lo Mort Escuder", "Xarel·lo nou Escudé", "Xarel·lo Pujols", "Xarel·lo Reempeltat casan", "Xarel·lo Truco", "Xarel·lo Vermell Oliverà", "Xarel·lo Vinya Llarga"];
+const PARCEL_DATA = [
+{
+"nom": "Cabernet Café",
+"sup": 0.5147,
+"municipi": "Santa Fe",
+"varietat": "Cabernet",
+"codis": "AT695"
+},
+{
+"nom": "Cabernet Truco",
+"sup": 0.7809,
+"municipi": "La Granada",
+"varietat": "Cabernet",
+"codis": "AJ029"
+},
+{
+"nom": "Cal Caramet",
+"sup": 0.884,
+"municipi": "Avinyonet",
+"varietat": "Xarel·lo",
+"codis": "AB026"
+},
+{
+"nom": "Carme i Roser Raventós",
+"sup": 1.9516,
+"municipi": "Avinyonet",
+"varietat": "Xarel·lo",
+"codis": "AA964 / AA965"
+},
+{
+"nom": "Cau del Torrent",
+"sup": 0.1716,
+"municipi": "Subirats",
+"varietat": "Xarel·lo",
+"codis": "IN271"
+},
+{
+"nom": "Chardonnay Bas",
+"sup": 0.4505,
+"municipi": "La Granada",
+"varietat": "Chardonnay",
+"codis": "AI899"
+},
+{
+"nom": "Chardonnay Lavern",
+"sup": 2.7237,
+"municipi": "Subirats",
+"varietat": "Chardonnay",
+"codis": "IE545 / AW402"
+},
+{
+"nom": "Chardonnay les cabanyes",
+"sup": 1.1818,
+"municipi": "La Granada",
+"varietat": "Chardonnay",
+"codis": "AJ171"
+},
+{
+"nom": "Escoda Autopista",
+"sup": 0.8263,
+"municipi": "Vilafranca",
+"varietat": "Xarel·lo",
+"codis": "BB859"
+},
+{
+"nom": "Escoda autopista Petita",
+"sup": 0.088,
+"municipi": "Vilafranca",
+"varietat": "Xarel·lo",
+"codis": "IN288"
+},
+{
+"nom": "Escoda Poligon",
+"sup": 1.1184,
+"municipi": "Avinyonet",
+"varietat": "Xarel·lo",
+"codis": "AA935 / AA936 / AA937 / AA938"
+},
+{
+"nom": "Escoda Vilafranca",
+"sup": 0.8083,
+"municipi": "Vilafranca",
+"varietat": "Xarel·lo",
+"codis": "BB354"
+},
+{
+"nom": "Garnatxa negra escuder",
+"sup": 1.04,
+"municipi": "Subirats",
+"varietat": "Garnatxa negra",
+"codis": "LE263"
+},
+{
+"nom": "Josep Raventós",
+"sup": 0.457,
+"municipi": "Avinyonet",
+"varietat": "Xarel·lo",
+"codis": "AA949"
+},
+{
+"nom": "Josep Via",
+"sup": 0.7552,
+"municipi": "Avinyonet",
+"varietat": "Xarel·lo",
+"codis": "AA948"
+},
+{
+"nom": "L'Oliverá",
+"sup": 0.8106,
+"municipi": "Castellet",
+"varietat": "Xarel·lo",
+"codis": "KC746"
+},
+{
+"nom": "La Masia",
+"sup": 2.8772,
+"municipi": "Castellet",
+"varietat": "Xarel·lo",
+"codis": "AD318 / IX548"
+},
+{
+"nom": "La Salada Masia",
+"sup": 2.0782,
+"municipi": "Subirats",
+"varietat": "Xarel·lo",
+"codis": "AW505"
+},
+{
+"nom": "Lavern Xarel·lo Carretera",
+"sup": 0.8702,
+"municipi": "Subirats",
+"varietat": "Xarel·lo",
+"codis": "AV153"
+},
+{
+"nom": "Lavern Xarel·lo Vinya Mig",
+"sup": 1.9037,
+"municipi": "Subirats",
+"varietat": "Xarel·lo",
+"codis": "AV154"
+},
+{
+"nom": "Les Rovires",
+"sup": 0.67,
+"municipi": "Santa Fe",
+"varietat": "Chardonnay",
+"codis": "AT719"
+},
+{
+"nom": "Macabeu altre part riera escuder",
+"sup": 0.5196,
+"municipi": "Subirats",
+"varietat": "Macabeu",
+"codis": "AW428"
+},
+{
+"nom": "Macabeu Bas Ave",
+"sup": 0.3016,
+"municipi": "Avinyonet",
+"varietat": "Macabeu",
+"codis": "AB087"
+},
+{
+"nom": "Macabeu Josep Maria",
+"sup": 0.6475,
+"municipi": "Santa Fe",
+"varietat": "Macabeu",
+"codis": "AT594"
+},
+{
+"nom": "Macabeu Jove Mas Masagué",
+"sup": 0.4258,
+"municipi": "Santa Fe",
+"varietat": "Macabeu",
+"codis": "JF676"
+},
+{
+"nom": "Macabeu Lavern",
+"sup": 2.2971,
+"municipi": "Subirats",
+"varietat": "Macabeu",
+"codis": "AV119 / AV120 / AV128 / AV143 / AW149"
+},
+{
+"nom": "Macabeu Mas Mesague",
+"sup": 1.2712,
+"municipi": "Santa Fe",
+"varietat": "Macabeu",
+"codis": "AT634"
+},
+{
+"nom": "Macabeu Miquel",
+"sup": 1.9542,
+"municipi": "Santa Fe",
+"varietat": "Macabeu",
+"codis": "IE172 / JI233 / JI235"
+},
+{
+"nom": "Macabeu Nou Escudé D",
+"sup": 0.2033,
+"municipi": "Subirats",
+"varietat": "Macabeu",
+"codis": "KA573"
+},
+{
+"nom": "Macabeu Nou Escudé E",
+"sup": 0.32,
+"municipi": "Subirats",
+"varietat": "Macabeu",
+"codis": "KA572"
+},
+{
+"nom": "Macabeu oria jove",
+"sup": 0.4003,
+"municipi": "Santa Fe",
+"varietat": "Macabeu",
+"codis": "AT593"
+},
+{
+"nom": "Macabeu Oria Vell",
+"sup": 1.077,
+"municipi": "Santa Fe",
+"varietat": "Macabeu",
+"codis": "AT639"
+},
+{
+"nom": "Macabeu Plana Escudé",
+"sup": 1.8869,
+"municipi": "Subirats",
+"varietat": "Macabeu",
+"codis": "AW447 / AW436 / AW465 / AW449"
+},
+{
+"nom": "Macabeu Pomers",
+"sup": 0.4907,
+"municipi": "Subirats",
+"varietat": "Macabeu",
+"codis": "AW982"
+},
+{
+"nom": "Macabeu Pont Escudé",
+"sup": 1.393,
+"municipi": "Subirats",
+"varietat": "Macabeu",
+"codis": "IN905"
+},
+{
+"nom": "Malvasia de sitges escuder",
+"sup": 0.8908,
+"municipi": "Subirats",
+"varietat": "Malvasia",
+"codis": "LE272"
+},
+{
+"nom": "Malvasia Santa Fe",
+"sup": 0.2201,
+"municipi": "Santa Fe",
+"varietat": "Malvasia",
+"codis": "AT640"
+},
+{
+"nom": "Mas Pardal",
+"sup": 1.9614,
+"municipi": "Vilafranca",
+"varietat": "Xarel·lo",
+"codis": "JJ894"
+},
+{
+"nom": "Merlot santa Fe",
+"sup": 1.0031,
+"municipi": "Santa Fe",
+"varietat": "Merlot",
+"codis": "AI847"
+},
+{
+"nom": "Modesta Malvasia",
+"sup": 0.273,
+"municipi": "Avinyonet",
+"varietat": "Malvasia",
+"codis": "AB021"
+},
+{
+"nom": "Modesta Xarel·lo",
+"sup": 1.3506,
+"municipi": "Avinyonet",
+"varietat": "Xarel·lo",
+"codis": "AB020"
+},
+{
+"nom": "Molí de Vent",
+"sup": 1.0,
+"municipi": "Vilafranca",
+"varietat": "Macabeu",
+"codis": "JV107"
+},
+{
+"nom": "Moneu Dreta",
+"sup": 0.25,
+"municipi": "Subirats",
+"varietat": "Moneu",
+"codis": "LC824"
+},
+{
+"nom": "Moneu Esquerre",
+"sup": 0.1507,
+"municipi": "Subirats",
+"varietat": "Moneu",
+"codis": "LB828"
+},
+{
+"nom": "Montargull Xarel·lo dreta abaix",
+"sup": 0.338,
+"municipi": "Subirats",
+"varietat": "Xarel·lo",
+"codis": "AW472"
+},
+{
+"nom": "Montargull Xarel·lo Esquerre",
+"sup": 0.779,
+"municipi": "Subirats",
+"varietat": "Xarel·lo",
+"codis": "AW458"
+},
+{
+"nom": "Montargull Xarel·lo Esquerre mig",
+"sup": 0.3176,
+"municipi": "Subirats",
+"varietat": "Xarel·lo",
+"codis": "AW457"
+},
+{
+"nom": "Muscat Bas",
+"sup": 0.4942,
+"municipi": "La Granada",
+"varietat": "Muscat",
+"codis": "AI897 / AI898 / IF474"
+},
+{
+"nom": "Muscat Rectoria",
+"sup": 1.3913,
+"municipi": "La Granada",
+"varietat": "Muscat",
+"codis": "AI894 / AI895 / AI896 / AI903"
+},
+{
+"nom": "Oria Jove",
+"sup": 0.6066,
+"municipi": "Santa Fe",
+"varietat": "Macabeu",
+"codis": "JI234"
+},
+{
+"nom": "Parellada Escuder",
+"sup": 0.6131,
+"municipi": "Subirats",
+"varietat": "Parellada",
+"codis": "AW442"
+},
+{
+"nom": "Parellada Pujols",
+"sup": 1.2366,
+"municipi": "Font Rubi",
+"varietat": "Parellada",
+"codis": "AI721 / IN111"
+},
+{
+"nom": "Pla Llorenç",
+"sup": 0.9238,
+"municipi": "La Granada",
+"varietat": "Macabeu",
+"codis": "AJ038"
+},
+{
+"nom": "Plana Mas Bertran",
+"sup": 1.2403,
+"municipi": "Avinyonet",
+"varietat": "Xarel·lo",
+"codis": "AB003"
+},
+{
+"nom": "Plana Mas Bertran Masia",
+"sup": 0.836,
+"municipi": "Avinyonet",
+"varietat": "Xarel·lo",
+"codis": "AB016"
+},
+{
+"nom": "Sobrehort Dot Xarel·lo",
+"sup": 0.9989,
+"municipi": "Avinyonet",
+"varietat": "Xarel·lo",
+"codis": "AV638"
+},
+{
+"nom": "Subirat parent santa fe",
+"sup": 0.5841,
+"municipi": "Santa Fe",
+"varietat": "Subirat parent",
+"codis": "LC819 / LC865"
+},
+{
+"nom": "Sumoll negre Escudé",
+"sup": 0.065,
+"municipi": "Subirats",
+"varietat": "Sumoll Negre",
+"codis": "KE952"
+},
+{
+"nom": "Tigsa",
+"sup": 0.9071,
+"municipi": "Vilafranca",
+"varietat": "Xarel·lo",
+"codis": "JA932"
+},
+{
+"nom": "Tofol Xic",
+"sup": 0.709,
+"municipi": "Vilafranca",
+"varietat": "Macabeu",
+"codis": "BB318"
+},
+{
+"nom": "Torrent de la Salada",
+"sup": 1.3282,
+"municipi": "Subirats",
+"varietat": "Xarel·lo",
+"codis": "IA867"
+},
+{
+"nom": "Trepat Cal Escudé",
+"sup": 1.6821,
+"municipi": "Subirats",
+"varietat": "Trepat",
+"codis": "AW451 / AW463 / KC096"
+},
+{
+"nom": "Vinya Hort",
+"sup": 0.3924,
+"municipi": "La Granada",
+"varietat": "Xarel·lo",
+"codis": "IN269"
+},
+{
+"nom": "Vinya llarga avinyonet",
+"sup": 0.4771,
+"municipi": "La Granada",
+"varietat": "Xarel·lo",
+"codis": "JA331"
+},
+{
+"nom": "Vinya Nova Mas Pardal",
+"sup": 0.5156,
+"municipi": "Vilafranca",
+"varietat": "Xarel·lo",
+"codis": "BB873"
+},
+{
+"nom": "Vinya Petita Lavern",
+"sup": 0.2492,
+"municipi": "Subirats",
+"varietat": "Xarel·lo",
+"codis": "IN287"
+},
+{
+"nom": "Vinya Pol",
+"sup": 0.5606,
+"municipi": "Vilafranca",
+"varietat": "Macabeu",
+"codis": "BB329"
+},
+{
+"nom": "Vinya Torres",
+"sup": 0.5141,
+"municipi": "Vilafranca",
+"varietat": "Macabeu",
+"codis": "BB323"
+},
+{
+"nom": "Xarel·lo atre banda riera escuder",
+"sup": 0.8353,
+"municipi": "Subirats",
+"varietat": "Xarel·lo",
+"codis": "AW426"
+},
+{
+"nom": "Xarel·lo Carretera",
+"sup": 1.7216,
+"municipi": "Subirats",
+"varietat": "Xarel·lo",
+"codis": "AV123"
+},
+{
+"nom": "Xarel·lo Casan",
+"sup": 1.0238,
+"municipi": "Santa Fe",
+"varietat": "Xarel·lo",
+"codis": "AT635 / JI232"
+},
+{
+"nom": "Xarel·lo Jove Vinya Llarga",
+"sup": 0.3773,
+"municipi": "Santa Fe",
+"varietat": "Xarel·lo",
+"codis": "AT633"
+},
+{
+"nom": "Xarel·lo Les costes",
+"sup": 0.5012,
+"municipi": "Santa Fe",
+"varietat": "Xarel·lo",
+"codis": "AT674"
+},
+{
+"nom": "Xarel·lo Miquel Gran",
+"sup": 0.4784,
+"municipi": "Subirats",
+"varietat": "Xarel·lo",
+"codis": "AV113"
+},
+{
+"nom": "Xarel·lo Miquel Petita",
+"sup": 0.0921,
+"municipi": "Subirats",
+"varietat": "Xarel·lo",
+"codis": "AV118"
+},
+{
+"nom": "Xarel·lo Mort Escuder",
+"sup": 1.3824,
+"municipi": "Subirats",
+"varietat": "Xarel·lo",
+"codis": "AW429"
+},
+{
+"nom": "Xarel·lo nou Escudé",
+"sup": 1.9258,
+"municipi": "Subirats",
+"varietat": "Xarel·lo",
+"codis": "AW975 / AW977 / KD895 / KD896"
+},
+{
+"nom": "Xarel·lo Pujols",
+"sup": 0.4419,
+"municipi": "Font Rubi",
+"varietat": "Xarel·lo",
+"codis": "AG341"
+},
+{
+"nom": "Xarel·lo Reempeltat casan",
+"sup": 0.7711,
+"municipi": "Santa Fe",
+"varietat": "Xarel·lo",
+"codis": "AT641"
+},
+{
+"nom": "Xarel·lo Truco",
+"sup": 0.3369,
+"municipi": "La Granada",
+"varietat": "Xarel·lo",
+"codis": "AJ031"
+},
+{
+"nom": "Xarel·lo Vermell Oliverà",
+"sup": 1.0458,
+"municipi": "Castellet",
+"varietat": "Xarel·lo Vermell",
+"codis": "KA617"
+},
+{
+"nom": "Xarel·lo Vinya Llarga",
+"sup": 1.5412,
+"municipi": "Santa Fe",
+"varietat": "Xarel·lo",
+"codis": "AT636 / JF677 / JF678"
+}
+];
+
+let currentType = 'fitosanitario';
+let accessToken = null;
+let tokenClient = null;
+let spreadsheetId = localStorage.getItem('spreadsheetId') || null;
+let currentWizardStep = 1;
+
+const TYPES = {
+  fitosanitario:{ label:'Tratamiento Fitosanitario', icon:'🌿', cls:'ph-grape',   tab:'active-fitosanitario' },
+  labor:        { label:'Labor del Suelo',           icon:'🚜', cls:'ph-leaf',    tab:'active-labor' },
+  riego:        { label:'Riego',                     icon:'💧', cls:'ph-blue',    tab:'active-riego' },
+  abonado:      { label:'Abonado / Fertilización',   icon:'🌱', cls:'ph-harvest', tab:'active-abonado' },
+};
+
+// ═══════════════════════════════════════════
+//  INIT
+// ═══════════════════════════════════════════
+document.getElementById('fecha').valueAsDate = new Date();
+document.getElementById('log-fecha').valueAsDate = new Date();
+loadConfig();
+populateParcelas();
+renderTracker();
+
+// ═══════════════════════════════════════════
+//  NAV
+// ═══════════════════════════════════════════
+function showPage(name) {
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('visible'));
+  document.querySelectorAll('.main-nav-btn').forEach(b=>b.classList.remove('active'));
+  document.getElementById('page-'+name).classList.add('visible');
+  document.getElementById('nav-'+name).classList.add('active');
+  if(name==='seguimiento') renderTracker();
+  if(name==='setup') updateCheckList();
+}
+
+// ═══════════════════════════════════════════
+//  FORM TYPE SWITCHER
+// ═══════════════════════════════════════════
+
+function onParcelaChange(nom) {
+  const info=document.getElementById('parcelaInfo');
+  if(!nom||nom==='Todo el viñedo'){ info.style.display='none'; return; }
+  const d=PARCEL_DATA.find(p=>p.nom===nom);
+  if(!d){ info.style.display='none'; return; }
+  info.style.display='block';
+  info.innerHTML='<strong>'+d.varietat+'</strong> &nbsp;·&nbsp; '+d.sup.toFixed(4)+' ha &nbsp;·&nbsp; '+d.municipi+'<br>RVC: '+d.codis;
+}
+
+function switchType(type) {
+  document.querySelectorAll('.form-section').forEach(s=>s.classList.remove('visible'));
+  document.getElementById('sec-'+type).classList.add('visible');
+  document.querySelectorAll('.tab-btn').forEach(b=>b.className='tab-btn');
+  const t=TYPES[type];
+  document.getElementById('tab-'+type).classList.add(t.tab);
+  const ph=document.getElementById('panelHeader');
+  ph.className='panel-header '+t.cls;
+  document.getElementById('panelIcon').textContent=t.icon;
+  document.getElementById('panelTitle').textContent=t.label;
+  currentType=type;
+}
+
+// ═══════════════════════════════════════════
+//  CONFIG STORAGE
+// ═══════════════════════════════════════════
+function loadConfig() {
+  const cid=localStorage.getItem('cfg_clientId')||'';
+  const email=localStorage.getItem('cfg_email')||'';
+  const waP=localStorage.getItem('cfg_waPhone')||'';
+  const waK=localStorage.getItem('cfg_waKey')||'';
+
+  // Pre-seed real parcel·lari on first load
+  if(!localStorage.getItem('cfg_parcelas')) {
+    localStorage.setItem('cfg_parcelas', JSON.stringify(DEFAULT_PARCELAS));
+  }
+  const p=getParcelas();
+
+  if(document.getElementById('cfg-clientId')) document.getElementById('cfg-clientId').value=cid;
+  if(document.getElementById('cfg-email')) document.getElementById('cfg-email').value=email;
+  if(document.getElementById('cfg-waPhone')) document.getElementById('cfg-waPhone').value=waP;
+  if(document.getElementById('cfg-waKey')) document.getElementById('cfg-waKey').value=waK;
+  if(document.getElementById('cfg-parcelas')) document.getElementById('cfg-parcelas').value=p.join('\n');
+
+  if(document.getElementById('wizard-clientId')) document.getElementById('wizard-clientId').value=cid;
+  if(document.getElementById('wizard-email')) document.getElementById('wizard-email').value=email;
+  if(document.getElementById('wizard-waPhone')) document.getElementById('wizard-waPhone').value=waP;
+  if(document.getElementById('wizard-waKey')) document.getElementById('wizard-waKey').value=waK;
+
+  updateBadge('clientId',!!cid);
+  updateBadge('email',!!email);
+  updateBadge('whatsapp',!!(waP&&waK));
+}
+
+function saveAllConfig() {
+  const fields={
+    clientId:'cfg-clientId', email:'cfg-email',
+    waPhone:'cfg-waPhone', waKey:'cfg-waKey'
+  };
+  Object.entries(fields).forEach(([k,id])=>{
+    const v=(document.getElementById(id)?.value||'').trim();
+    if(v) localStorage.setItem('cfg_'+k,v);
+  });
+  // Parcelas
+  const pList=document.getElementById('cfg-parcelas').value.split('\n').map(l=>l.trim()).filter(Boolean);
+  if(pList.length) localStorage.setItem('cfg_parcelas',JSON.stringify(pList));
+
+  updateBadge('clientId',!!localStorage.getItem('cfg_clientId'));
+  updateBadge('email',!!localStorage.getItem('cfg_email'));
+  updateBadge('whatsapp',!!(localStorage.getItem('cfg_waPhone')&&localStorage.getItem('cfg_waKey')));
+  populateParcelas(); renderTracker();
+  showToast('✅ Configuración guardada',false,true);
+}
+
+function saveClientId() {
+  const v=(document.getElementById('wizard-clientId').value||'').trim();
+  if(!v){ showToast('⚠ Pega el Client ID primero',true); return; }
+  localStorage.setItem('cfg_clientId',v);
+  document.getElementById('cfg-clientId').value=v;
+  updateBadge('clientId',true);
+  document.getElementById('badge-wClientId').className='badge badge-ok';
+  document.getElementById('badge-wClientId').textContent='✓ Client ID guardado';
+  showToast('✅ Client ID guardado',false,true);
+}
+
+function saveContactConfig() {
+  const email=(document.getElementById('wizard-email').value||'').trim();
+  const waP=(document.getElementById('wizard-waPhone').value||'').trim();
+  const waK=(document.getElementById('wizard-waKey').value||'').trim();
+  if(!email||!waP||!waK){ showToast('⚠ Rellena todos los campos',true); return; }
+  localStorage.setItem('cfg_email',email);
+  localStorage.setItem('cfg_waPhone',waP);
+  localStorage.setItem('cfg_waKey',waK);
+  document.getElementById('cfg-email').value=email;
+  document.getElementById('cfg-waPhone').value=waP;
+  document.getElementById('cfg-waKey').value=waK;
+  updateBadge('email',true); updateBadge('whatsapp',true);
+  document.getElementById('badge-wContact').className='badge badge-ok';
+  document.getElementById('badge-wContact').textContent='✓ Datos de contacto guardados';
+  showToast('✅ Email y WhatsApp guardados',false,true);
+}
+
+function getParcelas() {
+  try{ return JSON.parse(localStorage.getItem('cfg_parcelas'))||DEFAULT_PARCELAS; }
+  catch{ return DEFAULT_PARCELAS; }
+}
+
+function populateParcelas() {
+  const parceles=getParcelas();
+  ['parcela','log-parcela'].forEach(id=>{
+    const sel=document.getElementById(id); if(!sel) return;
+    const cur=sel.value;
+    sel.innerHTML='<option value="">— Seleccionar —</option>';
+
+    // Group by municipi for optgroup
+    const byMun={};
+    parceles.forEach(nom=>{
+      const d=PARCEL_DATA.find(p=>p.nom===nom)||{municipi:'Altres',varietat:'',sup:0};
+      if(!byMun[d.municipi]) byMun[d.municipi]=[];
+      byMun[d.municipi].push({nom, sup:d.sup, varietat:d.varietat});
+    });
+
+    Object.keys(byMun).sort().forEach(mun=>{
+      const grp=document.createElement('optgroup');
+      grp.label='📍 '+mun;
+      byMun[mun].sort((a,b)=>a.nom.localeCompare(b.nom)).forEach(({nom,sup,varietat})=>{
+        const o=document.createElement('option');
+        o.value=nom;
+        o.textContent=nom+' ('+varietat+' · '+sup.toFixed(4)+' ha)';
+        grp.appendChild(o);
+      });
+      sel.appendChild(grp);
+    });
+
+    // Todo el viñedo at bottom
+    const oAll=document.createElement('option');
+    oAll.value='Todo el viñedo'; oAll.textContent='🍇 Todo el viñedo';
+    sel.appendChild(oAll);
+
+    if(cur) sel.value=cur;
+  });
+}
+
+function updateBadge(key,ok) {
+  const el=document.getElementById('badge-'+key); if(!el) return;
+  el.className='badge '+(ok?'badge-ok':'badge-none');
+  el.textContent=ok?'● Configurado':'● Sin configurar';
+}
+
+// ═══════════════════════════════════════════
+//  WIZARD STEPS
+// ═══════════════════════════════════════════
+function goStep(n) {
+  document.querySelectorAll('.wizard-panel').forEach(p=>p.classList.remove('active'));
+  document.getElementById('wpanel-'+n).classList.add('active');
+
+  for(let i=1;i<=5;i++){
+    const dot=document.getElementById('dot-'+i);
+    const nm=document.getElementById('sname-'+i);
+    dot.className='step-circle'+(i<n?' done':i===n?' active':'');
+    nm.className='step-name'+(i<n?' done':i===n?' active':'');
+    if(i<n) dot.textContent='✓';
+    else dot.textContent=i;
+  }
+  currentWizardStep=n;
+  if(n===5) updateCheckList();
+}
+
+function updateCheckList() {
+  const cid=!!localStorage.getItem('cfg_clientId');
+  const em=!!localStorage.getItem('cfg_email');
+  const wa=!!(localStorage.getItem('cfg_waPhone')&&localStorage.getItem('cfg_waKey'));
+  const sh=!!spreadsheetId;
+
+  function setChk(id,ok,warn){
+    const el=document.getElementById(id); if(!el) return;
+    el.className='check-status '+(ok?'cs-ok':warn?'cs-warn':'cs-pending');
+    el.textContent=ok?'✓ Listo':warn?'⚠ Revisar':'Pendiente';
+  }
+  setChk('chk-clientId',cid,false);
+  setChk('chk-email',em,false);
+  setChk('chk-wa',wa,false);
+  setChk('chk-sheet',sh,false);
+}
+
+function finishSetup() {
+  showToast('🎉 ¡Todo listo! El cuaderno está configurado.',false,true);
+  setTimeout(()=>showPage('registro'),1500);
+}
+
+// ═══════════════════════════════════════════
+//  GOOGLE OAUTH
+// ═══════════════════════════════════════════
+function initTokenClient(callback) {
+  const clientId=localStorage.getItem('cfg_clientId');
+  if(!clientId){ showToast('⚠ Primero guarda el Client ID en la Configuración inicial',true); return; }
+  if(!window.google){ showToast('⚠ Cargando librería de Google, espera un momento…',true); return; }
+  tokenClient=google.accounts.oauth2.initTokenClient({
+    client_id:clientId, scope:SCOPES, callback
+  });
+  tokenClient.requestAccessToken();
+}
+
+function startOAuth() { initTokenClient(handleToken); }
+function startOAuthWizard() { initTokenClient(handleTokenWizard); }
+
+function handleToken(resp) {
+  if(resp.error){ showToast('✗ Error: '+resp.error,true); return; }
+  accessToken=resp.access_token;
+  fetchUserInfo(()=>{ showConnected(); ensureSpreadsheet(); });
+}
+
+function handleTokenWizard(resp) {
+  if(resp.error){ showToast('✗ Error: '+resp.error,true); return; }
+  accessToken=resp.access_token;
+  fetchUserInfo(info=>{
+    document.getElementById('step3Status').textContent='✓ Conectado como '+info.email;
+    document.getElementById('step3Status').style.color=localStorage.getItem('--ok')||'#2D6A2D';
+    showConnected();
+    ensureSpreadsheet(()=>{ showToast('✅ Google Sheets creado y listo',false,true); updateCheckList(); });
+  });
+}
+
+function fetchUserInfo(cb) {
+  fetch('https://www.googleapis.com/oauth2/v3/userinfo',{headers:{Authorization:'Bearer '+accessToken}})
+    .then(r=>r.json()).then(info=>{ document.getElementById('userEmail').textContent=info.email||''; if(cb) cb(info); });
+}
+
+function showConnected() {
+  document.getElementById('notConnectedBar').style.display='none';
+  document.getElementById('connectedBar').style.display='block';
+}
+
+function disconnect() {
+  accessToken=null;
+  document.getElementById('notConnectedBar').style.display='block';
+  document.getElementById('connectedBar').style.display='none';
+  document.getElementById('sheetBar').style.display='none';
+  showToast('Sesión cerrada');
+}
+
+// ═══════════════════════════════════════════
+//  SHEETS API
+// ═══════════════════════════════════════════
+async function ensureSpreadsheet(cb) {
+  if(spreadsheetId) {
+    try {
+      const r=await gFetch(`https://sheets.googleapis.com/v4/spreadsheets/${spreadsheetId}?fields=spreadsheetId,spreadsheetUrl`);
+      if(r.spreadsheetId){ showSheetBar(r.spreadsheetUrl); updateCheckList(); if(cb) cb(); return; }
+    } catch(e){ spreadsheetId=null; }
+  }
+  await createSpreadsheet(cb);
+}
+
+async function createSpreadsheet(cb) {
+  showToast('📊 Creando hoja de cálculo…');
+  const ss=await gFetch('https://sheets.googleapis.com/v4/spreadsheets','POST',{
+    properties:{ title:SHEET_TITLE },
+    sheets:[{properties:{title:'Partes',sheetId:0}},{properties:{title:'Tratamientos',sheetId:1}}]
+  });
+  spreadsheetId=ss.spreadsheetId;
+  localStorage.setItem('spreadsheetId',spreadsheetId);
+  await gFetch(`https://sheets.googleapis.com/v4/spreadsheets/${spreadsheetId}/values/Partes!A1?valueInputOption=USER_ENTERED`,'PUT',
+    {values:[['Timestamp','Tipo','Fecha','Parcela','Operario','C1','C2','C3','C4','C5','C6','C7','C8','C9','Observaciones']]});
+  await gFetch(`https://sheets.googleapis.com/v4/spreadsheets/${spreadsheetId}/values/Tratamientos!A1?valueInputOption=USER_ENTERED`,'PUT',
+    {values:[['Fecha','Parcela','Producto','Dosis','Superficie']]});
+  showSheetBar(ss.spreadsheetUrl);
+  updateCheckList();
+  if(cb) cb();
+}
+
+function showSheetBar(url) {
+  document.getElementById('sheetBar').style.display='flex';
+  document.getElementById('sheetLink').href=url;
+}
+
+async function gFetch(url,method='GET',body=null) {
+  const opts={method,headers:{Authorization:'Bearer '+accessToken,'Content-Type':'application/json'}};
+  if(body) opts.body=JSON.stringify(body);
+  const r=await fetch(url,opts);
+  if(!r.ok) throw new Error(await r.text());
+  return r.json();
+}
+
+// ═══════════════════════════════════════════
+//  FORM SUBMIT
+// ═══════════════════════════════════════════
+function collectData(){
+  const g=id=>(document.getElementById(id)?.value||'').trim();
+  const base={tipo:currentType,fecha:g('fecha'),parcela:g('parcela'),operario:g('operario'),obs:g('observaciones')};
+  const sp={
+    fitosanitario:()=>({c1:g('fit-producto'),c2:g('fit-registro'),c3:g('fit-dosis'),c4:g('fit-caldo'),c5:g('fit-superficie'),c6:g('fit-objetivo'),c7:g('fit-tipo'),c8:g('fit-hora-ini')+'–'+g('fit-hora-fin'),c9:`T:${g('fit-temp')}°C HR:${g('fit-hr')}% V:${g('fit-viento')} PS:${g('fit-plazo')}d`}),
+    labor:()=>({c1:g('lab-tipo'),c2:g('lab-maquina'),c3:g('lab-hora-ini')+'–'+g('lab-hora-fin'),c4:g('lab-superficie'),c5:g('lab-fenologia')}),
+    riego:()=>({c1:g('rie-tipo'),c2:g('rie-origen'),c3:g('rie-hora-ini')+'–'+g('rie-hora-fin'),c4:g('rie-caudal'),c5:g('rie-volumen'),c6:g('rie-superficie'),c7:g('rie-motivo')}),
+    abonado:()=>({c1:g('abo-tipo'),c2:g('abo-producto'),c3:g('abo-dosis'),c4:g('abo-cantidad'),c5:g('abo-superficie'),c6:g('abo-forma'),c7:`N:${g('abo-n')} P:${g('abo-p')} K:${g('abo-k')}`}),
+  };
+  return{...base,...sp[currentType]()};
+}
+
+async function submitForm(){
+  if(!accessToken){ showToast('⚠ Primero conecta con Google',true); return; }
+  if(!spreadsheetId){ showToast('⚠ Hoja no encontrada — reconecta',true); return; }
+  const d=collectData();
+  if(!d.fecha){ showToast('⚠ Indica la fecha',true); return; }
+  const btn=document.getElementById('btnSubmit');
+  btn.disabled=true; btn.textContent='⏳ Guardando…';
+  try{
+    const ts=new Date().toLocaleString('es-ES');
+    const row=[ts,d.tipo,d.fecha,d.parcela,d.operario,d.c1||'',d.c2||'',d.c3||'',d.c4||'',d.c5||'',d.c6||'',d.c7||'',d.c8||'',d.c9||'',d.obs||''];
+    await gFetch(`https://sheets.googleapis.com/v4/spreadsheets/${spreadsheetId}/values/Partes:append?valueInputOption=USER_ENTERED&insertDataOption=INSERT_ROWS`,'POST',{values:[row]});
+    if(d.tipo==='fitosanitario'){
+      await gFetch(`https://sheets.googleapis.com/v4/spreadsheets/${spreadsheetId}/values/Tratamientos:append?valueInputOption=USER_ENTERED&insertDataOption=INSERT_ROWS`,'POST',{values:[[d.fecha,d.parcela,d.c1||'',d.c3||'',d.c5||'']]});
+      if(d.parcela) saveTreatment(d.parcela,d.fecha);
+    }
+    showToast('✅ Parte guardado en Google Sheets',false,true);
+    resetForm();
+  }catch(err){ console.error(err); showToast('✗ Error al guardar. Reconecta.',true);
+  }finally{ btn.disabled=false; btn.innerHTML='📋 &nbsp; Registrar Parte en Google Sheets'; }
+}
+
+function resetForm(){
+  document.querySelectorAll('.card-inner input:not([id^="cfg"]):not([id^="wizard"]), .card-inner textarea:not([id^="cfg"])').forEach(el=>{
+    if(el.type==='date') el.valueAsDate=new Date(); else el.value='';
+  });
+  document.querySelectorAll('#parcela,#sec-fitosanitario select,#sec-labor select,#sec-riego select,#sec-abonado select').forEach(s=>s.selectedIndex=0);
+}
+
+// ═══════════════════════════════════════════
+//  TRACKER
+// ═══════════════════════════════════════════
+function getTreatments(){ try{ return JSON.parse(localStorage.getItem('treatments')||'{}'); }catch{ return {}; } }
+
+function saveTreatment(parcela,dateStr){
+  const data=getTreatments(), parcelas=getParcelas();
+  const targets=parcela==='Todo el viñedo'?parcelas:[parcela];
+  targets.forEach(p=>{ if(!data[p]||dateStr>=data[p]) data[p]=dateStr; });
+  localStorage.setItem('treatments',JSON.stringify(data));
+}
+
+function daysSince(d){ if(!d) return null; const t=new Date(d+'T12:00:00'),n=new Date(); n.setHours(12,0,0,0); return Math.floor((n-t)/86400000); }
+function stateFor(d){ if(d===null) return 'none'; if(d<7) return 'ok'; if(d<=14) return 'warn'; return 'danger'; }
+
+function renderTracker(){
+  const tr=getTreatments(), parcelas=getParcelas();
+  const grid=document.getElementById('trackerGrid'); grid.innerHTML='';
+  const lbl={ ok:'En plazo', warn:'Revisar', danger:'¡URGENTE!', none:'Sin datos' };
+  parcelas.forEach(p=>{
+    const last=tr[p]||null, days=daysSince(last), state=stateFor(days);
+    const dTxt=days===null?'—':days;
+    const lTxt=last?'Último: '+new Date(last+'T12:00:00').toLocaleDateString('es-ES',{day:'numeric',month:'long'}):'Sin tratamientos';
+    grid.innerHTML+=`<div class="parcel-card state-${state}"><div class="sdot"></div><div class="parcel-name">${p}</div><div class="parcel-days">${dTxt}</div><div class="parcel-label">${days!==null?dTxt+' días · ':''}${lbl[state]}</div><div class="parcel-last">${lTxt}</div></div>`;
+  });
+}
+
+function logTreatment(){
+  const parcela=document.getElementById('log-parcela').value;
+  const fecha=document.getElementById('log-fecha').value;
+  if(!parcela){ showToast('⚠ Selecciona una parcela',true); return; }
+  if(!fecha){ showToast('⚠ Indica la fecha',true); return; }
+  saveTreatment(parcela,fecha); renderTracker();
+  showToast('✓ Tratamiento registrado — '+parcela,false,true);
+  document.getElementById('log-parcela').value='';
+  document.getElementById('log-fecha').valueAsDate=new Date();
+}
+
+// ═══════════════════════════════════════════
+//  SCRIPT GENERATOR
+// ═══════════════════════════════════════════
+function buildScript(){
+  const email=localStorage.getItem('cfg_email')||'TU_EMAIL@gmail.com';
+  const waPhone=localStorage.getItem('cfg_waPhone')||'+34600000000';
+  const waKey=localStorage.getItem('cfg_waKey')||'000000';
+  const sid=spreadsheetId||'PEGA_AQUI_EL_ID_DE_TU_SPREADSHEET';
+  const parcelas=JSON.stringify(getParcelas());
+
+  return `// ═══════════════════════════════════════════════════
+// CUADERNO DE CAMPO — VIÑEDO · Script de alertas
+// Generado automáticamente con tus datos
+// ═══════════════════════════════════════════════════
+
+const EMAIL_DESTINO  = "${email}";
+const WA_PHONE       = "${waPhone}";
+const WA_API_KEY     = "${waKey}";
+const SPREADSHEET_ID = "${sid}";
+const PARCELAS       = ${parcelas};
+const DIAS_AMARILLO  = 7;
+const DIAS_ROJO      = 14;
+
+// ── RESUMEN DIARIO (trigger: cada día a las 5:00h) ──
+function enviarResumenDiario() {
+  const ultimos  = getUltimosTratamientos();
+  const amarillo = [], rojo = [];
+
+  PARCELAS.forEach(p => {
+    const u = ultimos[p];
+    if (!u) return;
+    const dias = diasDesde(u.fecha);
+    if (dias > DIAS_ROJO)            rojo.push({p, dias, ...u});
+    else if (dias >= DIAS_AMARILLO)  amarillo.push({p, dias, ...u});
+  });
+
+  if (!amarillo.length && !rojo.length) return;
+
+  const hoy = new Date().toLocaleDateString("es-ES",{weekday:"long",day:"numeric",month:"long"});
+  let html = \`<div style="font-family:Georgia,serif;max-width:560px;margin:0 auto;background:#F5EFE0;padding:32px">
+    <h2 style="color:#1A3020;margin:0 0 4px">🍇 Cuaderno de Campo</h2>
+    <p style="color:#8A7A6A;font-size:13px;font-family:monospace;margin:0 0 24px">Resumen diario · \${hoy}</p>\`;
+
+  if (rojo.length) {
+    html += \`<h3 style="color:#8A1A1A">🔴 URGENTE — más de \${DIAS_ROJO} días sin tratar</h3>
+    <table style="width:100%;border-collapse:collapse;margin-bottom:20px">\`;
+    rojo.forEach(r => {
+      const f = new Date(r.fecha).toLocaleDateString("es-ES",{day:"numeric",month:"short"});
+      html += \`<tr style="border-bottom:1px solid #E08080"><td style="padding:8px 4px"><strong>\${r.p}</strong></td><td style="padding:8px 4px;color:#8A1A1A;font-size:20px;font-family:monospace"><b>\${r.dias}d</b></td><td style="padding:8px 4px;color:#8A7A6A;font-size:13px">Último: \${f}</td></tr>\`;
+    });
+    html += '</table>';
+  }
+  if (amarillo.length) {
+    html += \`<h3 style="color:#8A6A00">🟡 ATENCIÓN — entre \${DIAS_AMARILLO} y \${DIAS_ROJO} días</h3>
+    <table style="width:100%;border-collapse:collapse;margin-bottom:20px">\`;
+    amarillo.forEach(r => {
+      const f = new Date(r.fecha).toLocaleDateString("es-ES",{day:"numeric",month:"short"});
+      html += \`<tr style="border-bottom:1px solid #D4B800"><td style="padding:8px 4px"><strong>\${r.p}</strong></td><td style="padding:8px 4px;color:#8A6A00;font-size:20px;font-family:monospace"><b>\${r.dias}d</b></td><td style="padding:8px 4px;color:#8A7A6A;font-size:13px">Último: \${f}</td></tr>\`;
+    });
+    html += '</table>';
+  }
+  html += '<p style="color:#8A7A6A;font-size:12px;font-family:monospace;border-top:1px solid #D8CEBA;padding-top:12px">Cuaderno de Campo · Viñedo · Penedès</p></div>';
+
+  GmailApp.sendEmail(EMAIL_DESTINO, \`🍇 Viñedo · Resumen \${hoy}\`, "", {htmlBody:html});
+
+  let wa = \`🍇 *Viñedo · \${new Date().toLocaleDateString("es-ES")}*\\n\`;
+  if (rojo.length)     { wa += \`\\n🔴 *URGENTE (>14 días)*\\n\`; rojo.forEach(r=>wa+=\`• \${r.p}: \${r.dias} días\\n\`); }
+  if (amarillo.length) { wa += \`\\n🟡 *ATENCIÓN (7-14 días)*\\n\`; amarillo.forEach(r=>wa+=\`• \${r.p}: \${r.dias} días\\n\`); }
+  enviarWhatsApp(wa);
+}
+
+// ── ALERTA INMEDIATA al cruzar 14 días ─────────────
+function comprobarAlertas() {
+  const ul = getUltimosTratamientos();
+  PARCELAS.forEach(p => {
+    const u = ul[p]; if (!u) return;
+    const dias = diasDesde(u.fecha);
+    if (dias === DIAS_ROJO + 1) {
+      const html = \`<div style="font-family:Georgia,serif;background:#FDE8E8;padding:28px;border-left:4px solid #E08080">
+        <h2 style="color:#8A1A1A">⚠️ Tratamiento urgente</h2>
+        <p><strong>\${p}</strong> lleva <strong style="font-size:24px;color:#8A1A1A">\${dias} días</strong> sin tratamiento.</p></div>\`;
+      GmailApp.sendEmail(EMAIL_DESTINO, \`🔴 Viñedo · \${p} lleva \${dias} días sin tratamiento!\`, "", {htmlBody:html});
+      enviarWhatsApp(\`🔴 *ALERTA VIÑEDO*\\n\${p} lleva *\${dias} días* sin tratamiento.\\n¡Revisar urgentemente!\`);
+    }
+  });
+}
+
+// ── HELPERS ────────────────────────────────────────
+function getUltimosTratamientos() {
+  const data = SpreadsheetApp.openById(SPREADSHEET_ID)
+    .getSheetByName("Tratamientos").getDataRange().getValues();
+  const ul = {};
+  for (let i = 1; i < data.length; i++) {
+    const [fecha, parcela, producto] = data[i];
+    if (!parcela) continue;
+    const targets = parcela === "Todo el viñedo" ? PARCELAS : [parcela];
+    targets.forEach(p => {
+      if (!ul[p] || new Date(fecha) > new Date(ul[p].fecha)) ul[p] = {fecha, producto};
+    });
+  }
+  return ul;
+}
+
+function diasDesde(fecha) {
+  const hoy = new Date(); hoy.setHours(0,0,0,0);
+  const t   = new Date(fecha); t.setHours(0,0,0,0);
+  return Math.floor((hoy - t) / 86400000);
+}
+
+function enviarWhatsApp(msg) {
+  try {
+    UrlFetchApp.fetch(\`https://api.callmebot.com/whatsapp.php?phone=\${WA_PHONE}&text=\${encodeURIComponent(msg)}&apikey=\${WA_API_KEY}\`);
+  } catch(e) { Logger.log("WA error: " + e.message); }
+}
+
+// ── TEST (ejecutar manualmente para verificar) ─────
+function testAlertas() {
+  GmailApp.sendEmail(EMAIL_DESTINO, "✅ Test Cuaderno Viñedo", "El sistema de alertas funciona correctamente. 🍇");
+  enviarWhatsApp("✅ *Test Cuaderno Viñedo*\\nAlertas configuradas correctamente 🍇");
+}
+
+function doGet() { return ContentService.createTextOutput("OK"); }`;
+}
+
+function generateAndShowScript(){
+  const code=buildScript();
+  // Wizard area
+  const sa=document.getElementById('scriptArea');
+  if(sa){ sa.style.display='block'; document.getElementById('scriptContent').textContent=code; }
+  // Main area
+  const sam=document.getElementById('scriptAreaMain');
+  if(sam){ sam.style.display='block'; document.getElementById('scriptContentMain').textContent=code; }
+  updateCheckList();
+}
+
+function copyScript(){ _copy(document.getElementById('scriptContent').textContent); }
+function copyScriptMain(){ _copy(document.getElementById('scriptContentMain').textContent); }
+function _copy(txt){ navigator.clipboard.writeText(txt).then(()=>showToast('✅ Script copiado — pégalo en Apps Script',false,true)); }
+
+// ═══════════════════════════════════════════
+//  TOAST
+// ═══════════════════════════════════════════
+function showToast(msg,error=false,success=false){
+  const t=document.getElementById('toast');
+  t.textContent=msg;
+  t.className='toast'+(error?' error':success?' success':'');
+  t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'),3500);
+}
+</script>
+</body>
+</html>
