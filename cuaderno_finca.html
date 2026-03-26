@@ -61,6 +61,28 @@ select{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/
 .form-section{display:none;}.form-section.visible{display:block;animation:sectionIn .3s ease;}
 
 .parcel-info-bar{display:none;margin-top:.35rem;background:#EEF4FF;border:1px solid #90B4F0;border-radius:2px;padding:.45rem .8rem;font-family:'DM Mono',monospace;font-size:.71rem;color:#2A4A8A;line-height:1.65;}
+/* Selecció múltiple de parcel·les */
+.multi-parcel-wrap{position:relative;}
+.multi-parcel-selected{min-height:2.6rem;background:white;border:1.5px solid #D8CEBA;border-radius:2px;padding:.4rem .7rem;cursor:pointer;display:flex;flex-wrap:wrap;gap:.35rem;align-items:center;transition:border-color .2s;}
+.multi-parcel-selected:focus-within,.multi-parcel-selected.open{border-color:var(--harvest);box-shadow:0 0 0 3px rgba(196,120,58,.12);}
+.multi-parcel-placeholder{font-family:'DM Sans',sans-serif;font-size:.9rem;color:#AAA;}
+.mp-pill{display:inline-flex;align-items:center;gap:.3rem;background:var(--vine);color:var(--paper);font-family:'DM Mono',monospace;font-size:.68rem;padding:.25rem .55rem;border-radius:2px;white-space:nowrap;}
+.mp-pill-remove{cursor:pointer;opacity:.7;font-size:.85rem;line-height:1;margin-left:.1rem;}
+.mp-pill-remove:hover{opacity:1;}
+.multi-parcel-dropdown{display:none;position:absolute;top:100%;left:0;right:0;z-index:50;background:white;border:1.5px solid var(--harvest);border-top:none;border-radius:0 0 2px 2px;max-height:260px;overflow-y:auto;box-shadow:0 8px 24px rgba(0,0,0,.12);}
+.multi-parcel-dropdown.open{display:block;}
+.mp-search{width:100%;border:none;border-bottom:1px solid #D8CEBA;padding:.55rem .8rem;font-family:'DM Sans',sans-serif;font-size:.88rem;outline:none;}
+.mp-optgroup-label{font-family:'DM Mono',monospace;font-size:.62rem;letter-spacing:.1em;text-transform:uppercase;color:var(--fog);padding:.5rem .8rem .2rem;background:var(--parchment);}
+.mp-option{padding:.5rem .8rem;font-size:.88rem;cursor:pointer;display:flex;align-items:center;gap:.6rem;transition:background .1s;}
+.mp-option:hover{background:var(--ok-bg);}
+.mp-option.selected{background:var(--ok-bg);font-weight:500;}
+.mp-option-check{width:14px;height:14px;border:1.5px solid #D8CEBA;border-radius:2px;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:.7rem;}
+.mp-option.selected .mp-option-check{background:var(--vine);border-color:var(--vine);color:white;}
+.mp-actions{display:flex;gap:.5rem;padding:.5rem .8rem;border-top:1px solid #D8CEBA;background:var(--parchment);}
+.mp-btn{font-family:'DM Mono',monospace;font-size:.68rem;letter-spacing:.06em;background:none;border:1px solid #D8CEBA;border-radius:2px;padding:.25rem .6rem;cursor:pointer;color:var(--fog);}
+.mp-btn:hover{background:var(--parchment);color:var(--ink);}
+.mp-btn.primary{background:var(--vine);color:var(--paper);border-color:var(--vine);}
+.mp-count-info{font-family:'DM Mono',monospace;font-size:.68rem;color:var(--fog);padding:.3rem .8rem;border-top:1px solid #D8CEBA;text-align:center;}
 
 .btn-submit{width:100%;padding:1rem;background:var(--vine);color:var(--paper);border:none;border-radius:2px;font-family:'Playfair Display',serif;font-size:1.05rem;letter-spacing:.08em;cursor:pointer;transition:all .25s;margin-top:.5rem;}
 .btn-submit:hover{background:var(--soil);transform:translateY(-1px);box-shadow:0 6px 20px rgba(0,0,0,.2);}
@@ -172,6 +194,94 @@ tbody td{padding:.55rem .8rem;color:var(--ink);vertical-align:middle;}
 .toast.error{background:#7A1A1A;}.toast.success{background:var(--ok);}
 
 footer{text-align:center;margin-top:1.5rem;font-family:'DM Mono',monospace;font-size:.65rem;letter-spacing:.12em;color:rgba(245,239,224,.35);text-transform:uppercase;}
+
+/* COSTOS */
+.var-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:.8rem;margin-bottom:1.2rem;}
+.var-box{background:var(--parchment);border-radius:2px;padding:.9rem 1rem;border:1px solid #D8CEBA;}
+.var-box label{font-family:'DM Mono',monospace;font-size:.63rem;letter-spacing:.1em;text-transform:uppercase;color:var(--fog);display:block;margin-bottom:.35rem;}
+.var-box input{background:white;border:1.5px solid #D8CEBA;border-radius:2px;padding:.45rem .7rem;font-family:'DM Mono',monospace;font-size:.92rem;color:var(--ink);width:100%;text-align:right;}
+.var-box input:focus{outline:none;border-color:var(--harvest);box-shadow:0 0 0 2px rgba(196,120,58,.12);}
+.var-unit{font-family:'DM Mono',monospace;font-size:.68rem;color:var(--fog);text-align:right;margin-top:.2rem;}
+.cost-section{padding:1.2rem 2rem 0;}
+.cost-section h3{font-family:'Playfair Display',serif;font-size:1.05rem;color:var(--ink);margin-bottom:.8rem;}
+.cost-acccio-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(165px,1fr));gap:.7rem;margin-bottom:1.5rem;}
+.cost-accio-box{background:white;border:1.5px solid #D8CEBA;border-radius:2px;padding:.9rem 1rem;text-align:center;}
+.ca-icon{font-size:1.5rem;margin-bottom:.3rem;}
+.ca-label{font-family:'DM Mono',monospace;font-size:.62rem;letter-spacing:.08em;text-transform:uppercase;color:var(--fog);margin-bottom:.4rem;}
+.ca-cost{font-family:'DM Mono',monospace;font-size:1.4rem;font-weight:700;color:var(--vine);}
+.ca-unit{font-family:'DM Mono',monospace;font-size:.6rem;color:var(--fog);}
+.ca-detail{font-size:.72rem;color:var(--fog);margin-top:.3rem;line-height:1.4;}
+.cost-parcela-wrap{padding:0 2rem 1.5rem;}
+.cost-parcela-filter{display:flex;gap:.7rem;flex-wrap:wrap;margin-bottom:1rem;align-items:flex-end;}
+.cost-parcela-filter .field{flex:1;min-width:180px;margin-bottom:0;}
+.cost-table-wrap{overflow-x:auto;}
+.cost-table{width:100%;border-collapse:collapse;font-size:.83rem;}
+.cost-table thead th{background:var(--vine);color:var(--paper);font-family:'DM Mono',monospace;font-size:.65rem;letter-spacing:.08em;text-transform:uppercase;padding:.55rem .7rem;text-align:right;}
+.cost-table thead th:first-child{text-align:left;}
+.cost-table tbody tr{border-bottom:1px solid #D8CEBA;}
+.cost-table tbody tr:hover{background:rgba(245,239,224,.5);}
+.cost-table tbody td{padding:.5rem .7rem;text-align:right;font-family:'DM Mono',monospace;font-size:.78rem;}
+.cost-table tbody td:first-child{text-align:left;font-family:'DM Sans',sans-serif;font-size:.83rem;}
+.cost-table tfoot td{background:var(--parchment);font-family:'DM Mono',monospace;font-size:.8rem;font-weight:700;padding:.6rem .7rem;text-align:right;border-top:2px solid #D8CEBA;}
+.cost-table tfoot td:first-child{text-align:left;}
+.cost-total-finca{display:flex;gap:1rem;flex-wrap:wrap;padding:1rem 2rem 1.5rem;border-top:1px solid #D8CEBA;}
+.ctf-box{flex:1;min-width:140px;background:var(--vine);color:var(--paper);border-radius:2px;padding:1rem 1.2rem;text-align:center;}
+.ctf-num{font-family:'DM Mono',monospace;font-size:1.5rem;font-weight:700;}
+.ctf-lbl{font-family:'DM Mono',monospace;font-size:.62rem;letter-spacing:.08em;text-transform:uppercase;margin-top:.3rem;opacity:.75;}
+.dropdown-editor{margin-bottom:1.2rem;}
+.dropdown-editor h4{font-family:'DM Mono',monospace;font-size:.7rem;letter-spacing:.1em;text-transform:uppercase;color:var(--fog);margin-bottom:.6rem;}
+.dropdown-pills{display:flex;flex-wrap:wrap;gap:.4rem;margin-bottom:.6rem;}
+.dp-pill{display:inline-flex;align-items:center;gap:.3rem;background:var(--parchment);border:1px solid #D8CEBA;border-radius:2px;padding:.3rem .6rem;font-size:.82rem;color:var(--ink);}
+.dp-pill.dp-custom{background:#EEF4FF;border-color:#90B4F0;color:#2A4A8A;}
+.dp-pill-del{background:none;border:none;cursor:pointer;color:#CCC;font-size:.9rem;padding:0;line-height:1;}
+.dp-pill-del:hover{color:#E53935;}
+.dp-add-row{display:flex;gap:.5rem;align-items:center;}
+.dp-add-row input{flex:1;font-size:.85rem;padding:.4rem .6rem;}
+.dp-add-row button{white-space:nowrap;}
+.custom-accio-row{display:flex;display:flex;gap:.6rem;align-items:flex-start;background:white;border:1px solid #D8CEBA;border-radius:2px;padding:.7rem .9rem;margin-bottom:.5rem;flex-wrap:wrap;}
+.custom-accio-row .ca-nom{flex:2;min-width:130px;font-size:.88rem;font-weight:500;color:var(--ink);}
+.custom-accio-row .ca-comps{flex:3;min-width:200px;}
+.comp-row{display:flex;gap:.4rem;align-items:center;margin-bottom:.3rem;flex-wrap:wrap;}
+.comp-row select{flex:2;min-width:100px;font-size:.8rem;padding:.3rem .5rem;}
+.comp-row input{flex:1;min-width:60px;font-size:.8rem;padding:.3rem .5rem;text-align:right;}
+.comp-row .comp-lbl{font-family:'DM Mono',monospace;font-size:.6rem;color:var(--fog);white-space:nowrap;}
+.comp-row .comp-cost{font-family:'DM Mono',monospace;font-size:.75rem;color:var(--vine);min-width:55px;text-align:right;font-weight:600;}
+.comp-add{font-size:.68rem;padding:.25rem .6rem;margin-top:.2rem;}
+.custom-accio-total{font-family:'DM Mono',monospace;font-size:.82rem;color:var(--vine);font-weight:700;min-width:70px;text-align:right;align-self:flex-start;padding-top:.2rem;}
+.custom-accio-remove{background:none;border:none;cursor:pointer;color:#CCC;font-size:1.1rem;padding:0;align-self:flex-start;}
+.custom-accio-remove:hover{color:#E53935;}
+@media(max-width:500px){
+  .dropdown-editor{margin-bottom:1.2rem;}
+.dropdown-editor h4{font-family:'DM Mono',monospace;font-size:.7rem;letter-spacing:.1em;text-transform:uppercase;color:var(--fog);margin-bottom:.6rem;}
+.dropdown-pills{display:flex;flex-wrap:wrap;gap:.4rem;margin-bottom:.6rem;}
+.dp-pill{display:inline-flex;align-items:center;gap:.3rem;background:var(--parchment);border:1px solid #D8CEBA;border-radius:2px;padding:.3rem .6rem;font-size:.82rem;color:var(--ink);}
+.dp-pill.dp-custom{background:#EEF4FF;border-color:#90B4F0;color:#2A4A8A;}
+.dp-pill-del{background:none;border:none;cursor:pointer;color:#CCC;font-size:.9rem;padding:0;line-height:1;}
+.dp-pill-del:hover{color:#E53935;}
+.dp-add-row{display:flex;gap:.5rem;align-items:center;}
+.dp-add-row input{flex:1;font-size:.85rem;padding:.4rem .6rem;}
+.dp-add-row button{white-space:nowrap;}
+.custom-accio-row{display:flex;flex-direction:column;}
+}
+.fit-prod-row{display:flex;gap:.5rem;align-items:center;background:white;border:1px solid #D8CEBA;border-radius:2px;padding:.5rem .7rem;margin-bottom:.4rem;flex-wrap:wrap;}
+.fit-prod-row select{flex:2;min-width:140px;font-size:.83rem;padding:.4rem .6rem;}
+.fit-prod-row input{flex:1;min-width:70px;font-size:.83rem;padding:.4rem .6rem;text-align:right;}
+.fit-prod-row .fp-label{font-family:'DM Mono',monospace;font-size:.6rem;letter-spacing:.06em;text-transform:uppercase;color:var(--fog);min-width:30px;}
+.fit-prod-row .fp-cost{font-family:'DM Mono',monospace;font-size:.78rem;color:var(--vine);min-width:60px;text-align:right;font-weight:600;}
+.fit-prod-remove{background:none;border:none;cursor:pointer;color:#CCC;font-size:1.1rem;padding:0 .2rem;flex-shrink:0;}
+.fit-prod-remove:hover{color:#E53935;}
+@media(max-width:500px){
+  .fit-prod-row{gap:.3rem;}
+  .fit-prod-row select{min-width:120px;}
+  .fit-prod-row input{min-width:55px;}
+}
+@media(max-width:600px){
+  .var-grid{grid-template-columns:repeat(2,1fr);}
+  .cost-acccio-grid{grid-template-columns:repeat(2,1fr);}
+  .cost-section{padding:.8rem 1rem 0;}
+  .cost-parcela-wrap{padding:0 1rem 1rem;}
+  .cost-total-finca{padding:.8rem 1rem 1rem;}
+}
 
 @keyframes fadeDown{from{opacity:0;transform:translateY(-20px)}to{opacity:1;transform:translateY(0)}}
 @keyframes fadeUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
@@ -285,6 +395,7 @@ footer{text-align:center;margin-top:1.5rem;font-family:'DM Mono',monospace;font-
   <button class="main-nav-btn" onclick="showPage('seguimiento')" id="nav-seguimiento"><span class="nav-icon">🗓️</span>Seguiment</button>
   <button class="main-nav-btn" onclick="showPage('historial')" id="nav-historial"><span class="nav-icon">📚</span>Historial</button>
   <button class="main-nav-btn" onclick="showPage('exportar')" id="nav-exportar"><span class="nav-icon">📥</span>Exportar</button>
+  <button class="main-nav-btn" onclick="showPage('costos')" id="nav-costos"><span class="nav-icon">💶</span>Costos</button>
 </div>
 
 <!-- ══ REGISTRAR ══ -->
@@ -305,9 +416,22 @@ footer{text-align:center;margin-top:1.5rem;font-family:'DM Mono',monospace;font-
       <div class="row row-3">
         <div class="field"><label>Data</label><input type="date" id="fecha" required></div>
         <div class="field">
-          <label>Parcel·la</label>
-          <select id="parcela" onchange="onParcelaChange(this.value)"><option value="">— Seleccionar —</option></select>
-          <div class="parcel-info-bar" id="parcelaInfo"></div>
+          <label>Parcel·les <span id="parcelaCount" style="color:var(--harvest);font-size:.7rem"></span></label>
+          <div class="multi-parcel-wrap" id="mpWrap">
+            <div class="multi-parcel-selected" id="mpSelected">
+              <span class="multi-parcel-placeholder" id="mpPlaceholder">— Seleccionar parcel·les —</span>
+            </div>
+            <div class="multi-parcel-dropdown" id="mpDropdown">
+              <input class="mp-search" id="mpSearch" type="text" placeholder="Cercar parcel·la…" oninput="filterMpOptions()" onclick="event.stopPropagation()">
+              <div id="mpOptions"></div>
+              <div class="mp-count-info" id="mpCountInfo">Cap seleccionada</div>
+              <div class="mp-actions">
+                <button class="mp-btn" onclick="mpSelectAll()">Seleccionar totes</button>
+                <button class="mp-btn" onclick="mpClearAll()">Netejar</button>
+                <button class="mp-btn primary" onclick="closeMpDropdown()">Confirmar</button>
+              </div>
+            </div>
+          </div>
         </div>
         <div class="field"><label>Operari</label><input type="text" id="operario" placeholder="Nom"></div>
       </div>
@@ -315,13 +439,25 @@ footer{text-align:center;margin-top:1.5rem;font-family:'DM Mono',monospace;font-
 
       <!-- FITOSANITARI -->
       <div class="form-section visible" id="sec-fitosanitario">
-        <div class="section-label">Producte aplicat</div>
-        <div class="row row-2">
-          <div class="field"><label>Nom del producte</label><input type="text" id="fit-producto" placeholder="Mancozeb, Sofre…"></div>
-          <div class="field"><label>Número de registre</label><input type="text" id="fit-registro" placeholder="ES-00000"></div>
+        <div class="section-label">Productes aplicats (mescla)</div>
+
+        <!-- Mixer de productes -->
+        <div id="fitMixer" style="margin-bottom:.8rem"></div>
+        <button type="button" class="btn btn-outline" style="font-size:.7rem;padding:.4rem .8rem;margin-bottom:1rem" onclick="addFitProd()">+ Afegir producte</button>
+
+        <!-- Cost total mescla -->
+        <div style="background:var(--ok-bg);border:1px solid #90C890;border-radius:2px;padding:.6rem 1rem;font-family:'DM Mono',monospace;font-size:.78rem;color:var(--ok);margin-bottom:.8rem;display:flex;justify-content:space-between;align-items:center">
+          <span>Cost productes mescla</span>
+          <strong id="fit-cost-total">— €/ha</strong>
         </div>
-        <div class="row row-3">
-          <div class="field"><label>Dosi (L o Kg/Ha)</label><input type="number" id="fit-dosis" placeholder="0.00" step="0.01" min="0"></div>
+
+        <!-- Hidden field for legacy collectData compat -->
+        <input type="hidden" id="fit-producto" value="">
+        <input type="hidden" id="fit-registro" value="">
+        <input type="hidden" id="fit-dosis" value="">
+        <input type="hidden" id="fit-preu" value="">
+
+        <div class="row row-2">
           <div class="field"><label>Volum brou (L/Ha)</label><input type="number" id="fit-caldo" placeholder="300" step="1" min="0"></div>
           <div class="field"><label>Superfície (Ha)</label><input type="number" id="fit-superficie" placeholder="0.00" step="0.01" min="0"></div>
         </div>
@@ -350,7 +486,7 @@ footer{text-align:center;margin-top:1.5rem;font-family:'DM Mono',monospace;font-
       <div class="form-section" id="sec-labor">
         <div class="row row-2">
           <div class="field"><label>Tipus de labor</label>
-            <select id="lab-tipo"><option>Poda d'hivern</option><option>Poda en verd / despuntat</option><option>Desfullat</option><option>Aclarida de raïms</option><option>Llaurada / Cultivador</option><option>Desbrossada mecànica</option><option>Sega de coberta vegetal</option><option>Aporcament</option><option>Lligada / Agobio</option><option>Verema</option><option>Altre</option></select>
+            <select id="lab-tipo"><option>Poda d'hivern</option><option>Poda en verd / despuntat</option><option>Desfullat</option><option>Aclarida de raïms</option><option>Llaurada / Cultivador</option><option>Desbrossada mecànica</option><option>Sega de coberta vegetal</option><option>Triturar vergues</option><option>Aporcament</option><option>Lligada / Agobio</option><option>Verema</option><option>Altre</option></select>
           </div>
           <div class="field"><label>Maquinària / Eina</label><input type="text" id="lab-maquina" placeholder="Tractor, podadora…"></div>
         </div>
@@ -517,6 +653,150 @@ footer{text-align:center;margin-top:1.5rem;font-family:'DM Mono',monospace;font-
   </div>
 </div>
 
+<div class="page" id="page-costos">
+
+  <!-- Variables ajustables -->
+  <div class="card" style="margin-bottom:1.2rem">
+    <div class="panel-header ph-harvest">⚙️ &nbsp; Variables de cost — ajustables cada any</div>
+    <div class="card-inner">
+      <div class="var-grid">
+        <div class="var-box">
+          <label>Preu gasoil</label>
+          <input type="number" id="v-gasoil" value="1.035" step="0.001" min="0" oninput="renderCostos()">
+          <div class="var-unit">€ / litre</div>
+        </div>
+        <div class="var-box">
+          <label>Salari tractorista</label>
+          <input type="number" id="v-salari" value="2000" step="10" min="0" oninput="renderCostos()">
+          <div class="var-unit">€ / mes (160h)</div>
+        </div>
+        <div class="var-box">
+          <label>Preu fertilitzant</label>
+          <input type="number" id="v-fertilitzant" value="20.9" step="0.1" min="0" oninput="renderCostos()">
+          <div class="var-unit">€ / tona</div>
+        </div>
+        <div class="var-box">
+          <label>Dosi fertilitzant</label>
+          <input type="number" id="v-dosi-fert" value="4.659" step="0.1" min="0" oninput="renderCostos()">
+          <div class="var-unit">tones / ha</div>
+        </div>
+        <div class="var-box" style="border:1.5px solid #C4783A">
+          <label>Amortització maquinària <span style="color:var(--harvest)">2024</span></label>
+          <input type="number" id="v-amort" value="332.19" step="0.01" min="0" oninput="renderCostos()">
+          <div class="var-unit">€ / ha / any · <span style="color:var(--fog)">Total: 24.409€ ÷ 73,48ha SCP</span></div>
+        </div>
+      </div>
+      <button class="btn btn-vine" onclick="resetVariables()">↺ Restaurar valors 2024</button>
+    </div>
+  </div>
+
+  <!-- Catàleg de productes fitosanitaris -->
+  <div class="card" style="margin-bottom:1.2rem">
+    <div class="panel-header ph-grape">🧪 &nbsp; Catàleg de productes fitosanitaris</div>
+    <div class="card-inner">
+      <p style="font-size:.84rem;color:var(--fog);margin-bottom:1rem;line-height:1.6">
+        Defineix el preu de cada producte. S'utilitza per calcular el cost de cada tractament registrat.
+        El preu també el pots introduir directament al formulari de tractament.
+      </p>
+      <div style="overflow-x:auto">
+        <table class="cost-table" id="producteTable" style="margin-bottom:.8rem">
+          <thead><tr>
+            <th style="text-align:left">Producte</th>
+            <th>Preu (€/kg o L)</th>
+            <th>Dosi habitual (kg/ha)</th>
+            <th>Cost habitual (€/ha)</th>
+            <th></th>
+          </tr></thead>
+          <tbody id="producteTbody"></tbody>
+        </table>
+      </div>
+      <div style="display:flex;gap:.6rem;flex-wrap:wrap;align-items:flex-end;margin-top:.5rem">
+        <div class="field" style="margin-bottom:0;min-width:160px"><label>Nou producte</label><input type="text" id="new-prod-nom" placeholder="Nom del producte"></div>
+        <div class="field" style="margin-bottom:0;width:110px"><label>Preu €/kg</label><input type="number" id="new-prod-preu" placeholder="0.00" step="0.01" min="0"></div>
+        <div class="field" style="margin-bottom:0;width:110px"><label>Dosi kg/ha</label><input type="number" id="new-prod-dosi" placeholder="0" step="0.1" min="0"></div>
+        <button class="btn btn-grape" onclick="addProducte()" style="margin-bottom:1rem">+ Afegir</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Cost per acció -->
+  <div class="card" style="margin-bottom:1.2rem">
+    <div class="panel-header ph-soil">📊 &nbsp; Cost unitari per acció (€/ha)</div>
+    <div class="cost-section">
+      <div class="cost-acccio-grid" id="costAccioGrid"></div>
+    </div>
+  </div>
+
+  <!-- Editor de desplegables del formulari -->
+  <div class="card" style="margin-bottom:1.2rem">
+    <div class="panel-header" style="background:#2A5472">✏️ &nbsp; Editar opcions dels desplegables del formulari</div>
+    <div class="card-inner">
+      <p style="font-size:.84rem;color:var(--fog);margin-bottom:1.2rem;line-height:1.6">
+        Personalitza les opcions de cada selector. Les opcions en blau les has afegit tu. Les canvis es guarden automàticament.
+      </p>
+      <div id="dropdownEditors"></div>
+    </div>
+  </div>
+
+  <!-- Accions personalitzades -->
+  <div class="card" style="margin-bottom:1.2rem">
+    <div class="panel-header" style="background:#2C1A0E">➕ &nbsp; Gestió d'accions personalitzades</div>
+    <div class="card-inner">
+      <p style="font-size:.84rem;color:var(--fog);margin-bottom:1rem;line-height:1.6">
+        Afegeix noves accions amb els seus components de cost (gasoil, mà d'obra, productes, etc.).
+        Apareixeran al desplegable del formulari de Labor i al càlcul de costos per parcel·la.
+      </p>
+      <div id="customAcciosList"></div>
+      <button class="btn btn-vine" onclick="addCustomAccio()" style="margin-top:.5rem">➕ Nova acció</button>
+    </div>
+  </div>
+
+  <!-- Cost per parcella -->
+  <div class="card">
+    <div class="panel-header ph-vine" style="background:var(--vine)">🌿 &nbsp; Cost acumulat per parcel·la</div>
+    <div class="cost-section">
+      <div class="cost-parcela-filter">
+        <div class="field">
+          <label>Filtrar per parcel·la</label>
+          <select id="cost-filt-parcela" onchange="renderCostParceles()">
+            <option value="">Totes les parcel·les</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>Any</label>
+          <select id="cost-filt-any" onchange="renderCostParceles()">
+            <option value="">Tots els anys</option>
+          </select>
+        </div>
+      </div>
+    </div>
+    <div class="cost-parcela-wrap">
+      <div class="cost-table-wrap">
+        <table class="cost-table" id="costTable">
+          <thead>
+            <tr>
+              <th style="text-align:left">Parcel·la</th>
+              <th>Sup (ha)</th>
+              <th>Llaurar</th>
+              <th>Poda</th>
+              <th>Tractaments</th>
+              <th>Abonar</th>
+              <th>Reg</th>
+              <th>Amortitz.</th>
+              <th><strong>Total €</strong></th>
+              <th>€/ha</th>
+            </tr>
+          </thead>
+          <tbody id="costTableBody"></tbody>
+          <tfoot id="costTableFoot"></tfoot>
+        </table>
+      </div>
+    </div>
+    <div class="cost-total-finca" id="costTotalFinca"></div>
+  </div>
+
+</div>
+
 <footer>Cuaderno de Campo · Viñedo · Penedès &nbsp;·&nbsp; Dades guardades al navegador</footer>
 </div>
 <div class="toast" id="toast"></div>
@@ -571,6 +851,20 @@ document.addEventListener('DOMContentLoaded', function() {
   renderTracker();
   renderHistorial();
   updateExportStats();
+
+  // Listener per obrir/tancar el dropdown de parcel·les
+  const mpSel = document.getElementById('mpSelected');
+  if(mpSel) mpSel.addEventListener('click', toggleMpDropdown);
+
+  // Init mixer de productes fitosanitaris
+  initFitMixer();
+  // Apply saved dropdown customizations
+  applyAllDropdowns();
+  // Sync custom accions to form
+  syncCustomAccionsToForm();
+
+  // Poblar filtres de costos
+  populateCostFilters();
 });
 
 // ══════════════════════════════════════════════════
@@ -584,6 +878,10 @@ function showPage(name) {
   if(name==='seguimiento') renderTracker();
   if(name==='historial')   renderHistorial();
   if(name==='exportar')    updateExportStats();
+  if(name==='costos') {
+    renderCostos();
+    renderDropdownEditors();
+  }
 }
 
 // ══════════════════════════════════════════════════
@@ -605,6 +903,9 @@ function switchType(type) {
 // ══════════════════════════════════════════════════
 //  PARCEL·LES — desplegable per municipi
 // ══════════════════════════════════════════════════
+// ── Multi-parcel state ────────────────────────────────────────────────────
+let mpSelected_list = []; // array of selected parcel names
+
 function populateParceles() {
   const byMun = {};
   PARCEL_DATA.forEach(p => {
@@ -612,12 +913,11 @@ function populateParceles() {
     byMun[p.municipi].push(p);
   });
 
-  ['parcela','log-parcela','filt-parcela'].forEach(id => {
+  // log-parcela and filt-parcela keep normal select
+  ['log-parcela','filt-parcela'].forEach(id => {
     const sel = document.getElementById(id); if(!sel) return;
     const cur = sel.value;
-    sel.innerHTML = '<option value="">— Totes —</option>';
-    if(id==='parcela'||id==='log-parcela') sel.innerHTML = '<option value="">— Seleccionar —</option>';
-
+    sel.innerHTML = id==='filt-parcela' ? '<option value="">Totes</option>' : '<option value="">— Seleccionar —</option>';
     Object.keys(byMun).sort().forEach(mun => {
       const grp = document.createElement('optgroup');
       grp.label = '📍 ' + mun;
@@ -629,15 +929,141 @@ function populateParceles() {
       });
       sel.appendChild(grp);
     });
-
-    if(id==='parcela'||id==='log-parcela') {
+    if(id==='log-parcela') {
       const oAll = document.createElement('option');
       oAll.value = 'Tota la finca'; oAll.textContent = '🍇 Tota la finca';
       sel.appendChild(oAll);
     }
     if(cur) sel.value = cur;
   });
+
+  // Build multi-select options
+  buildMpOptions(byMun);
 }
+
+function buildMpOptions(byMun) {
+  const container = document.getElementById('mpOptions'); if(!container) return;
+  container.innerHTML = '';
+  Object.keys(byMun).sort().forEach(mun => {
+    const lbl = document.createElement('div');
+    lbl.className = 'mp-optgroup-label';
+    lbl.textContent = '📍 ' + mun;
+    container.appendChild(lbl);
+    byMun[mun].forEach(p => {
+      const div = document.createElement('div');
+      div.className = 'mp-option' + (mpSelected_list.includes(p.nom) ? ' selected' : '');
+      div.dataset.nom = p.nom;
+      div.dataset.mun = mun.toLowerCase();
+      div.innerHTML = `<div class="mp-option-check">${mpSelected_list.includes(p.nom)?'✓':''}</div>
+        <span>${p.nom} <span style="color:var(--fog);font-size:.78rem">${p.varietat} · ${p.sup.toFixed(2)} ha</span></span>`;
+      div.onclick = (e) => { e.stopPropagation(); toggleMpOption(p.nom); };
+      container.appendChild(div);
+    });
+  });
+  updateMpUI();
+}
+
+function toggleMpOption(nom) {
+  const idx = mpSelected_list.indexOf(nom);
+  if(idx === -1) mpSelected_list.push(nom);
+  else mpSelected_list.splice(idx, 1);
+  // Update option visuals
+  document.querySelectorAll('.mp-option').forEach(el => {
+    const sel = mpSelected_list.includes(el.dataset.nom);
+    el.classList.toggle('selected', sel);
+    el.querySelector('.mp-option-check').textContent = sel ? '✓' : '';
+  });
+  updateMpUI();
+}
+
+function updateMpUI() {
+  const box = document.getElementById('mpSelected');
+  const ph  = document.getElementById('mpPlaceholder');
+  const cnt = document.getElementById('parcelaCount');
+  const info = document.getElementById('mpCountInfo');
+  // Remove old pills
+  box.querySelectorAll('.mp-pill').forEach(p => p.remove());
+  if(mpSelected_list.length === 0) {
+    ph.style.display = '';
+    if(cnt) cnt.textContent = '';
+    if(info) info.textContent = 'Cap seleccionada';
+  } else {
+    ph.style.display = 'none';
+    mpSelected_list.forEach(nom => {
+      const pill = document.createElement('span');
+      pill.className = 'mp-pill';
+      // Usar DOM en lloc d'innerHTML per evitar problemes amb apòstrofs
+      pill.textContent = nom;
+      const removeBtn = document.createElement('span');
+      removeBtn.className = 'mp-pill-remove';
+      removeBtn.textContent = '×';
+      removeBtn.title = 'Treure';
+      removeBtn.addEventListener('click', function(e) {
+        e.stopPropagation();
+        toggleMpOption(nom);
+      });
+      pill.appendChild(removeBtn);
+      box.appendChild(pill);
+    });
+    if(cnt) cnt.textContent = '(' + mpSelected_list.length + ' sel.)';
+    if(info) info.textContent = mpSelected_list.length + ' parcel·la' + (mpSelected_list.length>1?'es':'') + ' seleccionada' + (mpSelected_list.length>1?'es':'');
+  }
+}
+
+function toggleMpDropdown() {
+  const dd = document.getElementById('mpDropdown');
+  const box = document.getElementById('mpSelected');
+  const isOpen = dd.classList.contains('open');
+  if(isOpen) { dd.classList.remove('open'); box.classList.remove('open'); }
+  else { dd.classList.add('open'); box.classList.add('open'); document.getElementById('mpSearch').focus(); }
+}
+
+function closeMpDropdown() {
+  document.getElementById('mpDropdown').classList.remove('open');
+  document.getElementById('mpSelected').classList.remove('open');
+}
+
+function filterMpOptions() {
+  const q = document.getElementById('mpSearch').value.toLowerCase();
+  document.querySelectorAll('.mp-option').forEach(el => {
+    const match = el.dataset.nom.toLowerCase().includes(q) || el.dataset.mun.includes(q);
+    el.style.display = match ? '' : 'none';
+  });
+  document.querySelectorAll('.mp-optgroup-label').forEach(lbl => {
+    const next = lbl.nextElementSibling;
+    let hasVisible = false;
+    let el = lbl.nextElementSibling;
+    while(el && el.classList.contains('mp-option')) {
+      if(el.style.display !== 'none') hasVisible = true;
+      el = el.nextElementSibling;
+    }
+    lbl.style.display = hasVisible ? '' : 'none';
+  });
+}
+
+function mpSelectAll() {
+  mpSelected_list = PARCEL_DATA.map(p => p.nom);
+  document.querySelectorAll('.mp-option').forEach(el => {
+    el.classList.add('selected');
+    el.querySelector('.mp-option-check').textContent = '✓';
+  });
+  updateMpUI();
+}
+
+function mpClearAll() {
+  mpSelected_list = [];
+  document.querySelectorAll('.mp-option').forEach(el => {
+    el.classList.remove('selected');
+    el.querySelector('.mp-option-check').textContent = '';
+  });
+  updateMpUI();
+}
+
+// Close dropdown when clicking outside
+document.addEventListener('click', e => {
+  const wrap = document.getElementById('mpWrap');
+  if(wrap && !wrap.contains(e.target)) closeMpDropdown();
+});
 
 function onParcelaChange(nom) {
   const info = document.getElementById('parcelaInfo');
@@ -672,12 +1098,14 @@ function saveTractament(parcela, dateStr) {
 // ══════════════════════════════════════════════════
 function collectData() {
   const g = id => (document.getElementById(id)?.value||'').trim();
+  const parceles = mpSelected_list.length > 0 ? mpSelected_list.join(' / ') : '';
   const base = { id: Date.now(), tipo:currentType, fecha:g('fecha'),
-                 parcela:g('parcela'), operario:g('operario'), obs:g('observaciones') };
+                 parcela:parceles, operario:g('operario'), obs:g('observaciones') };
   const sp = {
     fitosanitario: ()=>({ c1:g('fit-producto'), c2:g('fit-registro'), c3:g('fit-dosis'),
       c4:g('fit-caldo'), c5:g('fit-superficie'), c6:g('fit-objetivo'), c7:g('fit-tipo'),
-      c8:g('fit-hora-ini')+'–'+g('fit-hora-fin'), c9:'T:'+g('fit-temp')+'°C HR:'+g('fit-hr')+'% V:'+g('fit-viento')+' PS:'+g('fit-plazo')+'d' }),
+      c8:g('fit-hora-ini')+'–'+g('fit-hora-fin'), c9:'T:'+g('fit-temp')+'°C HR:'+g('fit-hr')+'% V:'+g('fit-viento')+' PS:'+g('fit-plazo')+'d',
+      c10: g('fit-preu') }),
     labor:   ()=>({ c1:g('lab-tipo'), c2:g('lab-maquina'), c3:g('lab-hora-ini')+'–'+g('lab-hora-fin'), c4:g('lab-superficie'), c5:g('lab-fenologia') }),
     riego:   ()=>({ c1:g('rie-tipo'), c2:g('rie-origen'), c3:g('rie-hora-ini')+'–'+g('rie-hora-fin'), c4:g('rie-caudal'), c5:g('rie-volumen'), c6:g('rie-superficie'), c7:g('rie-motivo') }),
     abonado: ()=>({ c1:g('abo-tipo'), c2:g('abo-producto'), c3:g('abo-dosis'), c4:g('abo-cantidad'), c5:g('abo-superficie'), c6:g('abo-forma'), c7:'N:'+g('abo-n')+' P:'+g('abo-p')+' K:'+g('abo-k') }),
@@ -688,13 +1116,16 @@ function collectData() {
 function guardarPart() {
   const d = collectData();
   if(!d.fecha) { showToast('⚠ Indica la data del part',true); return; }
-  if(!d.parcela) { showToast('⚠ Selecciona una parcel·la',true); return; }
+  if(!d.parcela) { showToast('⚠ Selecciona almenys una parcel·la',true); return; }
 
   const parts = getParts();
   parts.unshift(d);
   saveParts(parts);
 
-  if(d.tipo==='fitosanitario' && d.parcela) saveTractament(d.parcela, d.fecha);
+  // Per al seguiment, actualitza cada parcel·la individualment
+  if(d.tipo==='fitosanitario') {
+    mpSelected_list.forEach(nom => saveTractament(nom, d.fecha));
+  }
 
   // Sincronitza amb Google Sheets (en segon pla)
   enviarASheets(d);
@@ -709,7 +1140,12 @@ function resetForm() {
     if(el.type==='date') el.valueAsDate=new Date(); else el.value='';
   });
   document.querySelectorAll('#parcela,#sec-fitosanitario select,#sec-labor select,#sec-riego select,#sec-abonado select').forEach(s=>s.selectedIndex=0);
-  document.getElementById('parcelaInfo').style.display='none';
+  // Reset multi-parcel selection
+  mpSelected_list = [];
+  updateMpUI();
+  closeMpDropdown();
+  // Reset mixer fitosanitari
+  resetFitMixer();
 }
 
 // ══════════════════════════════════════════════════
@@ -927,6 +1363,825 @@ function downloadFile(content, filename, mime) {
 }
 
 function today() { return new Date().toISOString().slice(0,10); }
+
+// ══════════════════════════════════════════════════
+//  MÒDUL DE COSTOS
+// ══════════════════════════════════════════════════
+
+// Valors base 2024
+const COST_DEFAULTS = {
+  gasoil: 1.035, salari: 2000, fertilitzant: 20.9, dosiFert: 4.659,
+  amort: 332.19  // €/ha/any — Total 24.409,25€ ÷ 73,48ha SCP (2024)
+};
+
+// Catàleg de productes per defecte (2024)
+const PRODUCTES_DEFAULT = [
+  { nom:'Sofre pols',              preu:0.825, dosi:32,  unitat:'kg/ha' },
+  { nom:'Sofre mullable',          preu:1.20,  dosi:4,   unitat:'kg/ha' },
+  { nom:'Coure hidròxid',          preu:7.50,  dosi:2.5, unitat:'kg/ha' },
+  { nom:'Oxiclorur coure 50%',     preu:4.80,  dosi:3.0, unitat:'kg/ha' },
+  { nom:'Oxiclorur coure 80%',     preu:6.20,  dosi:2.0, unitat:'kg/ha' },
+  { nom:'Caldo bordalesès',        preu:3.50,  dosi:4.0, unitat:'kg/ha' },
+  { nom:'Mancozeb',                preu:4.20,  dosi:2.0, unitat:'kg/ha' },
+  { nom:'Folpet',                  preu:6.50,  dosi:1.5, unitat:'kg/ha' },
+  { nom:'Azoxistrobina',           preu:28.00, dosi:0.5, unitat:'L/ha'  },
+  { nom:'Captan',                  preu:5.20,  dosi:1.5, unitat:'kg/ha' },
+];
+
+function getProductes() {
+  try { return JSON.parse(localStorage.getItem('productes_fitosanitaris') || 'null') || PRODUCTES_DEFAULT; }
+  catch { return PRODUCTES_DEFAULT; }
+}
+function saveProductes(p) { localStorage.setItem('productes_fitosanitaris', JSON.stringify(p)); }
+
+function renderProducteTaula() {
+  const tbody = document.getElementById('producteTbody'); if(!tbody) return;
+  const prods = getProductes();
+  tbody.innerHTML = '';
+  prods.forEach((p, i) => {
+    const costHa = (p.preu * p.dosi).toFixed(2);
+    tbody.innerHTML += `<tr>
+      <td style="text-align:left">${p.nom}</td>
+      <td><input type="number" value="${p.preu}" step="0.01" min="0" style="width:80px;text-align:right;font-family:'DM Mono',monospace;font-size:.82rem;border:1px solid #D8CEBA;border-radius:2px;padding:.2rem .4rem" oninput="updateProducte(${i},'preu',this.value)"></td>
+      <td><input type="number" value="${p.dosi}" step="0.1" min="0" style="width:70px;text-align:right;font-family:'DM Mono',monospace;font-size:.82rem;border:1px solid #D8CEBA;border-radius:2px;padding:.2rem .4rem" oninput="updateProducte(${i},'dosi',this.value)"></td>
+      <td id="cost-ha-${i}" style="color:var(--vine);font-weight:600">${costHa}€</td>
+      <td><button onclick="deleteProducte(${i})" style="background:none;border:none;cursor:pointer;color:#CCC;font-size:1rem" title="Eliminar">✕</button></td>
+    </tr>`;
+  });
+  // Update preu hint on form if producte matches
+  updatePreuHint();
+}
+
+function updateProducte(i, field, val) {
+  const prods = getProductes();
+  prods[i][field] = parseFloat(val)||0;
+  saveProductes(prods);
+  // Update cost ha cell
+  const costHaEl = document.getElementById('cost-ha-'+i);
+  if(costHaEl) costHaEl.textContent = (prods[i].preu * prods[i].dosi).toFixed(2)+'€';
+  renderCostos();
+}
+
+function deleteProducte(i) {
+  const prods = getProductes();
+  prods.splice(i, 1);
+  saveProductes(prods);
+  renderProducteTaula();
+  renderCostos();
+}
+
+function addProducte() {
+  const nom  = document.getElementById('new-prod-nom')?.value.trim();
+  const preu = parseFloat(document.getElementById('new-prod-preu')?.value)||0;
+  const dosi = parseFloat(document.getElementById('new-prod-dosi')?.value)||0;
+  if(!nom) { showToast('⚠ Indica el nom del producte', true); return; }
+  const prods = getProductes();
+  prods.push({ nom, preu, dosi });
+  saveProductes(prods);
+  document.getElementById('new-prod-nom').value = '';
+  document.getElementById('new-prod-preu').value = '';
+  document.getElementById('new-prod-dosi').value = '';
+  renderProducteTaula();
+  renderCostos();
+  showToast('✅ Producte afegit', false, true);
+}
+
+// ── MIXER DE PRODUCTES FITOSANITARIS ──────────────────────────────────────
+let fitProds = []; // [{prodIdx, dosi, preu}]
+
+function initFitMixer() {
+  fitProds = [{ prodIdx: 0, dosi: '', preu: '' }];
+  renderFitMixer();
+}
+
+function renderFitMixer() {
+  const container = document.getElementById('fitMixer'); if(!container) return;
+  const prods = getProductes();
+  container.innerHTML = '';
+  fitProds.forEach((fp, i) => {
+    const options = prods.map((p, pi) =>
+      `<option value="${pi}" ${pi===fp.prodIdx?'selected':''}>${p.nom} (${p.preu}€/${p.unitat||'kg'})</option>`
+    ).join('');
+    const row = document.createElement('div');
+    row.className = 'fit-prod-row';
+    row.innerHTML = `
+      <select onchange="fitProdChange(${i},'prodIdx',this.value)">
+        <option value="">— Seleccionar —</option>${options}
+      </select>
+      <span class="fp-label">Dosi</span>
+      <input type="number" value="${fp.dosi}" placeholder="${fp.prodIdx!==''&&prods[fp.prodIdx]?prods[fp.prodIdx].dosi:''}" step="0.1" min="0"
+        oninput="fitProdChange(${i},'dosi',this.value)" style="width:70px">
+      <span class="fp-label">${fp.prodIdx!==''&&prods[fp.prodIdx]?prods[fp.prodIdx].unitat||'kg/ha':'kg/ha'}</span>
+      <span class="fp-label">Preu</span>
+      <input type="number" value="${fp.preu}" placeholder="${fp.prodIdx!==''&&prods[fp.prodIdx]?prods[fp.prodIdx].preu:''}" step="0.01" min="0"
+        oninput="fitProdChange(${i},'preu',this.value)" style="width:65px">
+      <span class="fp-label">€/kg</span>
+      <span class="fp-cost" id="fp-cost-${i}">—</span>
+      ${fitProds.length>1?`<button class="fit-prod-remove" onclick="removeFitProd(${i})" title="Treure">✕</button>`:''}`;
+    container.appendChild(row);
+    calcFitProdCost(i);
+  });
+  calcFitMixerTotal();
+  // Update hidden fields for collectData
+  updateFitHiddenFields();
+}
+
+function fitProdChange(i, field, val) {
+  if(field==='prodIdx') {
+    fitProds[i].prodIdx = val===''?'':parseInt(val);
+    // Autofill dosi/preu from catalog if empty
+    const prods = getProductes();
+    if(val!=='' && prods[fitProds[i].prodIdx]) {
+      const p = prods[fitProds[i].prodIdx];
+      if(!fitProds[i].dosi) fitProds[i].dosi = p.dosi;
+      if(!fitProds[i].preu) fitProds[i].preu = p.preu;
+    }
+  } else {
+    fitProds[i][field] = val;
+  }
+  renderFitMixer();
+}
+
+function addFitProd() {
+  fitProds.push({ prodIdx: '', dosi: '', preu: '' });
+  renderFitMixer();
+}
+
+function removeFitProd(i) {
+  fitProds.splice(i, 1);
+  renderFitMixer();
+}
+
+function calcFitProdCost(i) {
+  const fp = fitProds[i];
+  const prods = getProductes();
+  const dosi = parseFloat(fp.dosi) || (fp.prodIdx!==''&&prods[fp.prodIdx]?prods[fp.prodIdx].dosi:0);
+  const preu = parseFloat(fp.preu) || (fp.prodIdx!==''&&prods[fp.prodIdx]?prods[fp.prodIdx].preu:0);
+  const cost = dosi * preu;
+  const el = document.getElementById('fp-cost-'+i);
+  if(el) el.textContent = cost>0 ? cost.toFixed(2)+'€/ha' : '—';
+  return cost;
+}
+
+function calcFitMixerTotal() {
+  let total = 0;
+  fitProds.forEach((fp, i) => { total += calcFitProdCost(i); });
+  const el = document.getElementById('fit-cost-total');
+  if(el) el.textContent = total>0 ? total.toFixed(2)+' €/ha' : '— €/ha';
+  return total;
+}
+
+function updateFitHiddenFields() {
+  const prods = getProductes();
+  // c1 = noms productes, c3 = dosi total, c10 = cost total €/ha
+  const noms  = fitProds.filter(fp=>fp.prodIdx!=='').map(fp=>prods[fp.prodIdx]?.nom||'').filter(Boolean).join(' + ');
+  const costTotal = calcFitMixerTotal();
+  const dosiPrinc = fitProds.length>0 ? (parseFloat(fitProds[0].dosi)||0) : 0;
+  const elNom  = document.getElementById('fit-producto');
+  const elDosi = document.getElementById('fit-dosis');
+  const elPreu = document.getElementById('fit-preu');
+  if(elNom)  elNom.value  = noms;
+  if(elDosi) elDosi.value = dosiPrinc;
+  if(elPreu) elPreu.value = costTotal > 0 ? costTotal : '';
+}
+
+function resetFitMixer() { initFitMixer(); }
+
+// When typing product name in form, autofill preu from catalog
+function updatePreuHint() {
+  const nom  = document.getElementById('fit-producto')?.value?.trim().toLowerCase();
+  const hint = document.getElementById('fit-preu-hint');
+  if(!nom || !hint) return;
+  const prod = getProductes().find(p => p.nom.toLowerCase().includes(nom) || nom.includes(p.nom.toLowerCase()));
+  if(prod) {
+    hint.textContent = '→ '+prod.nom+' ('+prod.preu+'€/kg)';
+    // Autofill if field is empty
+    const preuField = document.getElementById('fit-preu');
+    if(preuField && !preuField.value) { preuField.value = prod.preu; calcCostTractament(); }
+  } else { hint.textContent = ''; }
+}
+
+function calcCostTractament() {
+  const dosi = parseFloat(document.getElementById('fit-dosis')?.value)||0;
+  const preu = parseFloat(document.getElementById('fit-preu')?.value)||0;
+  const costHa = dosi * preu;
+  const field = document.getElementById('fit-cost-ha-input');
+  if(field) field.value = costHa > 0 ? costHa.toFixed(2) : '';
+}
+
+// Definició de cada acció: com es calcula el cost/ha
+const ACCIONS_COST = [
+  { id:'llaurar',    label:'Llaurar',    icon:'🚜',
+    calcul: v => {
+      const costHora = v.salari / 160;
+      const gasoilHa = 7.5 * v.gasoil;
+      const maObraHa = 1.3 * costHora;
+      return { total: gasoilHa + maObraHa,
+               detail: `Gasoil: ${gasoilHa.toFixed(2)}€ · M.O.: ${maObraHa.toFixed(2)}€` };
+    }
+  },
+  { id:'triturar',   label:'Triturar herba', icon:'🌿',
+    calcul: v => {
+      const costHora = v.salari / 160;
+      const gasoilHa = 7.5 * v.gasoil;
+      const maObraHa = 1.3 * costHora;
+      return { total: gasoilHa + maObraHa,
+               detail: `Gasoil: ${gasoilHa.toFixed(2)}€ · M.O.: ${maObraHa.toFixed(2)}€` };
+    }
+  },
+  { id:'triturar_vergues', label:'Triturar vergues', icon:'🌾',
+    calcul: v => {
+      const costHora = v.salari / 160;
+      const gasoilHa = 9.0 * v.gasoil;
+      const maObraHa = 1.5 * costHora;
+      return { total: gasoilHa + maObraHa,
+               detail: `Gasoil: ${gasoilHa.toFixed(2)}€ · M.O.: ${maObraHa.toFixed(2)}€` };
+    }
+  },
+  { id:'poda',       label:'Poda',       icon:'✂️',
+    calcul: v => {
+      const costHora = v.salari / 160;
+      const base = 228.37 * (costHora / 12.5); // ajust proporcional al salari
+      return { total: base, detail: `Mà d'obra poda (proporcional)` };
+    }
+  },
+  { id:'fitosanitario', label:'Tractament', icon:'🌡️',
+    calcul: (v, part) => {
+      const costHora = v.salari / 160;
+      const gasoilHa = 5.0 * v.gasoil;
+      const maObraHa = 0.5 * costHora;
+      // Si el part té preu (c10) i dosi (c3), usar-los; sinó usar catàleg
+      let producteHa = 0;
+      if(part && part.c10 && part.c3) {
+        producteHa = parseFloat(part.c10) * parseFloat(part.c3);
+      } else if(part && part.c1) {
+        const prod = getProductes().find(p => p.nom.toLowerCase().includes((part.c1||'').toLowerCase().split(' ')[0]));
+        if(prod) producteHa = prod.preu * prod.dosi;
+        else {
+          // Fallback: sofre per defecte
+          const sofre = getProductes().find(p => p.nom.toLowerCase().includes('sofre'));
+          if(sofre) producteHa = sofre.preu * sofre.dosi;
+        }
+      }
+      return { total: gasoilHa + maObraHa + producteHa,
+               detail: `Gasoil: ${gasoilHa.toFixed(2)}€ · M.O.: ${maObraHa.toFixed(2)}€ · Producte: ${producteHa.toFixed(2)}€` };
+    }
+  },
+  { id:'abonar',     label:'Abonar',     icon:'🌱',
+    calcul: v => {
+      const costHora = v.salari / 160;
+      const gasoilHa = 3.533 * v.gasoil;
+      const maObraHa = 0.9638 * costHora;
+      const fertilitzantHa = v.dosiFert * v.fertilitzant;
+      return { total: gasoilHa + maObraHa + fertilitzantHa,
+               detail: `Gasoil: ${gasoilHa.toFixed(2)}€ · M.O.: ${maObraHa.toFixed(2)}€ · Fertilitzant: ${fertilitzantHa.toFixed(2)}€` };
+    }
+  },
+  { id:'riego',      label:'Reg',        icon:'💧',
+    calcul: v => {
+      const costHora = v.salari / 160;
+      return { total: costHora * 0.5, detail: `M.O.: ${(costHora*0.5).toFixed(2)}€` };
+    }
+  },
+  { id:'amortitzacio', label:'Amortització', icon:'🏗️',
+    calcul: (v) => ({
+      total: v.amort,
+      detail: `Tractors 12.905€ · Maquinària 10.755€ · Abonadora 300€ · Remolcs 450€`
+    })
+  },
+];
+
+// Mapeig tipus de part → id acció per al càlcul
+const TIPO_TO_ACCIO = {
+  'fitosanitario': 'fitosanitario',
+  'labor': null, // es determina per c1
+  'riego': 'riego',
+  'abonado': 'abonar'
+};
+
+const LABOR_TO_ACCIO = {
+  // Català (valors actuals del formulari)
+  "Poda d'hivern":              'poda',
+  'Poda en verd / despuntat':   'poda',
+  'Desfullat':                  null,
+  'Aclarida de raïms':          null,
+  'Llaurada / Cultivador':      'llaurar',
+  'Desbrossada mecànica':       'triturar',
+  'Sega de coberta vegetal':    'triturar',
+  'Aporcament':                 'llaurar',
+  'Lligada / Agobio':           null,
+  'Verema':                     null,
+  'Altre':                      null,
+  // Castellà (parts antics)
+  'Poda de invierno':           'poda',
+  'Poda en verde / despuntado': 'poda',
+  'Laboreo / Cultivador':       'llaurar',
+  'Desherbado mecánico':        'triturar',
+  'Siega de cubierta vegetal':  'triturar',
+  'Aporque':                    'llaurar',
+};
+
+function getVars() {
+  const n = id => parseFloat(document.getElementById(id)?.value || 0);
+  return {
+    gasoil: n('v-gasoil'), salari: n('v-salari'),
+    fertilitzant: n('v-fertilitzant'), dosiFert: n('v-dosi-fert'),
+    amort: n('v-amort')
+  };
+}
+
+function resetVariables() {
+  document.getElementById('v-gasoil').value       = COST_DEFAULTS.gasoil;
+  document.getElementById('v-salari').value       = COST_DEFAULTS.salari;
+  document.getElementById('v-fertilitzant').value = COST_DEFAULTS.fertilitzant;
+  document.getElementById('v-dosi-fert').value    = COST_DEFAULTS.dosiFert;
+  document.getElementById('v-amort').value        = COST_DEFAULTS.amort;
+  renderCostos();
+}
+
+function renderCostos() {
+  renderProducteTaula();
+  renderCustomAccions();
+  renderCostAccions();
+  renderCostParceles();
+}
+
+function renderCostAccions() {
+  const v = getVars();
+  const grid = document.getElementById('costAccioGrid'); if(!grid) return;
+  grid.innerHTML = '';
+  ACCIONS_COST.forEach(a => {
+    const r = a.calcul(v);
+    grid.innerHTML += `
+      <div class="cost-accio-box">
+        <div class="ca-icon">${a.icon}</div>
+        <div class="ca-label">${a.label}</div>
+        <div class="ca-cost">${r.total.toFixed(2)}</div>
+        <div class="ca-unit">€ / ha</div>
+        <div class="ca-detail">${r.detail}</div>
+      </div>`;
+  });
+}
+
+function populateCostFilters() {
+  renderProducteTaula();
+  const selP = document.getElementById('cost-filt-parcela'); if(!selP) return;
+  selP.innerHTML = '<option value="">Totes les parcel·les</option>';
+  PARCEL_DATA.forEach(p => {
+    const o = document.createElement('option');
+    o.value = p.nom; o.textContent = p.nom;
+    selP.appendChild(o);
+  });
+  // Years
+  const selA = document.getElementById('cost-filt-any'); if(!selA) return;
+  selA.innerHTML = '<option value="">Tots els anys</option>';
+  const anys = new Set();
+  getParts().forEach(p => { if(p.fecha) anys.add(p.fecha.slice(0,4)); });
+  [...anys].sort().reverse().forEach(a => {
+    const o = document.createElement('option');
+    o.value = a; o.textContent = a;
+    selA.appendChild(o);
+  });
+}
+
+function renderCostParceles() {
+  const v       = getVars();
+  const filtP   = document.getElementById('cost-filt-parcela')?.value || '';
+  const filtA   = document.getElementById('cost-filt-any')?.value || '';
+  let parts     = getParts();
+  if(filtA) parts = parts.filter(p => p.fecha?.startsWith(filtA));
+
+  // Build cost map: parcela → { accioId: total€ }
+  const costMap = {};
+  parts.forEach(part => {
+    // Each part can have multiple parceles (separator ' / ')
+    const parceles = part.parcela ? part.parcela.split(' / ').map(p=>p.trim()) : [];
+    parceles.forEach(nomP => {
+      if(!nomP) return;
+      const parcelInfo = PARCEL_DATA.find(p => p.nom === nomP);
+      const sup = parcelInfo ? parcelInfo.sup : 0;
+
+      let accioId = TIPO_TO_ACCIO[part.tipo];
+      if(part.tipo === 'labor' && part.c1) {
+        accioId = LABOR_TO_ACCIO[part.c1] || null;
+        // Detectar triturar vergues
+        // Triturar vergues (més intensiu que triturar herba)
+        if((part.c1||'').toLowerCase().includes('vergues') ||
+           (part.c1||'').toLowerCase().includes('verges')) {
+          accioId = 'triturar_vergues';
+        }
+      }
+      if(!accioId || sup === 0) return;
+
+      const cost = getAccioCalcul(accioId, v, part) * sup;
+      if(cost === 0) return;
+
+      if(!costMap[nomP]) costMap[nomP] = {};
+      costMap[nomP][accioId] = (costMap[nomP][accioId] || 0) + cost;
+    });
+  });
+
+  // Render table
+  const parceles = filtP ? [filtP] : PARCEL_DATA.map(p=>p.nom);
+  const tbody = document.getElementById('costTableBody'); if(!tbody) return;
+  const tfoot = document.getElementById('costTableFoot');
+  tbody.innerHTML = '';
+
+  const totals = { llaurar:0, poda:0, fitosanitario:0, abonar:0, riego:0, amort:0, total:0, sup:0 };
+
+  parceles.forEach(nomP => {
+    const cm = costMap[nomP] || {};
+    const pi = PARCEL_DATA.find(p=>p.nom===nomP);
+    if(!pi) return;
+    const sup = pi.sup;
+
+    const llaurar  = (cm['llaurar']||0) + (cm['triturar']||0) + (cm['triturar_vergues']||0);
+    const poda     = cm['poda']||0;
+    const fito     = cm['fitosanitario']||0;
+    const abonar   = cm['abonar']||0;
+    const reg      = cm['riego']||0;
+    const amort    = sup * v.amort;  // amortització proporcional a la superfície
+    const totalOps = llaurar + poda + fito + abonar + reg;
+    const total    = totalOps + amort;
+    const costHa   = sup > 0 ? total / sup : 0;
+
+    if(totalOps === 0 && !filtP) return; // skip parceles with no activity
+
+    totals.llaurar += llaurar; totals.poda += poda;
+    totals.fitosanitario += fito; totals.abonar += abonar;
+    totals.riego += reg; totals.amort += amort;
+    totals.total += total; totals.sup += sup;
+
+    const fmt = n => n > 0 ? n.toFixed(0)+'€' : '—';
+    tbody.innerHTML += `<tr>
+      <td>${nomP}</td>
+      <td>${sup.toFixed(2)}</td>
+      <td>${fmt(llaurar)}</td>
+      <td>${fmt(poda)}</td>
+      <td>${fmt(fito)}</td>
+      <td>${fmt(abonar)}</td>
+      <td>${fmt(reg)}</td>
+      <td style="color:var(--harvest)">${fmt(amort)}</td>
+      <td><strong>${fmt(total)}</strong></td>
+      <td>${costHa>0?costHa.toFixed(0)+'€':'—'}</td>
+    </tr>`;
+  });
+
+  // Footer totals
+  const fmt = n => n > 0 ? n.toFixed(0)+'€' : '—';
+  const avgHa = totals.sup > 0 ? totals.total / totals.sup : 0;
+  tfoot.innerHTML = `<tr>
+    <td>TOTAL</td>
+    <td>${totals.sup.toFixed(2)}</td>
+    <td>${fmt(totals.llaurar)}</td>
+    <td>${fmt(totals.poda)}</td>
+    <td>${fmt(totals.fitosanitario)}</td>
+    <td>${fmt(totals.abonar)}</td>
+    <td>${fmt(totals.riego)}</td>
+    <td style="color:var(--harvest)">${fmt(totals.amort)}</td>
+    <td><strong>${fmt(totals.total)}</strong></td>
+    <td>${avgHa>0?avgHa.toFixed(0)+'€':'—'}</td>
+  </tr>`;
+
+  // Summary boxes
+  const finca = document.getElementById('costTotalFinca'); if(!finca) return;
+  finca.innerHTML = `
+    <div class="ctf-box"><div class="ctf-num">${totals.total.toFixed(0)}€</div><div class="ctf-lbl">Cost total</div></div>
+    <div class="ctf-box"><div class="ctf-num">${avgHa.toFixed(0)}€</div><div class="ctf-lbl">Mitjana €/ha</div></div>
+    <div class="ctf-box"><div class="ctf-num">${Object.keys(costMap).length}</div><div class="ctf-lbl">Parcel·les actives</div></div>
+    <div class="ctf-box"><div class="ctf-num">${parts.length}</div><div class="ctf-lbl">Parts registrats</div></div>`;
+}
+
+// ══════════════════════════════════════════════════
+//  EDITOR DE DESPLEGABLES
+// ══════════════════════════════════════════════════
+
+// Default options for each dropdown (original values)
+const DROPDOWN_DEFAULTS = {
+  'lab-tipo': [
+    "Poda d'hivern","Poda en verd / despuntat","Desfullat","Aclarida de raïms",
+    "Llaurada / Cultivador","Desbrossada mecànica","Sega de coberta vegetal","Triturar vergues",
+    "Aporcament","Lligada / Agobio","Verema","Altre"
+  ],
+  'fit-objetivo': [
+    "Míldiu","Oïdi","Botrytis","Àcars","Polilla del raïm",
+    "Cigarrera","Flavescència daurada","Herbicida","Preventiu general","Altre"
+  ],
+  'fit-tipo': ["Polvorització foliar","Polvorització sòl","Tractament tronc"],
+  'rie-tipo': ["Degoteig","Microaspersió","Aspersió","Gravetat / Inundació"],
+  'rie-origen': ["Pou propi","Comunitat de regants","Embassament / Bassa","Xarxa municipal"],
+  'abo-tipo': [
+    "Orgànic sòlid (compost, fems)","Orgànic líquid","Mineral (NPK sòlid)",
+    "Mineral líquid / fertirrigació","Foliar","Esmena càlcica","Corrector de pH"
+  ],
+  'abo-forma': [
+    "Incorporació al sòl (fresadora)","Superfície (al vol)",
+    "Localitzat en línia","Fertirrigació","Polvorització foliar"
+  ],
+  'lab-fenologia': [
+    "Repòs vegetatiu","Plor","Brotació","2-3 fulles","Inflorescències visibles",
+    "Floració","Quallat","Envero","Maduració","Post-verema"
+  ],
+};
+
+const DROPDOWN_LABELS = {
+  'lab-tipo':      "🚜 Labor — Tipus de feina",
+  'fit-objetivo':  "🌿 Tractament — Plaga / Malaltia objectiu",
+  'fit-tipo':      "🌿 Tractament — Tipus d'aplicació",
+  'rie-tipo':      "💧 Reg — Tipus de reg",
+  'rie-origen':    "💧 Reg — Origen de l'aigua",
+  'abo-tipo':      "🌱 Adob — Tipus de fertilitzant",
+  'abo-forma':     "🌱 Adob — Forma d'aplicació",
+  'lab-fenologia': "🍇 Labor — Estat fenològic",
+};
+
+function getDropdownOptions(id) {
+  try {
+    const saved = JSON.parse(localStorage.getItem('dropdown_'+id) || 'null');
+    return saved || [...DROPDOWN_DEFAULTS[id]];
+  } catch { return [...DROPDOWN_DEFAULTS[id]]; }
+}
+
+function saveDropdownOptions(id, opts) {
+  localStorage.setItem('dropdown_'+id, JSON.stringify(opts));
+}
+
+function applyDropdownToForm(id) {
+  const sel = document.getElementById(id); if(!sel) return;
+  const opts = getDropdownOptions(id);
+  const cur = sel.value;
+  const hasEmpty = id === 'fit-objetivo' || id === 'lab-fenologia';
+  sel.innerHTML = hasEmpty ? '<option value="">— Seleccionar —</option>' : '';
+  opts.forEach(o => {
+    const el = document.createElement('option');
+    el.value = o; el.textContent = o;
+    sel.appendChild(el);
+  });
+  if(cur && [...sel.options].some(o=>o.value===cur)) sel.value = cur;
+}
+
+function applyAllDropdowns() {
+  Object.keys(DROPDOWN_DEFAULTS).forEach(id => applyDropdownToForm(id));
+}
+
+function renderDropdownEditors() {
+  const container = document.getElementById('dropdownEditors'); if(!container) return;
+  container.innerHTML = '';
+  Object.keys(DROPDOWN_DEFAULTS).forEach(id => {
+    const opts = getDropdownOptions(id);
+    const defaults = DROPDOWN_DEFAULTS[id];
+    const label = DROPDOWN_LABELS[id] || id;
+
+    const section = document.createElement('div');
+    section.className = 'dropdown-editor';
+
+    const pillsHtml = opts.map((o, i) => {
+      const isCustom = !defaults.includes(o);
+      return `<span class="dp-pill ${isCustom?'dp-custom':''}">
+        ${o}
+        <button class="dp-pill-del" onclick="removeDropdownOption('${id}',${i})" title="Treure">✕</button>
+      </span>`;
+    }).join('');
+
+    section.innerHTML = `
+      <h4>${label}</h4>
+      <div class="dropdown-pills" id="dpills-${id}">${pillsHtml}</div>
+      <div class="dp-add-row">
+        <input type="text" id="dp-new-${id}" placeholder="Nova opció…" 
+          onkeydown="if(event.key==='Enter') addDropdownOption('${id}')">
+        <button class="btn btn-vine" style="padding:.4rem .9rem;font-size:.7rem" 
+          onclick="addDropdownOption('${id}')">+ Afegir</button>
+        <button class="btn btn-outline" style="padding:.4rem .7rem;font-size:.65rem"
+          onclick="resetDropdown('${id}')" title="Restaurar per defecte">↺</button>
+      </div>`;
+    container.appendChild(section);
+
+    // Separator
+    const sep = document.createElement('hr');
+    sep.style.cssText = 'border:none;border-top:1px solid #D8CEBA;margin:.8rem 0 1rem';
+    container.appendChild(sep);
+  });
+}
+
+function addDropdownOption(id) {
+  const input = document.getElementById('dp-new-'+id); if(!input) return;
+  const val = input.value.trim();
+  if(!val) return;
+  const opts = getDropdownOptions(id);
+  if(opts.includes(val)) { showToast('⚠ Aquesta opció ja existeix', true); return; }
+  opts.push(val);
+  saveDropdownOptions(id, opts);
+  input.value = '';
+  applyDropdownToForm(id);
+  renderDropdownEditors();
+  // Also sync to lab-tipo LABOR_TO_ACCIO if needed
+  if(id==='lab-tipo') syncCustomAccionsToForm();
+  showToast('✅ Opció afegida', false, true);
+}
+
+function removeDropdownOption(id, i) {
+  const opts = getDropdownOptions(id);
+  opts.splice(i, 1);
+  saveDropdownOptions(id, opts);
+  applyDropdownToForm(id);
+  renderDropdownEditors();
+}
+
+function resetDropdown(id) {
+  localStorage.removeItem('dropdown_'+id);
+  applyDropdownToForm(id);
+  renderDropdownEditors();
+  showToast('↺ Restaurat per defecte');
+}
+
+// ══════════════════════════════════════════════════
+//  ACCIONS PERSONALITZADES
+// ══════════════════════════════════════════════════
+
+const COMP_TYPES = [
+  { id:'gasoil',    label:'Gasoil',        unit:'L/ha',   calcul:(v,q)=> q * v.gasoil },
+  { id:'maobra',    label:"Mà d'obra",    unit:'h/ha',   calcul:(v,q)=> q * (v.salari/160) },
+  { id:'producte',  label:'Producte',      unit:'€/ha',   calcul:(v,q)=> q },
+  { id:'fix',       label:'Cost fix',      unit:'€/ha',   calcul:(v,q)=> q },
+];
+
+function getCustomAccions() {
+  try { return JSON.parse(localStorage.getItem('custom_accions') || '[]'); }
+  catch { return []; }
+}
+function saveCustomAccions(a) { localStorage.setItem('custom_accions', JSON.stringify(a)); }
+
+function renderCustomAccions() {
+  const container = document.getElementById('customAcciosList'); if(!container) return;
+  const accions = getCustomAccions();
+  const v = getVars();
+  container.innerHTML = '';
+
+  if(accions.length === 0) {
+    container.innerHTML = '<p style="font-size:.83rem;color:var(--fog);font-style:italic;margin-bottom:.5rem">Cap acció personalitzada. Prem "Nova acció" per crear-ne una.</p>';
+    return;
+  }
+
+  accions.forEach((acc, i) => {
+    const totalCost = calcCustomAccioCost(acc, v);
+    const row = document.createElement('div');
+    row.className = 'custom-accio-row';
+
+    const compsHtml = acc.components.map((c, ci) => {
+      const ct = COMP_TYPES.find(t=>t.id===c.type)||COMP_TYPES[0];
+      const cost = ct.calcul(v, parseFloat(c.qty)||0);
+      const typeOpts = COMP_TYPES.map(t=>`<option value="${t.id}" ${t.id===c.type?'selected':''}>${t.label}</option>`).join('');
+      return `<div class="comp-row">
+        <select onchange="updateCustomComp(${i},${ci},'type',this.value)">${typeOpts}</select>
+        <input type="number" value="${c.qty}" placeholder="0" step="0.1" min="0"
+          oninput="updateCustomComp(${i},${ci},'qty',this.value)" style="width:65px">
+        <span class="comp-lbl">${ct.unit}</span>
+        <span class="comp-cost" id="cc-${i}-${ci}">${cost>0?cost.toFixed(2)+'€':''}</span>
+        <button onclick="removeCustomComp(${i},${ci})" style="background:none;border:none;cursor:pointer;color:#CCC;font-size:.9rem" title="Treure">✕</button>
+      </div>`;
+    }).join('');
+
+    row.innerHTML = `
+      <div style="flex:2;min-width:130px">
+        <input type="text" value="${acc.nom}" placeholder="Nom de l'acció"
+          oninput="updateCustomAccioNom(${i},this.value)"
+          style="width:100%;font-size:.88rem;font-weight:500;border:1px solid #D8CEBA;border-radius:2px;padding:.35rem .6rem;margin-bottom:.4rem">
+        <div style="font-family:'DM Mono',monospace;font-size:.6rem;color:var(--fog);letter-spacing:.06em;text-transform:uppercase">
+          Tipus de labor associat
+        </div>
+        <input type="text" value="${acc.laborKey||''}" placeholder="ex: Verema, Esporga..."
+          oninput="updateCustomAccioLaborKey(${i},this.value)"
+          style="width:100%;font-size:.8rem;border:1px solid #D8CEBA;border-radius:2px;padding:.3rem .6rem;color:var(--fog)">
+      </div>
+      <div class="ca-comps">
+        ${compsHtml}
+        <button class="btn btn-outline comp-add" onclick="addCustomComp(${i})">+ Component</button>
+      </div>
+      <div style="display:flex;flex-direction:column;align-items:flex-end;gap:.4rem">
+        <span class="custom-accio-total" id="cat-total-${i}">${totalCost.toFixed(2)} €/ha</span>
+        <button class="custom-accio-remove" onclick="deleteCustomAccio(${i})" title="Eliminar acció">🗑</button>
+      </div>`;
+    container.appendChild(row);
+  });
+}
+
+function calcCustomAccioCost(acc, v) {
+  return acc.components.reduce((sum, c) => {
+    const ct = COMP_TYPES.find(t=>t.id===c.type)||COMP_TYPES[0];
+    return sum + ct.calcul(v, parseFloat(c.qty)||0);
+  }, 0);
+}
+
+function addCustomAccio() {
+  const accions = getCustomAccions();
+  accions.push({ nom:'Nova acció', laborKey:'', components:[{type:'maobra',qty:''}] });
+  saveCustomAccions(accions);
+  renderCustomAccions();
+  syncCustomAccionsToForm();
+}
+
+function deleteCustomAccio(i) {
+  const accions = getCustomAccions();
+  accions.splice(i, 1);
+  saveCustomAccions(accions);
+  renderCustomAccions();
+  syncCustomAccionsToForm();
+  renderCostos();
+}
+
+function updateCustomAccioNom(i, val) {
+  const accions = getCustomAccions();
+  accions[i].nom = val;
+  saveCustomAccions(accions);
+  syncCustomAccionsToForm();
+}
+
+function updateCustomAccioLaborKey(i, val) {
+  const accions = getCustomAccions();
+  accions[i].laborKey = val;
+  saveCustomAccions(accions);
+  syncCustomAccionsToForm();
+}
+
+function addCustomComp(i) {
+  const accions = getCustomAccions();
+  accions[i].components.push({type:'maobra', qty:''});
+  saveCustomAccions(accions);
+  renderCustomAccions();
+}
+
+function removeCustomComp(i, ci) {
+  const accions = getCustomAccions();
+  accions[i].components.splice(ci, 1);
+  saveCustomAccions(accions);
+  renderCustomAccions();
+}
+
+function updateCustomComp(i, ci, field, val) {
+  const accions = getCustomAccions();
+  accions[i].components[ci][field] = val;
+  saveCustomAccions(accions);
+  // Update cost display
+  const v = getVars();
+  const ct = COMP_TYPES.find(t=>t.id===accions[i].components[ci].type)||COMP_TYPES[0];
+  const cost = ct.calcul(v, parseFloat(val)||0);
+  const el = document.getElementById(`cc-${i}-${ci}`);
+  if(el) el.textContent = cost>0 ? cost.toFixed(2)+'€' : '';
+  // Update total
+  const total = calcCustomAccioCost(accions[i], v);
+  const telEl = document.getElementById(`cat-total-${i}`);
+  if(telEl) telEl.textContent = total.toFixed(2)+' €/ha';
+  renderCostos();
+}
+
+// Sync custom accions to LABOR_TO_ACCIO and lab-tipo select
+function syncCustomAccionsToForm() {
+  const accions = getCustomAccions();
+  // Add to LABOR_TO_ACCIO
+  accions.forEach(acc => {
+    if(acc.laborKey && acc.laborKey.trim()) {
+      LABOR_TO_ACCIO[acc.laborKey.trim()] = 'custom_'+acc.nom;
+    }
+  });
+  // Add to lab-tipo select if not already present
+  const sel = document.getElementById('lab-tipo'); if(!sel) return;
+  // Remove old custom options
+  sel.querySelectorAll('.custom-opt').forEach(o=>o.remove());
+  accions.forEach(acc => {
+    if(!acc.nom.trim()) return;
+    const exists = [...sel.options].some(o=>o.value===acc.nom);
+    if(!exists) {
+      const o = document.createElement('option');
+      o.value = acc.nom; o.textContent = acc.nom; o.className = 'custom-opt';
+      sel.appendChild(o);
+    }
+  });
+}
+
+// Override renderCostParceles to include custom accions
+const _origGetAccioId = function(part) {
+  let accioId = TIPO_TO_ACCIO[part.tipo];
+  if(part.tipo === 'labor' && part.c1) {
+    accioId = LABOR_TO_ACCIO[part.c1] || null;
+    if((part.c1||'').toLowerCase().includes('vergues') || (part.c1||'').toLowerCase().includes('verges')) {
+      accioId = 'triturar_vergues';
+    }
+  }
+  return accioId;
+};
+
+function getAccioCalcul(accioId, v, part) {
+  // Check built-in accions first
+  const builtin = ACCIONS_COST.find(a => a.id === accioId);
+  if(builtin) return builtin.calcul(v, part).total;
+  // Check custom accions
+  if(accioId && accioId.startsWith('custom_')) {
+    const nom = accioId.replace('custom_','');
+    const acc = getCustomAccions().find(a=>a.nom===nom);
+    if(acc) return calcCustomAccioCost(acc, v);
+  }
+  return 0;
+}
 
 // ══════════════════════════════════════════════════
 //  TOAST
