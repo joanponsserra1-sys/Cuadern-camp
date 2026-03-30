@@ -855,9 +855,15 @@ footer{text-align:center;margin-top:1.5rem;font-family:monospace;font-size:.65re
 
   <!-- Sencrop banner -->
   <div class="sencrop-banner" style="margin-bottom:1.2rem">
-    🌦️ <strong>Mode manual</strong> — Introdueix les dades de cada estació manualment.
-    Quan tinguis el token de l'API de Sencrop (<strong><a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="315041587142545f52435e411f525e5c">[email&#160;protected]</a></strong>),
-    les dades s'actualitzaran automàticament en temps real.
+    🌍 <strong>Open-Meteo integrat</strong> — Dades meteorològiques gratuïtes i automàtiques.
+    Prem el botó per carregar temperatura, humitat, precipitació i historial hivernal (EPI) per tots els municipis.
+    <br><br>
+    <button id="btnUpdateMeteo" onclick="updateAllFromOpenMeteo()" style="background:#4CAF50;color:white;border:none;border-radius:2px;padding:.7rem 1.4rem;font-family:monospace;font-size:.82rem;cursor:pointer;letter-spacing:.06em">
+      🔄 Actualitzar dades (Open-Meteo)
+    </button>
+    <span style="font-family:monospace;font-size:.65rem;opacity:.6;margin-left:.8rem">
+      Sense API key · Resolució 9km · Historial des de 1940
+    </span>
   </div>
 
   <!-- Alerta global -->
