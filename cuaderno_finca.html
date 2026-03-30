@@ -2,8 +2,17 @@
 <html lang="ca">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Cuaderno de Campo — Viñedo</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Cuaderno de Camp — Viñedo</title>
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Cuaderno Camp">
+<meta name="theme-color" content="#1A3020">
+<meta name="description" content="Gestió de vinya Cava Miquel Pons · Penedès">
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="icon.png">
+<link rel="icon" type="image/png" href="icon-192.png">
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=DM+Mono:wght@300;400;500&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
 <style>
 :root{
@@ -2903,6 +2912,15 @@ function showToast(msg,error=false,success=false){
   el.className='toast'+(error?' error':success?' success':'');
   setTimeout(()=>el.classList.add('show'),10);
   setTimeout(()=>el.classList.remove('show'),3000);
+}
+</script>
+<script>
+if('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('sw.js')
+      .then(r => console.log('SW registrat:', r.scope))
+      .catch(e => console.log('SW error:', e));
+  });
 }
 </script>
 </body>
