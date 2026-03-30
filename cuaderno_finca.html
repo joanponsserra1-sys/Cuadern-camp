@@ -2752,30 +2752,64 @@ function renderEPI() {
     const lv  = epiLevel(total);
     const pct = Math.min(100, Math.max(0, (total / 80) * 100));
 
-    const monthsHtml = EPI_MONTH_KEYS.map((mes, i) => {
-      const m = (munData[mes]) || {};
-      const epiMes = monthly[mes];
-      const oi1 = 'saveEpiData(&quot;' + mun + '&quot;,&quot;' + mes + '&quot;,&quot;pluja&quot;,this.value)';
-      const oi2 = 'saveEpiData(&quot;' + mun + '&quot;,&quot;' + mes + '&quot;,&quot;tmed&quot;,this.value)';
-      return '<div class="epi-month">' +
-        '<div class="epi-month-lbl">' + EPI_MONTHS_LABELS[i] + '</div>' +
-        '<input type="number" class="epi-month-input" value="' + (m.pluja||'') + '" placeholder="mm" step="1" min="0" oninput="' + oi1 + '">' +
-        '<input type="number" class="epi-month-input" value="' + (m.tmed||'') + '" placeholder="T" step="0.5" oninput="' + oi2 + '" style="font-size:.65rem;color:var(--fog)">' +
-        '<div class="epi-month-val" style="color:' + (epiMes>0?'var(--harvest)':'var(--fog)') + '">' + (epiMes>0?'+'+epiMes:epiMes) + '</div>' +
-        '</div>';
-    }).join('');
-
-    grid.innerHTML += '<div class="epi-mun-card">' +
-      '<div class="epi-mun-name">📍 ' + mun + '</div>' +
+    // Build month cells using DOM (evita problemes amb quotes)
+    const munCard = document.createElement('div');
+    munCard.className = 'epi-mun-card';
+    munCard.innerHTML = '<div class="epi-mun-name">📍 ' + mun + '</div>' +
       '<div class="epi-gauge"><div class="epi-gauge-fill epi-' + lv.cls + '" style="width:' + pct + '%"></div></div>' +
       '<div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:.5rem">' +
         '<span class="epi-val ' + lv.cls + '">' + lv.emoji + ' EPI ' + (total>0?'+'+total:total) + '</span>' +
         '<span class="epi-label">' + lv.label + '</span>' +
-      '</div>' +
-      '<div class="epi-months">' + monthsHtml + '</div>' +
-      '<div style="font-size:.72rem;color:var(--fog);margin-top:.5rem;font-style:italic">' + lv.risk + '</div>' +
       '</div>';
+
+    const monthsDiv = document.createElement('div');
+    monthsDiv.className = 'epi-months';
+
+    EPI_MONTH_KEYS.forEach((mes, i) => {
+      const m = (munData[mes]) || {};
+      const epiMes = monthly[mes];
+      const cell = document.createElement('div');
+      cell.className = 'epi-month';
+
+      const lbl = document.createElement('div');
+      lbl.className = 'epi-month-lbl';
+      lbl.textContent = EPI_MONTHS_LABELS[i];
+      cell.appendChild(lbl);
+
+      // Pluja input
+      const inp1 = document.createElement('input');
+      inp1.type = 'number'; inp1.className = 'epi-month-input';
+      inp1.value = m.pluja||''; inp1.placeholder = 'mm';
+      inp1.step = '1'; inp1.min = '0';
+      inp1.addEventListener('input', (function(mn, ms){ return function(){ saveEpiData(mn, ms, 'pluja', this.value); }; })(mun, mes));
+      cell.appendChild(inp1);
+
+      // Temp input
+      const inp2 = document.createElement('input');
+      inp2.type = 'number'; inp2.className = 'epi-month-input';
+      inp2.value = m.tmed||''; inp2.placeholder = 'T';
+      inp2.step = '0.5'; inp2.style.cssText = 'font-size:.65rem;color:var(--fog)';
+      inp2.addEventListener('input', (function(mn, ms){ return function(){ saveEpiData(mn, ms, 'tmed', this.value); }; })(mun, mes));
+      cell.appendChild(inp2);
+
+      const valDiv = document.createElement('div');
+      valDiv.className = 'epi-month-val';
+      valDiv.style.color = epiMes>0 ? 'var(--harvest)' : 'var(--fog)';
+      valDiv.textContent = epiMes>0 ? '+'+epiMes : epiMes;
+      cell.appendChild(valDiv);
+
+      monthsDiv.appendChild(cell);
+    });
+
+    munCard.appendChild(monthsDiv);
+    const riskDiv = document.createElement('div');
+    riskDiv.style.cssText = 'font-size:.72rem;color:var(--fog);margin-top:.5rem;font-style:italic';
+    riskDiv.textContent = lv.risk;
+    munCard.appendChild(riskDiv);
+    grid.appendChild(munCard);
   });
+
+  // MUNICIPIS_METEO.forEach end (cards built via DOM above)
 
   const avgEpi   = Math.round(globalEpi / MUNICIPIS_METEO.length * 10) / 10;
   const globalLv = epiLevel(avgEpi);
