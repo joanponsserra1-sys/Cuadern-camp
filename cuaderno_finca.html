@@ -2398,7 +2398,14 @@ async function fetchOpenMeteoEPI(mun) {
   const year = new Date().getFullYear();
   // Oct previous year to Mar current year
   const start = `${year-1}-10-01`;
-  const end   = `${year}-03-31`;
+  // Use yesterday as end date to ensure data availability
+  const yesterday = new Date(); yesterday.setDate(yesterday.getDate()-2);
+  const endYear  = yesterday.getFullYear();
+  const endMonth = String(yesterday.getMonth()+1).padStart(2,'0');
+  const endDay   = String(yesterday.getDate()).padStart(2,'0');
+  // Cap at end of March current year
+  const endMar = `${year}-03-31`;
+  const end = endMar < `${endYear}-${endMonth}-${endDay}` ? endMar : `${endYear}-${endMonth}-${endDay}`;
   try {
     // HR no disponible a ERA5 daily — usem només T i pluja per EPI
     const url = `https://archive-api.open-meteo.com/v1/archive?latitude=${c.lat}&longitude=${c.lon}` +
@@ -2461,10 +2468,12 @@ async function updateAllFromOpenMeteo() {
       }
       // Historial hivernal EPI
       const epi = await fetchOpenMeteoEPI(mun);
-      if(epi) {
+      if(epi && Object.keys(epi).length > 0) {
         epiData[mun] = epi;
         ok++;
-        console.log('EPI OK per', mun, epi);
+        console.log('EPI OK per', mun, JSON.stringify(epi));
+      } else {
+        console.log('EPI buit per', mun, epi);
       }
     } catch(e) {
       console.log('Error per', mun, e);
@@ -2786,34 +2795,39 @@ function renderEPI() {
     EPI_MONTH_KEYS.forEach((mes, i) => {
       const m = (munData[mes]) || {};
       const epiMes = monthly[mes];
+      const hasData = m.pluja !== undefined && m.pluja !== '';
       const cell = document.createElement('div');
       cell.className = 'epi-month';
 
+      // Label
       const lbl = document.createElement('div');
       lbl.className = 'epi-month-lbl';
       lbl.textContent = EPI_MONTHS_LABELS[i];
       cell.appendChild(lbl);
 
-      // Pluja input
+      // Pluja — input editable (mostra valor Open-Meteo si disponible)
       const inp1 = document.createElement('input');
       inp1.type = 'number'; inp1.className = 'epi-month-input';
-      inp1.value = m.pluja||''; inp1.placeholder = 'mm';
-      inp1.step = '1'; inp1.min = '0';
+      inp1.step = '1'; inp1.min = '0'; inp1.placeholder = 'mm';
+      if(hasData) inp1.value = m.pluja;
+      if(hasData) inp1.style.borderColor = '#4CAF50';
       inp1.addEventListener('input', (function(mn, ms){ return function(){ saveEpiData(mn, ms, 'pluja', this.value); }; })(mun, mes));
       cell.appendChild(inp1);
 
-      // Temp input
+      // Temp — input editable
       const inp2 = document.createElement('input');
       inp2.type = 'number'; inp2.className = 'epi-month-input';
-      inp2.value = m.tmed||''; inp2.placeholder = 'T';
-      inp2.step = '0.5'; inp2.style.cssText = 'font-size:.65rem;color:var(--fog)';
+      inp2.step = '0.5'; inp2.placeholder = 'T°';
+      inp2.style.cssText = 'font-size:.65rem;' + (hasData ? 'color:#2D6A2D;border-color:#4CAF50' : 'color:var(--fog)');
+      if(hasData && m.tmed !== '') inp2.value = m.tmed;
       inp2.addEventListener('input', (function(mn, ms){ return function(){ saveEpiData(mn, ms, 'tmed', this.value); }; })(mun, mes));
       cell.appendChild(inp2);
 
+      // EPI mes
       const valDiv = document.createElement('div');
       valDiv.className = 'epi-month-val';
-      valDiv.style.color = epiMes>0 ? 'var(--harvest)' : 'var(--fog)';
-      valDiv.textContent = epiMes>0 ? '+'+epiMes : epiMes;
+      valDiv.style.color = epiMes > 0 ? 'var(--harvest)' : (epiMes === 0 && !hasData ? '#CCC' : 'var(--fog)');
+      valDiv.textContent = hasData ? (epiMes>0?'+'+epiMes:epiMes) : '—';
       cell.appendChild(valDiv);
 
       monthsDiv.appendChild(cell);
