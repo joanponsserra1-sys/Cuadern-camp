@@ -649,7 +649,13 @@ footer{text-align:center;margin-top:1.5rem;font-family:monospace;font-size:.65re
 
     <!-- Registre ràpid -->
     <div class="tracker-log">
-      <div class="section-label">Registrar tractament ràpid</div>
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:.8rem">
+        <div class="section-label" style="margin:0">Registrar tractament ràpid</div>
+        <button onclick="syncTractamentsFromSheets().then(()=>renderTracker()).then(()=>showToast('✅ Sincronitzat amb Sheets',false,true))"
+          style="background:var(--ok);color:white;border:none;border-radius:2px;padding:.4rem .9rem;font-family:monospace;font-size:.65rem;cursor:pointer;letter-spacing:.06em">
+          🔄 Sincronitzar
+        </button>
+      </div>
       <div class="log-row">
         <div class="field"><label>Parcel·la</label><select id="log-parcela"><option value="">— Seleccionar —</option></select></div>
         <div class="field"><label>Data</label><input type="date" id="log-fecha"></div>
@@ -974,7 +980,11 @@ function showPage(name) {
   document.querySelectorAll('.main-nav-btn').forEach(b=>b.classList.remove('active'));
   document.getElementById('page-'+name).classList.add('visible');
   document.getElementById('nav-'+name).classList.add('active');
-  if(name==='seguimiento') renderTracker();
+  if(name==='seguimiento') {
+    renderTracker();
+    // Sync from Sheets in background
+    syncTractamentsFromSheets().then(() => renderTracker());
+  }
   if(name==='historial')   renderHistorial();
   if(name==='exportar')    updateExportStats();
   if(name==='costos') {
@@ -1265,6 +1275,26 @@ function daysSince(d) {
 }
 function stateFor(d) {
   if(d===null) return 'none'; if(d<7) return 'ok'; if(d<=14) return 'warn'; return 'danger';
+}
+
+async function syncTractamentsFromSheets() {
+  try {
+    const r = await fetch(SCRIPT_URL + '?action=tractaments', { mode: 'cors' });
+    if(!r.ok) return;
+    const data = await r.json();
+    if(data.tractaments) {
+      // Merge Sheets data with localStorage (Sheets wins if newer)
+      const local = getTractaments();
+      Object.entries(data.tractaments).forEach(([parcela, dateStr]) => {
+        if(!local[parcela] || dateStr > local[parcela]) {
+          local[parcela] = dateStr;
+        }
+      });
+      localStorage.setItem('tractaments', JSON.stringify(local));
+    }
+  } catch(e) {
+    console.log('Sheets sync error:', e);
+  }
 }
 
 function renderTracker() {
