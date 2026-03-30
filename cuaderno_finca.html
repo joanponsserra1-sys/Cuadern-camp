@@ -20,11 +20,11 @@ body{background-color:var(--vine);background-image:repeating-linear-gradient(0de
 header{text-align:center;margin-bottom:1.8rem;animation:fadeDown .8s ease both;}
 .logo-vine{font-size:2.8rem;margin-bottom:.3rem;filter:drop-shadow(0 2px 8px rgba(0,0,0,.4));}
 header h1{font-family:'Playfair Display',serif;font-size:clamp(1.6rem,4vw,2.4rem);color:var(--paper);letter-spacing:.04em;text-shadow:0 2px 12px rgba(0,0,0,.5);}
-header p{color:var(--parchment);font-size:.85rem;font-family:'DM Mono',monospace;letter-spacing:.12em;text-transform:uppercase;margin-top:.4rem;opacity:.75;}
+header p{color:var(--parchment);font-size:.85rem;font-family:monospace;letter-spacing:.12em;text-transform:uppercase;margin-top:.4rem;opacity:.75;}
 .divider{width:60px;height:2px;background:linear-gradient(90deg,transparent,var(--harvest),transparent);margin:1rem auto 0;}
 
 .main-nav{display:flex;gap:.4rem;margin-bottom:1.2rem;animation:fadeUp .8s .1s ease both;flex-wrap:wrap;}
-.main-nav-btn{flex:1;min-width:80px;padding:.7rem .4rem;background:rgba(245,239,224,.1);border:1.5px solid rgba(245,239,224,.2);border-radius:2px;color:rgba(245,239,224,.6);font-family:'DM Mono',monospace;font-size:.63rem;letter-spacing:.07em;text-transform:uppercase;cursor:pointer;transition:all .2s;text-align:center;}
+.main-nav-btn{flex:1;min-width:80px;padding:.7rem .4rem;background:rgba(245,239,224,.1);border:1.5px solid rgba(245,239,224,.2);border-radius:2px;color:rgba(245,239,224,.6);font-family:monospace;font-size:.63rem;letter-spacing:.07em;text-transform:uppercase;cursor:pointer;transition:all .2s;text-align:center;}
 .main-nav-btn:hover{background:rgba(245,239,224,.18);color:var(--paper);}
 .main-nav-btn.active{background:var(--paper);color:var(--ink);border-color:var(--paper);font-weight:500;}
 .main-nav-btn .nav-icon{display:block;font-size:1rem;margin-bottom:.2rem;}
@@ -35,12 +35,12 @@ header p{color:var(--parchment);font-size:.85rem;font-family:'DM Mono',monospace
 .card+.card{margin-top:1.2rem;}
 .card-inner{padding:2rem 2.5rem;}
 
-.panel-header{display:flex;align-items:center;gap:.8rem;padding:.9rem 2.5rem;font-family:'DM Mono',monospace;font-size:.72rem;letter-spacing:.12em;text-transform:uppercase;color:var(--paper);}
+.panel-header{display:flex;align-items:center;gap:.8rem;padding:.9rem 2.5rem;font-family:monospace;font-size:.72rem;letter-spacing:.12em;text-transform:uppercase;color:var(--paper);}
 .ph-grape{background:var(--grape);}.ph-leaf{background:var(--leaf);}.ph-blue{background:#2A5472;}.ph-harvest{background:var(--harvest);}.ph-soil{background:var(--soil);}.ph-ok{background:var(--ok);}
 
 .type-tabs{display:grid;grid-template-columns:repeat(2,1fr);gap:.6rem;margin-bottom:2rem;}
 @media(min-width:500px){.type-tabs{grid-template-columns:repeat(4,1fr);}}
-.tab-btn{background:var(--parchment);border:1.5px solid transparent;border-radius:2px;padding:.7rem .5rem;cursor:pointer;font-family:'DM Mono',monospace;font-size:.68rem;letter-spacing:.08em;text-transform:uppercase;color:var(--fog);text-align:center;transition:all .2s;line-height:1.4;}
+.tab-btn{background:var(--parchment);border:1.5px solid transparent;border-radius:2px;padding:.7rem .5rem;cursor:pointer;font-family:monospace;font-size:.68rem;letter-spacing:.08em;text-transform:uppercase;color:var(--fog);text-align:center;transition:all .2s;line-height:1.4;}
 .tab-btn .tab-icon{font-size:1.4rem;display:block;margin-bottom:.25rem;}
 .tab-btn:hover{border-color:var(--harvest);color:var(--soil);background:white;}
 .tab-btn.active-fitosanitario{background:var(--grape);border-color:var(--grape);color:var(--paper);}
@@ -48,11 +48,11 @@ header p{color:var(--parchment);font-size:.85rem;font-family:'DM Mono',monospace
 .tab-btn.active-riego{background:#2A5472;border-color:#2A5472;color:var(--paper);}
 .tab-btn.active-abonado{background:var(--harvest);border-color:var(--harvest);color:var(--paper);}
 
-.section-label{font-family:'DM Mono',monospace;font-size:.65rem;letter-spacing:.15em;text-transform:uppercase;color:var(--fog);margin-bottom:.5rem;margin-top:1.4rem;}
+.section-label{font-family:monospace;font-size:.65rem;letter-spacing:.15em;text-transform:uppercase;color:var(--fog);margin-bottom:.5rem;margin-top:1.4rem;}
 .row{display:grid;gap:1rem;}.row-2{grid-template-columns:1fr 1fr;}.row-3{grid-template-columns:1fr 1fr 1fr;}
 @media(max-width:500px){.row-2,.row-3{grid-template-columns:1fr;}}
 .field{display:flex;flex-direction:column;gap:.35rem;margin-bottom:1rem;}
-label{font-size:.75rem;font-family:'DM Mono',monospace;letter-spacing:.08em;text-transform:uppercase;color:var(--fog);}
+label{font-size:.75rem;font-family:monospace;letter-spacing:.08em;text-transform:uppercase;color:var(--fog);}
 input,select,textarea{background:white;border:1.5px solid #D8CEBA;border-radius:2px;padding:.65rem .85rem;font-family:'DM Sans',sans-serif;font-size:.92rem;color:var(--ink);transition:border-color .2s,box-shadow .2s;width:100%;appearance:none;-webkit-appearance:none;}
 input:focus,select:focus,textarea:focus{outline:none;border-color:var(--harvest);box-shadow:0 0 0 3px rgba(196,120,58,.12);}
 textarea{resize:vertical;min-height:80px;line-height:1.5;}
@@ -60,35 +60,35 @@ select{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/
 .sep{border:none;border-top:1px solid #D8CEBA;margin:1.5rem 0;}
 .form-section{display:none;}.form-section.visible{display:block;animation:sectionIn .3s ease;}
 
-.parcel-info-bar{display:none;margin-top:.35rem;background:#EEF4FF;border:1px solid #90B4F0;border-radius:2px;padding:.45rem .8rem;font-family:'DM Mono',monospace;font-size:.71rem;color:#2A4A8A;line-height:1.65;}
+.parcel-info-bar{display:none;margin-top:.35rem;background:#EEF4FF;border:1px solid #90B4F0;border-radius:2px;padding:.45rem .8rem;font-family:monospace;font-size:.71rem;color:#2A4A8A;line-height:1.65;}
 /* Selecció múltiple de parcel·les */
 .multi-parcel-wrap{position:relative;}
 .multi-parcel-selected{min-height:2.6rem;background:white;border:1.5px solid #D8CEBA;border-radius:2px;padding:.4rem .7rem;cursor:pointer;display:flex;flex-wrap:wrap;gap:.35rem;align-items:center;transition:border-color .2s;}
 .multi-parcel-selected:focus-within,.multi-parcel-selected.open{border-color:var(--harvest);box-shadow:0 0 0 3px rgba(196,120,58,.12);}
 .multi-parcel-placeholder{font-family:'DM Sans',sans-serif;font-size:.9rem;color:#AAA;}
-.mp-pill{display:inline-flex;align-items:center;gap:.3rem;background:var(--vine);color:var(--paper);font-family:'DM Mono',monospace;font-size:.68rem;padding:.25rem .55rem;border-radius:2px;white-space:nowrap;}
+.mp-pill{display:inline-flex;align-items:center;gap:.3rem;background:var(--vine);color:var(--paper);font-family:monospace;font-size:.68rem;padding:.25rem .55rem;border-radius:2px;white-space:nowrap;}
 .mp-pill-remove{cursor:pointer;opacity:.7;font-size:.85rem;line-height:1;margin-left:.1rem;}
 .mp-pill-remove:hover{opacity:1;}
 .multi-parcel-dropdown{display:none;position:absolute;top:100%;left:0;right:0;z-index:50;background:white;border:1.5px solid var(--harvest);border-top:none;border-radius:0 0 2px 2px;max-height:260px;overflow-y:auto;box-shadow:0 8px 24px rgba(0,0,0,.12);}
 .multi-parcel-dropdown.open{display:block;}
 .mp-search{width:100%;border:none;border-bottom:1px solid #D8CEBA;padding:.55rem .8rem;font-family:'DM Sans',sans-serif;font-size:.88rem;outline:none;}
-.mp-optgroup-label{font-family:'DM Mono',monospace;font-size:.62rem;letter-spacing:.1em;text-transform:uppercase;color:var(--fog);padding:.5rem .8rem .2rem;background:var(--parchment);}
+.mp-optgroup-label{font-family:monospace;font-size:.62rem;letter-spacing:.1em;text-transform:uppercase;color:var(--fog);padding:.5rem .8rem .2rem;background:var(--parchment);}
 .mp-option{padding:.5rem .8rem;font-size:.88rem;cursor:pointer;display:flex;align-items:center;gap:.6rem;transition:background .1s;}
 .mp-option:hover{background:var(--ok-bg);}
 .mp-option.selected{background:var(--ok-bg);font-weight:500;}
 .mp-option-check{width:14px;height:14px;border:1.5px solid #D8CEBA;border-radius:2px;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:.7rem;}
 .mp-option.selected .mp-option-check{background:var(--vine);border-color:var(--vine);color:white;}
 .mp-actions{display:flex;gap:.5rem;padding:.5rem .8rem;border-top:1px solid #D8CEBA;background:var(--parchment);}
-.mp-btn{font-family:'DM Mono',monospace;font-size:.68rem;letter-spacing:.06em;background:none;border:1px solid #D8CEBA;border-radius:2px;padding:.25rem .6rem;cursor:pointer;color:var(--fog);}
+.mp-btn{font-family:monospace;font-size:.68rem;letter-spacing:.06em;background:none;border:1px solid #D8CEBA;border-radius:2px;padding:.25rem .6rem;cursor:pointer;color:var(--fog);}
 .mp-btn:hover{background:var(--parchment);color:var(--ink);}
 .mp-btn.primary{background:var(--vine);color:var(--paper);border-color:var(--vine);}
-.mp-count-info{font-family:'DM Mono',monospace;font-size:.68rem;color:var(--fog);padding:.3rem .8rem;border-top:1px solid #D8CEBA;text-align:center;}
+.mp-count-info{font-family:monospace;font-size:.68rem;color:var(--fog);padding:.3rem .8rem;border-top:1px solid #D8CEBA;text-align:center;}
 
 .btn-submit{width:100%;padding:1rem;background:var(--vine);color:var(--paper);border:none;border-radius:2px;font-family:'Playfair Display',serif;font-size:1.05rem;letter-spacing:.08em;cursor:pointer;transition:all .25s;margin-top:.5rem;}
 .btn-submit:hover{background:var(--soil);transform:translateY(-1px);box-shadow:0 6px 20px rgba(0,0,0,.2);}
 .btn-submit:disabled{opacity:.6;cursor:not-allowed;transform:none;}
 
-.btn{display:inline-flex;align-items:center;gap:.4rem;border:none;border-radius:2px;padding:.6rem 1.1rem;font-family:'DM Mono',monospace;font-size:.72rem;letter-spacing:.08em;cursor:pointer;transition:all .2s;white-space:nowrap;text-decoration:none;}
+.btn{display:inline-flex;align-items:center;gap:.4rem;border:none;border-radius:2px;padding:.6rem 1.1rem;font-family:monospace;font-size:.72rem;letter-spacing:.08em;cursor:pointer;transition:all .2s;white-space:nowrap;text-decoration:none;}
 .btn-vine{background:var(--vine);color:var(--paper);}.btn-vine:hover{background:var(--soil);}
 .btn-harvest{background:var(--harvest);color:white;}.btn-harvest:hover{opacity:.88;}
 .btn-grape{background:var(--grape);color:var(--paper);}.btn-grape:hover{background:var(--must);}
@@ -104,11 +104,11 @@ select{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/
 .summary-box.s-ok{background:var(--ok-bg);}
 .summary-box.s-warn{background:var(--warn-bg);}
 .summary-box.s-danger{background:var(--danger-bg);}
-.summary-num{font-family:'DM Mono',monospace;font-size:2.4rem;font-weight:700;line-height:1;}
+.summary-num{font-family:monospace;font-size:2.4rem;font-weight:700;line-height:1;}
 .s-ok .summary-num{color:var(--ok);}
 .s-warn .summary-num{color:var(--warn);}
 .s-danger .summary-num{color:var(--danger);}
-.summary-lbl{font-family:'DM Mono',monospace;font-size:.62rem;letter-spacing:.1em;text-transform:uppercase;margin-top:.3rem;}
+.summary-lbl{font-family:monospace;font-size:.62rem;letter-spacing:.1em;text-transform:uppercase;margin-top:.3rem;}
 .s-ok .summary-lbl{color:var(--ok);}
 .s-warn .summary-lbl{color:var(--warn);}
 .s-danger .summary-lbl{color:var(--danger);}
@@ -129,7 +129,7 @@ select{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/
 .gh-warn .group-title{color:var(--warn);}
 .gh-danger .group-title{color:var(--danger);}
 .gh-none .group-title{color:var(--fog);}
-.group-count{font-family:'DM Mono',monospace;font-size:.7rem;letter-spacing:.08em;margin-left:auto;padding:.2rem .6rem;border-radius:10px;}
+.group-count{font-family:monospace;font-size:.7rem;letter-spacing:.08em;margin-left:auto;padding:.2rem .6rem;border-radius:10px;}
 .gh-ok .group-count{background:#4CAF50;color:white;}
 .gh-warn .group-count{background:#FFC107;color:var(--ink);}
 .gh-danger .group-count{background:#F44336;color:white;}
@@ -141,19 +141,19 @@ select{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/
 .prow.pr-warn{border-left:3px solid #FFC107;}
 .prow.pr-danger{border-left:3px solid #F44336;background:#FFF8F8;}
 .prow.pr-none{border-left:3px solid #D8CEBA;background:var(--parchment);}
-.prow-days{font-family:'DM Mono',monospace;font-size:1.1rem;font-weight:700;min-width:2.5rem;text-align:center;}
+.prow-days{font-family:monospace;font-size:1.1rem;font-weight:700;min-width:2.5rem;text-align:center;}
 .pr-ok .prow-days{color:var(--ok);}
 .pr-warn .prow-days{color:var(--warn);}
 .pr-danger .prow-days{color:var(--danger);}
 .pr-none .prow-days{color:var(--fog);}
 .prow-info{flex:1;min-width:0;}
 .prow-name{font-size:.88rem;font-weight:500;color:var(--ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
-.prow-meta{font-family:'DM Mono',monospace;font-size:.62rem;color:var(--fog);letter-spacing:.04em;margin-top:.1rem;}
-.prow-badge{font-family:'DM Mono',monospace;font-size:.6rem;padding:.2rem .5rem;border-radius:2px;white-space:nowrap;}
+.prow-meta{font-family:monospace;font-size:.62rem;color:var(--fog);letter-spacing:.04em;margin-top:.1rem;}
+.prow-badge{font-family:monospace;font-size:.6rem;padding:.2rem .5rem;border-radius:2px;white-space:nowrap;}
 .pr-danger .prow-badge{background:var(--danger-bg);color:var(--danger);}
 .prow.sensible-warn{background:#FFF3E0;border-left:3px solid #E65100!important;box-shadow:0 0 0 1px rgba(230,81,0,.15);}
 .prow.sensible-danger{background:#FFF0F0;border-left:3px solid #B71C1C!important;box-shadow:0 0 0 1px rgba(183,28,28,.2);}
-.sensible-badge{font-family:'DM Mono',monospace;font-size:.58rem;padding:.2rem .5rem;border-radius:2px;background:#FF6D00;color:white;white-space:nowrap;letter-spacing:.04em;}
+.sensible-badge{font-family:monospace;font-size:.58rem;padding:.2rem .5rem;border-radius:2px;background:#FF6D00;color:white;white-space:nowrap;letter-spacing:.04em;}
 .sensible-warn  .sensible-badge{background:#E65100;}
 .sensible-danger .sensible-badge{background:#B71C1C;}
 .prow-badges{display:flex;gap:.3rem;align-items:center;flex-wrap:wrap;}
@@ -167,18 +167,18 @@ select{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/
 .hist-filters .field{flex:1;min-width:130px;margin-bottom:0;}
 .hist-table-wrap{overflow-x:auto;padding:0 2.5rem 2rem;}
 table{width:100%;border-collapse:collapse;font-size:.83rem;}
-thead th{background:var(--vine);color:var(--paper);font-family:'DM Mono',monospace;font-size:.68rem;letter-spacing:.08em;text-transform:uppercase;padding:.6rem .8rem;text-align:left;}
+thead th{background:var(--vine);color:var(--paper);font-family:monospace;font-size:.68rem;letter-spacing:.08em;text-transform:uppercase;padding:.6rem .8rem;text-align:left;}
 tbody tr{border-bottom:1px solid #D8CEBA;}
 tbody tr:hover{background:rgba(245,239,224,.5);}
 tbody td{padding:.55rem .8rem;color:var(--ink);vertical-align:middle;}
-.badge-tipo{display:inline-block;padding:.15rem .5rem;border-radius:2px;font-family:'DM Mono',monospace;font-size:.65rem;letter-spacing:.06em;text-transform:uppercase;}
+.badge-tipo{display:inline-block;padding:.15rem .5rem;border-radius:2px;font-family:monospace;font-size:.65rem;letter-spacing:.06em;text-transform:uppercase;}
 .bt-fitosanitario{background:rgba(74,25,66,.12);color:var(--grape);}
 .bt-labor{background:rgba(90,122,58,.12);color:var(--leaf);}
 .bt-riego{background:rgba(42,84,114,.12);color:#2A5472;}
 .bt-abonado{background:rgba(196,120,58,.12);color:var(--harvest);}
 .del-btn{background:none;border:none;cursor:pointer;color:#CCC;font-size:1rem;padding:.1rem .3rem;transition:color .2s;}
 .del-btn:hover{color:#E53935;}
-.empty-hist{text-align:center;padding:2.5rem;color:var(--fog);font-family:'DM Mono',monospace;font-size:.8rem;letter-spacing:.08em;}
+.empty-hist{text-align:center;padding:2.5rem;color:var(--fog);font-family:monospace;font-size:.8rem;letter-spacing:.08em;}
 
 /* EXPORT */
 .export-section{padding:1.5rem 2.5rem;}
@@ -186,50 +186,116 @@ tbody td{padding:.55rem .8rem;color:var(--ink);vertical-align:middle;}
 .export-section p{font-size:.84rem;color:var(--fog);line-height:1.6;margin-bottom:1rem;}
 .export-stats{display:flex;gap:1rem;flex-wrap:wrap;margin-bottom:1.2rem;}
 .stat-box{flex:1;min-width:100px;background:var(--parchment);border-radius:2px;padding:.8rem 1rem;text-align:center;}
-.stat-num{font-family:'DM Mono',monospace;font-size:1.6rem;font-weight:500;color:var(--vine);}
-.stat-lbl{font-family:'DM Mono',monospace;font-size:.62rem;letter-spacing:.1em;text-transform:uppercase;color:var(--fog);margin-top:.2rem;}
+.stat-num{font-family:monospace;font-size:1.6rem;font-weight:500;color:var(--vine);}
+.stat-lbl{font-family:monospace;font-size:.62rem;letter-spacing:.1em;text-transform:uppercase;color:var(--fog);margin-top:.2rem;}
 
-.toast{position:fixed;bottom:2rem;left:50%;transform:translateX(-50%) translateY(100px);background:var(--vine);color:var(--paper);padding:1rem 2rem;border-radius:2px;font-family:'DM Mono',monospace;font-size:.8rem;letter-spacing:.1em;box-shadow:0 8px 32px rgba(0,0,0,.3);transition:transform .4s cubic-bezier(.34,1.56,.64,1);z-index:999;white-space:nowrap;}
+.toast{position:fixed;bottom:2rem;left:50%;transform:translateX(-50%) translateY(100px);background:var(--vine);color:var(--paper);padding:1rem 2rem;border-radius:2px;font-family:monospace;font-size:.8rem;letter-spacing:.1em;box-shadow:0 8px 32px rgba(0,0,0,.3);transition:transform .4s cubic-bezier(.34,1.56,.64,1);z-index:999;white-space:nowrap;}
 .toast.show{transform:translateX(-50%) translateY(0);}
 .toast.error{background:#7A1A1A;}.toast.success{background:var(--ok);}
 
-footer{text-align:center;margin-top:1.5rem;font-family:'DM Mono',monospace;font-size:.65rem;letter-spacing:.12em;color:rgba(245,239,224,.35);text-transform:uppercase;}
+/* METEO */
+.meteo-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:1rem;padding:1.5rem 2rem;}
+.meteo-card{background:white;border-radius:2px;border:1.5px solid #D8CEBA;overflow:hidden;transition:transform .2s;}
+.meteo-card:hover{transform:translateY(-2px);}
+.meteo-card-header{padding:.7rem 1rem;display:flex;align-items:center;gap:.6rem;}
+.meteo-mun{font-family:'Playfair Display',serif;font-size:1rem;color:var(--paper);}
+.meteo-ha{font-family:monospace;font-size:.65rem;color:rgba(255,255,255,.7);margin-left:auto;}
+.meteo-body{padding:.9rem 1rem;}
+.meteo-vars{display:grid;grid-template-columns:repeat(3,1fr);gap:.5rem;margin-bottom:.8rem;}
+.meteo-var{text-align:center;}
+.meteo-var label{font-family:monospace;font-size:.58rem;letter-spacing:.08em;text-transform:uppercase;color:var(--fog);display:block;margin-bottom:.25rem;}
+.meteo-var input{width:100%;text-align:center;font-family:monospace;font-size:.95rem;font-weight:600;border:1.5px solid #D8CEBA;border-radius:2px;padding:.4rem .3rem;color:var(--ink);}
+.meteo-var input:focus{outline:none;border-color:var(--harvest);}
+.meteo-var .mv-unit{font-family:monospace;font-size:.58rem;color:var(--fog);margin-top:.15rem;}
+.meteo-risks{display:grid;grid-template-columns:1fr 1fr;gap:.5rem;margin-top:.8rem;}
+.risk-box{border-radius:2px;padding:.65rem .8rem;text-align:center;}
+.risk-box .risk-name{font-family:monospace;font-size:.62rem;letter-spacing:.08em;text-transform:uppercase;margin-bottom:.3rem;}
+.risk-box .risk-level{font-family:'Playfair Display',serif;font-size:1rem;font-weight:700;}
+.risk-box .risk-reason{font-size:.7rem;margin-top:.2rem;line-height:1.4;}
+.risk-0{background:#E8F5E8;border:1px solid #90C890;} .risk-0 .risk-name{color:var(--ok);} .risk-0 .risk-level{color:var(--ok);}
+.risk-1{background:#FFF8E0;border:1px solid #D4B800;} .risk-1 .risk-name{color:var(--warn);} .risk-1 .risk-level{color:var(--warn);}
+.risk-2{background:#FFF0E0;border:1px solid #E65100;} .risk-2 .risk-name{color:#E65100;} .risk-2 .risk-level{color:#E65100;}
+.risk-3{background:#FDE8E8;border:1px solid #E08080;} .risk-3 .risk-name{color:var(--danger);} .risk-3 .risk-level{color:var(--danger);}
+.meteo-update{font-family:monospace;font-size:.62rem;color:var(--fog);text-align:right;margin-top:.5rem;}
+.meteo-parceles{font-size:.75rem;color:var(--fog);margin-top:.5rem;line-height:1.6;border-top:1px solid #EEE;padding-top:.5rem;}
+.meteo-alert-bar{background:var(--danger-bg);border-left:3px solid #F44336;border-radius:2px;padding:.6rem 1rem;margin:.5rem 2rem;font-size:.83rem;color:var(--danger);display:none;}
+.rain-bars{display:flex;align-items:flex-end;gap:2px;height:40px;margin-top:.4rem;}
+.rain-bar{flex:1;background:#4285F4;border-radius:1px 1px 0 0;min-width:4px;transition:height .3s;}
+.rain-bar-lbl{font-family:monospace;font-size:.5rem;color:var(--fog);text-align:center;margin-top:2px;}
+.rain-section label{font-family:monospace;font-size:.6rem;letter-spacing:.08em;text-transform:uppercase;color:var(--fog);display:block;margin-bottom:.4rem;}
+.rain-inputs{display:flex;gap:3px;flex-wrap:nowrap;overflow-x:auto;}
+.rain-day{display:flex;flex-direction:column;align-items:center;gap:2px;min-width:28px;}
+.rain-day input{width:28px;text-align:center;font-size:.72rem;font-family:monospace;border:1px solid #D8CEBA;border-radius:2px;padding:.2rem .1rem;}
+.rain-day .rd-lbl{font-family:monospace;font-size:.5rem;color:var(--fog);}
+.sencrop-banner{background:linear-gradient(135deg,#1A3A5A,#2A5472);color:var(--paper);border-radius:2px;padding:1.2rem 1.5rem;margin-bottom:1.2rem;font-size:.84rem;line-height:1.7;}
+.sencrop-banner strong{color:#90B4F0;}
+@media(max-width:600px){
+  .meteo-grid{padding:.8rem;gap:.8rem;}
+  .meteo-vars{grid-template-columns:repeat(3,1fr);gap:.3rem;}
+  .rain-inputs{overflow-x:auto;}
+}
+.epi-section{padding:1.5rem 2rem;border-top:2px solid #D8CEBA;margin-top:.5rem;}
+.epi-title{font-family:'Playfair Display',serif;font-size:1.1rem;color:var(--ink);margin-bottom:.3rem;}
+.epi-mun-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:.8rem;margin-bottom:1.2rem;}
+.epi-mun-card{background:var(--parchment);border-radius:2px;border:1px solid #D8CEBA;padding:.9rem 1rem;}
+.epi-mun-name{font-family:'Playfair Display',serif;font-size:.95rem;margin-bottom:.6rem;color:var(--ink);}
+.epi-gauge{height:8px;background:#E8E0D0;border-radius:4px;overflow:hidden;margin-bottom:.4rem;}
+.epi-gauge-fill{height:100%;border-radius:4px;transition:width .6s ease;}
+.epi-neg{background:#4CAF50;} .epi-low{background:#FFC107;} .epi-med{background:#FF9800;} .epi-high{background:#F44336;}
+.epi-val{font-family:monospace;font-size:.82rem;font-weight:700;}
+.epi-val.neg{color:var(--ok);} .epi-val.low{color:var(--warn);} .epi-val.med{color:#E65100;} .epi-val.high{color:var(--danger);}
+.epi-label{font-family:monospace;font-size:.62rem;color:var(--fog);letter-spacing:.06em;}
+.epi-months{display:grid;grid-template-columns:repeat(6,1fr);gap:3px;margin-top:.6rem;}
+.epi-month{text-align:center;}
+.epi-month-lbl{font-family:monospace;font-size:.55rem;color:var(--fog);letter-spacing:.04em;}
+.epi-month-val{font-family:monospace;font-size:.72rem;font-weight:600;}
+.epi-month-input{width:100%;text-align:center;font-family:monospace;font-size:.75rem;border:1px solid #D8CEBA;border-radius:2px;padding:.25rem .1rem;margin-top:.2rem;}
+.epi-global-box{display:flex;gap:1rem;flex-wrap:wrap;background:var(--vine);color:var(--paper);border-radius:2px;padding:1rem 1.5rem;margin-bottom:1rem;align-items:center;}
+.epi-global-num{font-family:monospace;font-size:2rem;font-weight:700;}
+.epi-global-lbl{font-family:monospace;font-size:.65rem;letter-spacing:.1em;text-transform:uppercase;opacity:.75;margin-top:.2rem;}
+.epi-interpretation{font-size:.83rem;line-height:1.7;color:var(--paper);flex:1;min-width:180px;}
+@media(max-width:600px){
+  .epi-section{padding:.8rem;}
+  .epi-months{grid-template-columns:repeat(3,1fr);}
+  .epi-mun-grid{grid-template-columns:1fr;}
+}
+footer{text-align:center;margin-top:1.5rem;font-family:monospace;font-size:.65rem;letter-spacing:.12em;color:rgba(245,239,224,.35);text-transform:uppercase;}
 
 /* COSTOS */
 .var-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:.8rem;margin-bottom:1.2rem;}
 .var-box{background:var(--parchment);border-radius:2px;padding:.9rem 1rem;border:1px solid #D8CEBA;}
-.var-box label{font-family:'DM Mono',monospace;font-size:.63rem;letter-spacing:.1em;text-transform:uppercase;color:var(--fog);display:block;margin-bottom:.35rem;}
-.var-box input{background:white;border:1.5px solid #D8CEBA;border-radius:2px;padding:.45rem .7rem;font-family:'DM Mono',monospace;font-size:.92rem;color:var(--ink);width:100%;text-align:right;}
+.var-box label{font-family:monospace;font-size:.63rem;letter-spacing:.1em;text-transform:uppercase;color:var(--fog);display:block;margin-bottom:.35rem;}
+.var-box input{background:white;border:1.5px solid #D8CEBA;border-radius:2px;padding:.45rem .7rem;font-family:monospace;font-size:.92rem;color:var(--ink);width:100%;text-align:right;}
 .var-box input:focus{outline:none;border-color:var(--harvest);box-shadow:0 0 0 2px rgba(196,120,58,.12);}
-.var-unit{font-family:'DM Mono',monospace;font-size:.68rem;color:var(--fog);text-align:right;margin-top:.2rem;}
+.var-unit{font-family:monospace;font-size:.68rem;color:var(--fog);text-align:right;margin-top:.2rem;}
 .cost-section{padding:1.2rem 2rem 0;}
 .cost-section h3{font-family:'Playfair Display',serif;font-size:1.05rem;color:var(--ink);margin-bottom:.8rem;}
 .cost-acccio-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(165px,1fr));gap:.7rem;margin-bottom:1.5rem;}
 .cost-accio-box{background:white;border:1.5px solid #D8CEBA;border-radius:2px;padding:.9rem 1rem;text-align:center;}
 .ca-icon{font-size:1.5rem;margin-bottom:.3rem;}
-.ca-label{font-family:'DM Mono',monospace;font-size:.62rem;letter-spacing:.08em;text-transform:uppercase;color:var(--fog);margin-bottom:.4rem;}
-.ca-cost{font-family:'DM Mono',monospace;font-size:1.4rem;font-weight:700;color:var(--vine);}
-.ca-unit{font-family:'DM Mono',monospace;font-size:.6rem;color:var(--fog);}
+.ca-label{font-family:monospace;font-size:.62rem;letter-spacing:.08em;text-transform:uppercase;color:var(--fog);margin-bottom:.4rem;}
+.ca-cost{font-family:monospace;font-size:1.4rem;font-weight:700;color:var(--vine);}
+.ca-unit{font-family:monospace;font-size:.6rem;color:var(--fog);}
 .ca-detail{font-size:.72rem;color:var(--fog);margin-top:.3rem;line-height:1.4;}
 .cost-parcela-wrap{padding:0 2rem 1.5rem;}
 .cost-parcela-filter{display:flex;gap:.7rem;flex-wrap:wrap;margin-bottom:1rem;align-items:flex-end;}
 .cost-parcela-filter .field{flex:1;min-width:180px;margin-bottom:0;}
 .cost-table-wrap{overflow-x:auto;}
 .cost-table{width:100%;border-collapse:collapse;font-size:.83rem;}
-.cost-table thead th{background:var(--vine);color:var(--paper);font-family:'DM Mono',monospace;font-size:.65rem;letter-spacing:.08em;text-transform:uppercase;padding:.55rem .7rem;text-align:right;}
+.cost-table thead th{background:var(--vine);color:var(--paper);font-family:monospace;font-size:.65rem;letter-spacing:.08em;text-transform:uppercase;padding:.55rem .7rem;text-align:right;}
 .cost-table thead th:first-child{text-align:left;}
 .cost-table tbody tr{border-bottom:1px solid #D8CEBA;}
 .cost-table tbody tr:hover{background:rgba(245,239,224,.5);}
-.cost-table tbody td{padding:.5rem .7rem;text-align:right;font-family:'DM Mono',monospace;font-size:.78rem;}
+.cost-table tbody td{padding:.5rem .7rem;text-align:right;font-family:monospace;font-size:.78rem;}
 .cost-table tbody td:first-child{text-align:left;font-family:'DM Sans',sans-serif;font-size:.83rem;}
-.cost-table tfoot td{background:var(--parchment);font-family:'DM Mono',monospace;font-size:.8rem;font-weight:700;padding:.6rem .7rem;text-align:right;border-top:2px solid #D8CEBA;}
+.cost-table tfoot td{background:var(--parchment);font-family:monospace;font-size:.8rem;font-weight:700;padding:.6rem .7rem;text-align:right;border-top:2px solid #D8CEBA;}
 .cost-table tfoot td:first-child{text-align:left;}
 .cost-total-finca{display:flex;gap:1rem;flex-wrap:wrap;padding:1rem 2rem 1.5rem;border-top:1px solid #D8CEBA;}
 .ctf-box{flex:1;min-width:140px;background:var(--vine);color:var(--paper);border-radius:2px;padding:1rem 1.2rem;text-align:center;}
-.ctf-num{font-family:'DM Mono',monospace;font-size:1.5rem;font-weight:700;}
-.ctf-lbl{font-family:'DM Mono',monospace;font-size:.62rem;letter-spacing:.08em;text-transform:uppercase;margin-top:.3rem;opacity:.75;}
+.ctf-num{font-family:monospace;font-size:1.5rem;font-weight:700;}
+.ctf-lbl{font-family:monospace;font-size:.62rem;letter-spacing:.08em;text-transform:uppercase;margin-top:.3rem;opacity:.75;}
 .dropdown-editor{margin-bottom:1.2rem;}
-.dropdown-editor h4{font-family:'DM Mono',monospace;font-size:.7rem;letter-spacing:.1em;text-transform:uppercase;color:var(--fog);margin-bottom:.6rem;}
+.dropdown-editor h4{font-family:monospace;font-size:.7rem;letter-spacing:.1em;text-transform:uppercase;color:var(--fog);margin-bottom:.6rem;}
 .dropdown-pills{display:flex;flex-wrap:wrap;gap:.4rem;margin-bottom:.6rem;}
 .dp-pill{display:inline-flex;align-items:center;gap:.3rem;background:var(--parchment);border:1px solid #D8CEBA;border-radius:2px;padding:.3rem .6rem;font-size:.82rem;color:var(--ink);}
 .dp-pill.dp-custom{background:#EEF4FF;border-color:#90B4F0;color:#2A4A8A;}
@@ -244,15 +310,15 @@ footer{text-align:center;margin-top:1.5rem;font-family:'DM Mono',monospace;font-
 .comp-row{display:flex;gap:.4rem;align-items:center;margin-bottom:.3rem;flex-wrap:wrap;}
 .comp-row select{flex:2;min-width:100px;font-size:.8rem;padding:.3rem .5rem;}
 .comp-row input{flex:1;min-width:60px;font-size:.8rem;padding:.3rem .5rem;text-align:right;}
-.comp-row .comp-lbl{font-family:'DM Mono',monospace;font-size:.6rem;color:var(--fog);white-space:nowrap;}
-.comp-row .comp-cost{font-family:'DM Mono',monospace;font-size:.75rem;color:var(--vine);min-width:55px;text-align:right;font-weight:600;}
+.comp-row .comp-lbl{font-family:monospace;font-size:.6rem;color:var(--fog);white-space:nowrap;}
+.comp-row .comp-cost{font-family:monospace;font-size:.75rem;color:var(--vine);min-width:55px;text-align:right;font-weight:600;}
 .comp-add{font-size:.68rem;padding:.25rem .6rem;margin-top:.2rem;}
-.custom-accio-total{font-family:'DM Mono',monospace;font-size:.82rem;color:var(--vine);font-weight:700;min-width:70px;text-align:right;align-self:flex-start;padding-top:.2rem;}
+.custom-accio-total{font-family:monospace;font-size:.82rem;color:var(--vine);font-weight:700;min-width:70px;text-align:right;align-self:flex-start;padding-top:.2rem;}
 .custom-accio-remove{background:none;border:none;cursor:pointer;color:#CCC;font-size:1.1rem;padding:0;align-self:flex-start;}
 .custom-accio-remove:hover{color:#E53935;}
 @media(max-width:500px){
   .dropdown-editor{margin-bottom:1.2rem;}
-.dropdown-editor h4{font-family:'DM Mono',monospace;font-size:.7rem;letter-spacing:.1em;text-transform:uppercase;color:var(--fog);margin-bottom:.6rem;}
+.dropdown-editor h4{font-family:monospace;font-size:.7rem;letter-spacing:.1em;text-transform:uppercase;color:var(--fog);margin-bottom:.6rem;}
 .dropdown-pills{display:flex;flex-wrap:wrap;gap:.4rem;margin-bottom:.6rem;}
 .dp-pill{display:inline-flex;align-items:center;gap:.3rem;background:var(--parchment);border:1px solid #D8CEBA;border-radius:2px;padding:.3rem .6rem;font-size:.82rem;color:var(--ink);}
 .dp-pill.dp-custom{background:#EEF4FF;border-color:#90B4F0;color:#2A4A8A;}
@@ -266,8 +332,8 @@ footer{text-align:center;margin-top:1.5rem;font-family:'DM Mono',monospace;font-
 .fit-prod-row{display:flex;gap:.5rem;align-items:center;background:white;border:1px solid #D8CEBA;border-radius:2px;padding:.5rem .7rem;margin-bottom:.4rem;flex-wrap:wrap;}
 .fit-prod-row select{flex:2;min-width:140px;font-size:.83rem;padding:.4rem .6rem;}
 .fit-prod-row input{flex:1;min-width:70px;font-size:.83rem;padding:.4rem .6rem;text-align:right;}
-.fit-prod-row .fp-label{font-family:'DM Mono',monospace;font-size:.6rem;letter-spacing:.06em;text-transform:uppercase;color:var(--fog);min-width:30px;}
-.fit-prod-row .fp-cost{font-family:'DM Mono',monospace;font-size:.78rem;color:var(--vine);min-width:60px;text-align:right;font-weight:600;}
+.fit-prod-row .fp-label{font-family:monospace;font-size:.6rem;letter-spacing:.06em;text-transform:uppercase;color:var(--fog);min-width:30px;}
+.fit-prod-row .fp-cost{font-family:monospace;font-size:.78rem;color:var(--vine);min-width:60px;text-align:right;font-weight:600;}
 .fit-prod-remove{background:none;border:none;cursor:pointer;color:#CCC;font-size:1.1rem;padding:0 .2rem;flex-shrink:0;}
 .fit-prod-remove:hover{color:#E53935;}
 @media(max-width:500px){
@@ -396,6 +462,7 @@ footer{text-align:center;margin-top:1.5rem;font-family:'DM Mono',monospace;font-
   <button class="main-nav-btn" onclick="showPage('historial')" id="nav-historial"><span class="nav-icon">📚</span>Historial</button>
   <button class="main-nav-btn" onclick="showPage('exportar')" id="nav-exportar"><span class="nav-icon">📥</span>Exportar</button>
   <button class="main-nav-btn" onclick="showPage('costos')" id="nav-costos"><span class="nav-icon">💶</span>Costos</button>
+  <button class="main-nav-btn" onclick="showPage('meteo')" id="nav-meteo"><span class="nav-icon">🌡️</span>Risc Meteo</button>
 </div>
 
 <!-- ══ REGISTRAR ══ -->
@@ -446,7 +513,7 @@ footer{text-align:center;margin-top:1.5rem;font-family:'DM Mono',monospace;font-
         <button type="button" class="btn btn-outline" style="font-size:.7rem;padding:.4rem .8rem;margin-bottom:1rem" onclick="addFitProd()">+ Afegir producte</button>
 
         <!-- Cost total mescla -->
-        <div style="background:var(--ok-bg);border:1px solid #90C890;border-radius:2px;padding:.6rem 1rem;font-family:'DM Mono',monospace;font-size:.78rem;color:var(--ok);margin-bottom:.8rem;display:flex;justify-content:space-between;align-items:center">
+        <div style="background:var(--ok-bg);border:1px solid #90C890;border-radius:2px;padding:.6rem 1rem;font-family:monospace;font-size:.78rem;color:var(--ok);margin-bottom:.8rem;display:flex;justify-content:space-between;align-items:center">
           <span>Cost productes mescla</span>
           <strong id="fit-cost-total">— €/ha</strong>
         </div>
@@ -773,26 +840,52 @@ footer{text-align:center;margin-top:1.5rem;font-family:'DM Mono',monospace;font-
     <div class="cost-parcela-wrap">
       <div class="cost-table-wrap">
         <table class="cost-table" id="costTable">
-          <thead>
-            <tr>
-              <th style="text-align:left">Parcel·la</th>
-              <th>Sup (ha)</th>
-              <th>Llaurar</th>
-              <th>Poda</th>
-              <th>Tractaments</th>
-              <th>Abonar</th>
-              <th>Reg</th>
-              <th>Amortitz.</th>
-              <th><strong>Total €</strong></th>
-              <th>€/ha</th>
-            </tr>
-          </thead>
+          <thead id="costTableHead"></thead>
           <tbody id="costTableBody"></tbody>
           <tfoot id="costTableFoot"></tfoot>
         </table>
       </div>
     </div>
     <div class="cost-total-finca" id="costTotalFinca"></div>
+  </div>
+
+</div>
+
+<div class="page" id="page-meteo">
+
+  <!-- Sencrop banner -->
+  <div class="sencrop-banner" style="margin-bottom:1.2rem">
+    🌦️ <strong>Mode manual</strong> — Introdueix les dades de cada estació manualment.
+    Quan tinguis el token de l'API de Sencrop (<strong><a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="315041587142545f52435e411f525e5c">[email&#160;protected]</a></strong>),
+    les dades s'actualitzaran automàticament en temps real.
+  </div>
+
+  <!-- Alerta global -->
+  <div class="meteo-alert-bar" id="meteoAlertBar"></div>
+
+  <!-- Cards per municipi -->
+  <div class="meteo-grid" id="meteoGrid"></div>
+
+  <!-- EPI Model -->
+  <div class="card" style="margin-top:1.2rem">
+    <div class="panel-header" style="background:#1A3A5A">🧫 &nbsp; Model EPI — Potencial d'inòcul hivernal (Míldiu)</div>
+    <div class="epi-section">
+      <p style="font-size:.84rem;color:var(--fog);line-height:1.7;margin-bottom:1.2rem">
+        El model <strong>EPI</strong> (Strizyk-Molot, ITV Nimes 1986) calcula la maduració de les oòspores hivernals de <em>Plasmopara viticola</em> a partir de les precipitacions i temperatures d'octubre a març.
+        Un EPI alt indica oòspores madures — quan es compleixin els tres deus (T&gt;10°C, brots&gt;10cm, pluja&gt;10mm) la infecció primària serà probable.
+        <strong>Introdueix precipitació (mm) i temperatura mitjana (°C) per cada mes i municipi.</strong>
+      </p>
+      <div id="epiGlobalBox"></div>
+      <div class="epi-mun-grid" id="epiMunGrid"></div>
+      <div style="background:var(--parchment);border-radius:2px;padding:1rem 1.2rem;border-left:3px solid #1A3A5A;font-size:.82rem;line-height:1.8;color:var(--fog)">
+        <strong style="color:var(--ink)">Com interpretar l'EPI:</strong><br>
+        🟢 <strong>EPI &lt;10</strong> — Inòcul baix. Campanya amb risc reduït.<br>
+        🟡 <strong>EPI 10–30</strong> — Inòcul moderat. Protecció preventiva a la brotació.<br>
+        🟠 <strong>EPI 30–60</strong> — Inòcul elevat. Tractar en brots 10cm. Alt risc infecció primària.<br>
+        🔴 <strong>EPI &gt;60</strong> — Molt alt risc. Protecció màxima des del desborrament.<br>
+        <em style="font-size:.78rem">L'EPI mesura la maduració d'oòspores, no la infecció directa. La infecció necessita a més: brots &gt;10cm + pluja &gt;10mm + T&gt;10°C.</em>
+      </div>
+    </div>
   </div>
 
 </div>
@@ -881,6 +974,14 @@ function showPage(name) {
   if(name==='costos') {
     renderCostos();
     renderDropdownEditors();
+  }
+  if(name==='meteo') {
+    renderMeteo();
+    renderEPI();
+    // Auto-load if no data yet
+    const md = getMeteoData();
+    const hasData = MUNICIPIS_METEO.some(m => md[m] && (md[m].temp || md[m].hr));
+    if(!hasData) updateAllFromOpenMeteo();
   }
 }
 
@@ -1402,8 +1503,8 @@ function renderProducteTaula() {
     const costHa = (p.preu * p.dosi).toFixed(2);
     tbody.innerHTML += `<tr>
       <td style="text-align:left">${p.nom}</td>
-      <td><input type="number" value="${p.preu}" step="0.01" min="0" style="width:80px;text-align:right;font-family:'DM Mono',monospace;font-size:.82rem;border:1px solid #D8CEBA;border-radius:2px;padding:.2rem .4rem" oninput="updateProducte(${i},'preu',this.value)"></td>
-      <td><input type="number" value="${p.dosi}" step="0.1" min="0" style="width:70px;text-align:right;font-family:'DM Mono',monospace;font-size:.82rem;border:1px solid #D8CEBA;border-radius:2px;padding:.2rem .4rem" oninput="updateProducte(${i},'dosi',this.value)"></td>
+      <td><input type="number" value="${p.preu}" step="0.01" min="0" style="width:80px;text-align:right;font-family:monospace;font-size:.82rem;border:1px solid #D8CEBA;border-radius:2px;padding:.2rem .4rem" oninput="updateProducte(${i},'preu',this.value)"></td>
+      <td><input type="number" value="${p.dosi}" step="0.1" min="0" style="width:70px;text-align:right;font-family:monospace;font-size:.82rem;border:1px solid #D8CEBA;border-radius:2px;padding:.2rem .4rem" oninput="updateProducte(${i},'dosi',this.value)"></td>
       <td id="cost-ha-${i}" style="color:var(--vine);font-weight:600">${costHa}€</td>
       <td><button onclick="deleteProducte(${i})" style="background:none;border:none;cursor:pointer;color:#CCC;font-size:1rem" title="Eliminar">✕</button></td>
     </tr>`;
@@ -1745,105 +1846,153 @@ function populateCostFilters() {
 }
 
 function renderCostParceles() {
-  const v       = getVars();
-  const filtP   = document.getElementById('cost-filt-parcela')?.value || '';
-  const filtA   = document.getElementById('cost-filt-any')?.value || '';
-  let parts     = getParts();
+  const v      = getVars();
+  const filtP  = document.getElementById('cost-filt-parcela')?.value || '';
+  const filtA  = document.getElementById('cost-filt-any')?.value || '';
+  let parts    = getParts();
   if(filtA) parts = parts.filter(p => p.fecha?.startsWith(filtA));
 
-  // Build cost map: parcela → { accioId: total€ }
+  // ── Build cost map: parcela → { accioId: cost€ } ──────────────────────
   const costMap = {};
+  const accioIds = new Set(); // track which accions appear
+
   parts.forEach(part => {
-    // Each part can have multiple parceles (separator ' / ')
     const parceles = part.parcela ? part.parcela.split(' / ').map(p=>p.trim()) : [];
     parceles.forEach(nomP => {
       if(!nomP) return;
       const parcelInfo = PARCEL_DATA.find(p => p.nom === nomP);
       const sup = parcelInfo ? parcelInfo.sup : 0;
+      if(sup === 0) return;
 
       let accioId = TIPO_TO_ACCIO[part.tipo];
       if(part.tipo === 'labor' && part.c1) {
         accioId = LABOR_TO_ACCIO[part.c1] || null;
-        // Detectar triturar vergues
-        // Triturar vergues (més intensiu que triturar herba)
         if((part.c1||'').toLowerCase().includes('vergues') ||
            (part.c1||'').toLowerCase().includes('verges')) {
           accioId = 'triturar_vergues';
         }
       }
-      if(!accioId || sup === 0) return;
+      if(!accioId) return;
 
       const cost = getAccioCalcul(accioId, v, part) * sup;
       if(cost === 0) return;
 
       if(!costMap[nomP]) costMap[nomP] = {};
       costMap[nomP][accioId] = (costMap[nomP][accioId] || 0) + cost;
+      accioIds.add(accioId);
     });
   });
 
-  // Render table
-  const parceles = filtP ? [filtP] : PARCEL_DATA.map(p=>p.nom);
-  const tbody = document.getElementById('costTableBody'); if(!tbody) return;
-  const tfoot = document.getElementById('costTableFoot');
-  tbody.innerHTML = '';
+  // ── Define column groups ───────────────────────────────────────────────
+  // Fixed columns always shown + dynamic columns from data
+  const FIXED_COLS = [
+    { id:'llaurar',       label:'Llaurar',      ids:['llaurar','triturar','triturar_vergues'] },
+    { id:'poda',          label:'Poda',          ids:['poda'] },
+    { id:'fitosanitario', label:'Tractaments',   ids:['fitosanitario'] },
+    { id:'abonar',        label:'Abonar',        ids:['abonar'] },
+    { id:'riego',         label:'Reg',           ids:['riego'] },
+  ];
 
-  const totals = { llaurar:0, poda:0, fitosanitario:0, abonar:0, riego:0, amort:0, total:0, sup:0 };
+  // Dynamic columns: accions that appear in data but aren't in fixed cols
+  const fixedIds = new Set(FIXED_COLS.flatMap(c=>c.ids));
+  const dynamicCols = [];
+  accioIds.forEach(id => {
+    if(!fixedIds.has(id)) {
+      // Get label from ACCIONS_COST or custom accions
+      const builtin = ACCIONS_COST.find(a=>a.id===id);
+      let label = builtin ? builtin.label : id.replace('custom_','');
+      dynamicCols.push({ id, label, ids:[id] });
+    }
+  });
+
+  const allCols = [...FIXED_COLS, ...dynamicCols];
+
+  // ── Build table header ─────────────────────────────────────────────────
+  const table = document.getElementById('costTable'); if(!table) return;
+  const thead = table.querySelector('thead');
+  const tbody = document.getElementById('costTableBody');
+  const tfoot = document.getElementById('costTableFoot');
+
+  thead.innerHTML = '<tr>' +
+    '<th style="text-align:left">Parcel·la</th>' +
+    '<th>Sup (ha)</th>' +
+    allCols.map(c => `<th>${c.label}</th>`).join('') +
+    '<th style="color:var(--harvest)">Amortitz.</th>' +
+    '<th><strong>Total €</strong></th>' +
+    '<th>€/ha</th>' +
+    '</tr>';
+
+  // ── Build rows ─────────────────────────────────────────────────────────
+  tbody.innerHTML = '';
+  tfoot.innerHTML = '';
+
+  const totals = {};
+  allCols.forEach(c => totals[c.id] = 0);
+  totals.amort = 0; totals.total = 0; totals.sup = 0;
+
+  const parceles = filtP ? [filtP] : PARCEL_DATA.map(p=>p.nom);
+  const fmt = n => n > 0 ? n.toFixed(0)+'€' : '—';
 
   parceles.forEach(nomP => {
-    const cm = costMap[nomP] || {};
-    const pi = PARCEL_DATA.find(p=>p.nom===nomP);
+    const cm  = costMap[nomP] || {};
+    const pi  = PARCEL_DATA.find(p=>p.nom===nomP);
     if(!pi) return;
     const sup = pi.sup;
 
-    const llaurar  = (cm['llaurar']||0) + (cm['triturar']||0) + (cm['triturar_vergues']||0);
-    const poda     = cm['poda']||0;
-    const fito     = cm['fitosanitario']||0;
-    const abonar   = cm['abonar']||0;
-    const reg      = cm['riego']||0;
-    const amort    = sup * v.amort;  // amortització proporcional a la superfície
-    const totalOps = llaurar + poda + fito + abonar + reg;
-    const total    = totalOps + amort;
-    const costHa   = sup > 0 ? total / sup : 0;
+    // Calc each column
+    const colVals = {};
+    let totalOps = 0;
+    allCols.forEach(c => {
+      const val = c.ids.reduce((s,id) => s + (cm[id]||0), 0);
+      colVals[c.id] = val;
+      totalOps += val;
+    });
 
-    if(totalOps === 0 && !filtP) return; // skip parceles with no activity
+    const amort = sup * v.amort;
+    const total = totalOps + amort;
+    const costHa = sup > 0 ? total / sup : 0;
 
-    totals.llaurar += llaurar; totals.poda += poda;
-    totals.fitosanitario += fito; totals.abonar += abonar;
-    totals.riego += reg; totals.amort += amort;
-    totals.total += total; totals.sup += sup;
+    if(totalOps === 0 && !filtP) return;
 
-    const fmt = n => n > 0 ? n.toFixed(0)+'€' : '—';
+    // Accumulate totals
+    allCols.forEach(c => totals[c.id] += colVals[c.id]);
+    totals.amort += amort; totals.total += total; totals.sup += sup;
+
+    // Color dynamic cols differently
+    const colCells = allCols.map((c,i) => {
+      const isDynamic = i >= FIXED_COLS.length;
+      const style = isDynamic ? ' style="color:#2A5472"' : '';
+      return `<td${style}>${fmt(colVals[c.id])}</td>`;
+    }).join('');
+
     tbody.innerHTML += `<tr>
       <td>${nomP}</td>
       <td>${sup.toFixed(2)}</td>
-      <td>${fmt(llaurar)}</td>
-      <td>${fmt(poda)}</td>
-      <td>${fmt(fito)}</td>
-      <td>${fmt(abonar)}</td>
-      <td>${fmt(reg)}</td>
+      ${colCells}
       <td style="color:var(--harvest)">${fmt(amort)}</td>
       <td><strong>${fmt(total)}</strong></td>
       <td>${costHa>0?costHa.toFixed(0)+'€':'—'}</td>
     </tr>`;
   });
 
-  // Footer totals
-  const fmt = n => n > 0 ? n.toFixed(0)+'€' : '—';
+  // ── Footer totals ──────────────────────────────────────────────────────
   const avgHa = totals.sup > 0 ? totals.total / totals.sup : 0;
+  const footCols = allCols.map((c,i) => {
+    const isDynamic = i >= FIXED_COLS.length;
+    const style = isDynamic ? ' style="color:#2A5472"' : '';
+    return `<td${style}>${fmt(totals[c.id])}</td>`;
+  }).join('');
+
   tfoot.innerHTML = `<tr>
     <td>TOTAL</td>
     <td>${totals.sup.toFixed(2)}</td>
-    <td>${fmt(totals.llaurar)}</td>
-    <td>${fmt(totals.poda)}</td>
-    <td>${fmt(totals.fitosanitario)}</td>
-    <td>${fmt(totals.abonar)}</td>
-    <td>${fmt(totals.riego)}</td>
+    ${footCols}
     <td style="color:var(--harvest)">${fmt(totals.amort)}</td>
     <td><strong>${fmt(totals.total)}</strong></td>
     <td>${avgHa>0?avgHa.toFixed(0)+'€':'—'}</td>
   </tr>`;
 
-  // Summary boxes
+  // ── Summary boxes ──────────────────────────────────────────────────────
   const finca = document.getElementById('costTotalFinca'); if(!finca) return;
   finca.innerHTML = `
     <div class="ctf-box"><div class="ctf-num">${totals.total.toFixed(0)}€</div><div class="ctf-lbl">Cost total</div></div>
@@ -2046,7 +2195,7 @@ function renderCustomAccions() {
         <input type="text" value="${acc.nom}" placeholder="Nom de l'acció"
           oninput="updateCustomAccioNom(${i},this.value)"
           style="width:100%;font-size:.88rem;font-weight:500;border:1px solid #D8CEBA;border-radius:2px;padding:.35rem .6rem;margin-bottom:.4rem">
-        <div style="font-family:'DM Mono',monospace;font-size:.6rem;color:var(--fog);letter-spacing:.06em;text-transform:uppercase">
+        <div style="font-family:monospace;font-size:.6rem;color:var(--fog);letter-spacing:.06em;text-transform:uppercase">
           Tipus de labor associat
         </div>
         <input type="text" value="${acc.laborKey||''}" placeholder="ex: Verema, Esporga..."
@@ -2141,6 +2290,9 @@ function syncCustomAccionsToForm() {
   accions.forEach(acc => {
     if(acc.laborKey && acc.laborKey.trim()) {
       LABOR_TO_ACCIO[acc.laborKey.trim()] = 'custom_'+acc.nom;
+    } else if(acc.nom && acc.nom.trim()) {
+      // Also map by nom directly if no laborKey set
+      LABOR_TO_ACCIO[acc.nom.trim()] = 'custom_'+acc.nom;
     }
   });
   // Add to lab-tipo select if not already present
@@ -2184,14 +2336,478 @@ function getAccioCalcul(accioId, v, part) {
 }
 
 // ══════════════════════════════════════════════════
+//  MÒDUL METEOROLÒGIC — RISC MÍLDIU / OÏDI
+// ══════════════════════════════════════════════════
+
+// Coordenades per municipi (Penedès)
+const MUNICIPIS_COORDS = {
+  'Avinyonet': { lat: 41.3833, lon: 1.7167 },
+  'Castellet':  { lat: 41.2833, lon: 1.6667 },
+  'Font Rubi':  { lat: 41.4333, lon: 1.6833 },
+  'La Granada': { lat: 41.3667, lon: 1.7500 },
+  'Santa Fe':   { lat: 41.4167, lon: 1.7333 },
+  'Subirats':   { lat: 41.3667, lon: 1.7833 },
+  'Vilafranca': { lat: 41.3500, lon: 1.7000 },
+};
+
+// ── Open-Meteo API ────────────────────────────────────────────────────────
+async function fetchOpenMeteoActual(mun) {
+  const c = MUNICIPIS_COORDS[mun];
+  if(!c) return null;
+  try {
+    const url = `https://api.open-meteo.com/v1/forecast?latitude=${c.lat}&longitude=${c.lon}` +
+      `&current=temperature_2m,relative_humidity_2m,precipitation` +
+      `&hourly=precipitation&past_days=10&forecast_days=1&timezone=Europe%2FMadrid`;
+    const r = await fetch(url);
+    const d = await r.json();
+    // Get last 10 days precipitation (daily sums from hourly)
+    const rain10 = [];
+    if(d.hourly && d.hourly.time) {
+      const hourlyP = d.hourly.precipitation || [];
+      const hourlyT = d.hourly.time || [];
+      const byDay = {};
+      hourlyT.forEach((t, i) => {
+        const day = t.slice(0,10);
+        byDay[day] = (byDay[day]||0) + (hourlyP[i]||0);
+      });
+      const days = Object.keys(byDay).sort().slice(-10);
+      days.forEach(day => rain10.push(Math.round(byDay[day]*10)/10));
+    }
+    return {
+      temp: d.current?.temperature_2m ?? '',
+      hr:   d.current?.relative_humidity_2m ?? '',
+      rain: rain10,
+      source: 'Open-Meteo',
+      updated: new Date().toLocaleString('ca-ES',{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'})
+    };
+  } catch(e) {
+    console.log('Open-Meteo error:', e);
+    return null;
+  }
+}
+
+async function fetchOpenMeteoEPI(mun) {
+  const c = MUNICIPIS_COORDS[mun];
+  if(!c) return null;
+  const year = new Date().getFullYear();
+  // Oct previous year to Mar current year
+  const start = `${year-1}-10-01`;
+  const end   = `${year}-03-31`;
+  try {
+    const url = `https://archive-api.open-meteo.com/v1/archive?latitude=${c.lat}&longitude=${c.lon}` +
+      `&start_date=${start}&end_date=${end}` +
+      `&daily=temperature_2m_mean,precipitation_sum,relative_humidity_2m_mean` +
+      `&timezone=Europe%2FMadrid`;
+    const r = await fetch(url);
+    const d = await r.json();
+    if(!d.daily) return null;
+    // Aggregate by month
+    const months = {};
+    d.daily.time.forEach((date, i) => {
+      const m = date.slice(0,7); // YYYY-MM
+      if(!months[m]) months[m] = { pluja:0, tmed:[], hr:[] };
+      months[m].pluja += d.daily.precipitation_sum[i] || 0;
+      if(d.daily.temperature_2m_mean[i] != null) months[m].tmed.push(d.daily.temperature_2m_mean[i]);
+      if(d.daily.relative_humidity_2m_mean && d.daily.relative_humidity_2m_mean[i] != null)
+        months[m].hr.push(d.daily.relative_humidity_2m_mean[i]);
+    });
+    // Map to EPI_MONTH_KEYS
+    const monthMap = { oct:`${year-1}-10`, nov:`${year-1}-11`, des:`${year-1}-12`,
+                       gen:`${year}-01`,   feb:`${year}-02`,   mar:`${year}-03` };
+    const result = {};
+    Object.entries(monthMap).forEach(([key, ym]) => {
+      const mv = months[ym];
+      if(mv) {
+        result[key] = {
+          pluja: Math.round(mv.pluja * 10) / 10,
+          tmed:  mv.tmed.length ? Math.round(mv.tmed.reduce((a,b)=>a+b,0)/mv.tmed.length*10)/10 : '',
+          hr:    mv.hr.length  ? Math.round(mv.hr.reduce((a,b)=>a+b,0)/mv.hr.length)           : ''
+        };
+      }
+    });
+    return result;
+  } catch(e) {
+    console.log('Open-Meteo EPI error:', e);
+    return null;
+  }
+}
+
+async function updateAllFromOpenMeteo() {
+  const btn = document.getElementById('btnUpdateMeteo');
+  if(btn) { btn.textContent = '⏳ Carregant...'; btn.disabled = true; }
+
+  const promises = MUNICIPIS_METEO.map(async mun => {
+    // Fetch current weather
+    const actual = await fetchOpenMeteoActual(mun);
+    if(actual) {
+      const d = getMeteoData();
+      if(!d[mun]) d[mun] = { temp:'', hr:'', rain: Array(10).fill(''), updated:'' };
+      d[mun].temp    = actual.temp;
+      d[mun].hr      = actual.hr;
+      d[mun].rain    = actual.rain;
+      d[mun].updated = actual.updated + ' (Open-Meteo)';
+      localStorage.setItem('meteo_data', JSON.stringify(d));
+    }
+    // Fetch EPI historical
+    const epi = await fetchOpenMeteoEPI(mun);
+    if(epi) {
+      const ed = getEpiData();
+      ed[mun] = epi;
+      localStorage.setItem('epi_data', JSON.stringify(ed));
+    }
+  });
+
+  await Promise.all(promises);
+  renderMeteo();
+  renderEPI();
+  if(btn) { btn.textContent = '🔄 Actualitzar dades (Open-Meteo)'; btn.disabled = false; }
+  showToast('✅ Dades actualitzades des de Open-Meteo', false, true);
+}
+
+const MUNICIPIS_METEO = [
+  'Avinyonet','Castellet','Font Rubi','La Granada','Santa Fe','Subirats','Vilafranca'
+];
+
+const MUN_COLORS = {
+  'Avinyonet': '#4A1942', 'Castellet': '#1A3A5A', 'Font Rubi': '#5A7A3A',
+  'La Granada': '#7B2D52', 'Santa Fe': '#2A5472',  'Subirats': '#1A3020',
+  'Vilafranca': '#C4783A'
+};
+
+const RISK_LABELS = ['Baix','Moderat','Alt','Molt alt'];
+const RISK_EMOJIS = ['🟢','🟡','🟠','🔴'];
+
+// ── Risk models ─────────────────────────────────────────────────────────────
+
+function calcMildiuRisk(data) {
+  // Model simplificat "3·10": T>10°C + pluja acumulada 10 dies + HR
+  const temp    = parseFloat(data.temp) || 0;
+  const hr      = parseFloat(data.hr) || 0;
+  const rain10  = (data.rain || []).reduce((s,v) => s + (parseFloat(v)||0), 0);
+  const rain48  = (data.rain || []).slice(-2).reduce((s,v) => s + (parseFloat(v)||0), 0);
+  const rain7   = (data.rain || []).slice(-7).reduce((s,v) => s + (parseFloat(v)||0), 0);
+
+  let score = 0;
+  let reasons = [];
+
+  if(temp >= 10 && temp <= 30) { score++; }
+  if(rain10 >= 10) { score++; reasons.push(`${rain10.toFixed(1)}mm/10d`); }
+  if(rain48 >= 5)  { score++; reasons.push(`${rain48.toFixed(1)}mm/48h`); }
+  if(hr >= 80)     { score++; reasons.push(`HR ${hr}%`); }
+
+  const level = Math.min(3, score > 3 ? 3 : score < 0 ? 0 : score);
+  return {
+    level,
+    label: RISK_LABELS[level],
+    emoji: RISK_EMOJIS[level],
+    reason: reasons.length ? reasons.join(' · ') : (temp < 10 ? 'T < 10°C' : 'Condicions favorables baixes'),
+    rain10, rain48, rain7
+  };
+}
+
+function calcOidiRisk(data) {
+  // Oïdi: T 15-35°C óptim 20-27°C, HR >40%, no necessita pluja
+  const temp = parseFloat(data.temp) || 0;
+  const hr   = parseFloat(data.hr) || 0;
+  const rain48 = (data.rain || []).slice(-2).reduce((s,v) => s + (parseFloat(v)||0), 0);
+
+  let score = 0;
+  let reasons = [];
+
+  if(temp >= 15 && temp <= 35)  { score++; }
+  if(temp >= 20 && temp <= 27)  { score++; reasons.push(`T òptima ${temp}°C`); }
+  if(hr >= 40 && hr < 80)       { score++; reasons.push(`HR ${hr}%`); }
+  if(hr >= 80)                  { score += 2; reasons.push(`HR alta ${hr}%`); } // rosada/boira
+  if(rain48 > 10)               { score -= 1; reasons.push('Pluja recent (inhibeix)'); } // pluja el rentava
+
+  const level = Math.min(3, Math.max(0, score > 3 ? 3 : score));
+  return {
+    level,
+    label: RISK_LABELS[level],
+    emoji: RISK_EMOJIS[level],
+    reason: reasons.length ? reasons.join(' · ') : (temp < 15 ? 'T < 15°C' : 'Condicions baixes')
+  };
+}
+
+// ── Storage ─────────────────────────────────────────────────────────────────
+function getMeteoData() {
+  try { return JSON.parse(localStorage.getItem('meteo_data') || '{}'); }
+  catch { return {}; }
+}
+function saveMeteoData(mun, field, val) {
+  const d = getMeteoData();
+  if(!d[mun]) d[mun] = { temp:'', hr:'', rain: Array(10).fill(''), updated:'' };
+  if(field === 'rain') {
+    d[mun].rain = val;
+  } else {
+    d[mun][field] = val;
+  }
+  d[mun].updated = new Date().toLocaleString('ca-ES',{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'});
+  localStorage.setItem('meteo_data', JSON.stringify(d));
+  renderMeteo();
+}
+
+// ── Render ───────────────────────────────────────────────────────────────────
+function renderMeteo() {
+  const grid = document.getElementById('meteoGrid'); if(!grid) return;
+  const allData = getMeteoData();
+  grid.innerHTML = '';
+
+  let alertMuns = [];
+
+  MUNICIPIS_METEO.forEach(mun => {
+    const d = allData[mun] || { temp:'', hr:'', rain: Array(10).fill(''), updated:'' };
+    const rain = Array.isArray(d.rain) ? d.rain : Array(10).fill('');
+    const color = MUN_COLORS[mun] || '#1A3020';
+
+    // Parcel·les del municipi
+    const parceles = PARCEL_DATA.filter(p => p.municipi === mun);
+    const haTotal  = parceles.reduce((s,p)=>s+p.sup,0);
+
+    // Risk calcs
+    const mildiuR = calcMildiuRisk({...d, rain});
+    const oidiR   = calcOidiRisk({...d, rain});
+
+    if(mildiuR.level >= 2 || oidiR.level >= 2) alertMuns.push(mun);
+
+    // Últims 10 dies (avui = dia 10)
+    const today = new Date();
+    const dayLabels = Array.from({length:10},(_,i)=>{
+      const d2 = new Date(today); d2.setDate(today.getDate()-(9-i));
+      return d2.toLocaleDateString('ca-ES',{day:'numeric',month:'numeric'});
+    });
+
+    const rainInputs = rain.map((v,i) => `
+      <div class="rain-day">
+        <input type="number" value="${v}" min="0" step="0.1" placeholder="0"
+          oninput="updateRainDay('${mun}',${i},this.value)">
+        <span class="rd-lbl">${dayLabels[i].split('/')[0]}/${dayLabels[i].split('/')[1]}</span>
+      </div>`).join('');
+
+    const maxRain = Math.max(...rain.map(v=>parseFloat(v)||0), 1);
+    const rainBars = rain.map(v => {
+      const mm = parseFloat(v)||0;
+      const h  = Math.round((mm/maxRain)*36) + 2;
+      return `<div class="rain-bar" style="height:${h}px" title="${mm}mm"></div>`;
+    }).join('');
+
+    const parcelesHtml = parceles.slice(0,4).map(p=>
+      `<span style="font-size:.72rem">${p.nom} (${p.varietat})</span>`
+    ).join(' · ') + (parceles.length>4?` <span style="color:var(--fog)">+${parceles.length-4} més</span>`:'');
+
+    grid.innerHTML += `
+      <div class="meteo-card">
+        <div class="meteo-card-header" style="background:${color}">
+          <span style="font-size:1.1rem">📍</span>
+          <span class="meteo-mun">${mun}</span>
+          <span class="meteo-ha">${parceles.length} parc. · ${haTotal.toFixed(1)} ha</span>
+        </div>
+        <div class="meteo-body">
+
+          <!-- Variables actuals -->
+          <div class="meteo-vars">
+            <div class="meteo-var">
+              <label>Temperatura</label>
+              <input type="number" value="${d.temp||''}" placeholder="—" step="0.5"
+                oninput="saveMeteoData('${mun}','temp',this.value)">
+              <div class="mv-unit">°C</div>
+            </div>
+            <div class="meteo-var">
+              <label>Humitat rel.</label>
+              <input type="number" value="${d.hr||''}" placeholder="—" min="0" max="100"
+                oninput="saveMeteoData('${mun}','hr',this.value)">
+              <div class="mv-unit">%</div>
+            </div>
+            <div class="meteo-var">
+              <label>Pluja avui</label>
+              <input type="number" value="${rain[9]||''}" placeholder="0" step="0.1" min="0"
+                oninput="updateRainDay('${mun}',9,this.value)">
+              <div class="mv-unit">mm</div>
+            </div>
+          </div>
+
+          <!-- Pluja 10 dies -->
+          <div class="rain-section" style="margin-bottom:.7rem">
+            <label>Precipitació acumulada 10 dies (${mildiuR.rain10.toFixed(1)} mm total)</label>
+            <div style="display:flex;align-items:flex-end;gap:2px;height:42px;margin-bottom:3px">
+              ${rainBars}
+            </div>
+            <div class="rain-inputs">${rainInputs}</div>
+          </div>
+
+          <!-- Riscos -->
+          <div class="meteo-risks">
+            <div class="risk-box risk-${mildiuR.level}">
+              <div class="risk-name">🍄 Míldiu</div>
+              <div class="risk-level">${mildiuR.emoji} ${mildiuR.label}</div>
+              <div class="risk-reason">${mildiuR.reason}</div>
+            </div>
+            <div class="risk-box risk-${oidiR.level}">
+              <div class="risk-name">🌫️ Oïdi</div>
+              <div class="risk-level">${oidiR.emoji} ${oidiR.label}</div>
+              <div class="risk-reason">${oidiR.reason}</div>
+            </div>
+          </div>
+
+          <!-- Parcel·les del municipi -->
+          <div class="meteo-parceles">${parcelesHtml}</div>
+
+          ${d.updated ? `<div class="meteo-update">Actualitzat: ${d.updated}</div>` : ''}
+        </div>
+      </div>`;
+  });
+
+  // Alert bar
+  const alertBar = document.getElementById('meteoAlertBar');
+  if(alertBar) {
+    if(alertMuns.length > 0) {
+      alertBar.style.display = 'block';
+      alertBar.innerHTML = `⚠️ <strong>Risc alt o molt alt</strong> detectat a: ${alertMuns.join(', ')} — Considera aplicar tractament preventiu.`;
+    } else {
+      alertBar.style.display = 'none';
+    }
+  }
+}
+
+function updateRainDay(mun, idx, val) {
+  const d = getMeteoData();
+  if(!d[mun]) d[mun] = { temp:'', hr:'', rain: Array(10).fill(''), updated:'' };
+  const rain = Array.isArray(d[mun].rain) ? [...d[mun].rain] : Array(10).fill('');
+  rain[idx] = val;
+  saveMeteoData(mun, 'rain', rain);
+}
+
+// ══════════════════════════════════════════════════
+//  MODEL EPI — FASE HIVERNAL MILDIU
+// ══════════════════════════════════════════════════
+
+const EPI_MONTHS_LABELS = ['Oct','Nov','Des','Gen','Feb','Mar'];
+const EPI_MONTH_KEYS = ['oct','nov','des','gen','feb','mar'];
+
+function epiCoefTemp(tMed) {
+  const t = parseFloat(tMed) || 8;
+  if(t < 0)  return 0;
+  if(t < 5)  return 0.3;
+  if(t < 10) return 0.7;
+  if(t < 15) return 1.0;
+  if(t < 20) return 0.8;
+  if(t < 25) return 0.5;
+  return 0.2;
+}
+
+function calcEPIMes(pluja, tMed, hrMed) {
+  if(!pluja || parseFloat(pluja) <= 0) return -2;
+  const coefT  = epiCoefTemp(tMed);
+  const coefHR = hrMed ? Math.min(1.2, (parseFloat(hrMed)||70) / 70) : 1.0;
+  const epi = Math.min(30, parseFloat(pluja) * coefT * coefHR * 0.15) - (parseFloat(pluja)<10 ? 1 : 0);
+  return Math.round(epi * 10) / 10;
+}
+
+function getEpiData() {
+  try { return JSON.parse(localStorage.getItem('epi_data') || '{}'); }
+  catch { return {}; }
+}
+
+function saveEpiData(mun, mes, field, val) {
+  const d = getEpiData();
+  if(!d[mun]) d[mun] = {};
+  if(!d[mun][mes]) d[mun][mes] = { pluja:'', tmed:'', hr:'' };
+  d[mun][mes][field] = val;
+  localStorage.setItem('epi_data', JSON.stringify(d));
+  renderEPI();
+}
+
+function calcEpiMunicipi(munData) {
+  let epiTotal = 0;
+  const monthly = {};
+  EPI_MONTH_KEYS.forEach(mes => {
+    const m = (munData && munData[mes]) || {};
+    const epi = calcEPIMes(m.pluja, m.tmed, m.hr);
+    monthly[mes] = epi;
+    epiTotal += epi;
+  });
+  return { total: Math.round(epiTotal * 10) / 10, monthly };
+}
+
+function epiLevel(epi) {
+  if(epi < 10)  return { cls:'neg',  label:'Baix',     emoji:'🟢', risk:"Risc reduit d'infeccions primaries" };
+  if(epi < 30)  return { cls:'low',  label:'Moderat',  emoji:'🟡', risk:"Proteccio preventiva a la brotacio" };
+  if(epi < 60)  return { cls:'med',  label:'Alt',      emoji:'🟠', risk:"Tractar en brots 10cm. Alt risc infeccio primaria" };
+  return        { cls:'high', label:'Molt alt', emoji:'🔴', risk:"Campanya d'alt risc. Maxima proteccio des del desborrament" };
+}
+
+function renderEPI() {
+  const grid      = document.getElementById('epiMunGrid');
+  const globalBox = document.getElementById('epiGlobalBox');
+  if(!grid) return;
+
+  const allData = getEpiData();
+  grid.innerHTML = '';
+  let globalEpi = 0;
+
+  MUNICIPIS_METEO.forEach(mun => {
+    const munData = allData[mun] || {};
+    const { total, monthly } = calcEpiMunicipi(munData);
+    globalEpi += total;
+    const lv  = epiLevel(total);
+    const pct = Math.min(100, Math.max(0, (total / 80) * 100));
+
+    const monthsHtml = EPI_MONTH_KEYS.map((mes, i) => {
+      const m = (munData[mes]) || {};
+      const epiMes = monthly[mes];
+      const oi1 = 'saveEpiData(&quot;' + mun + '&quot;,&quot;' + mes + '&quot;,&quot;pluja&quot;,this.value)';
+      const oi2 = 'saveEpiData(&quot;' + mun + '&quot;,&quot;' + mes + '&quot;,&quot;tmed&quot;,this.value)';
+      return '<div class="epi-month">' +
+        '<div class="epi-month-lbl">' + EPI_MONTHS_LABELS[i] + '</div>' +
+        '<input type="number" class="epi-month-input" value="' + (m.pluja||'') + '" placeholder="mm" step="1" min="0" oninput="' + oi1 + '">' +
+        '<input type="number" class="epi-month-input" value="' + (m.tmed||'') + '" placeholder="T" step="0.5" oninput="' + oi2 + '" style="font-size:.65rem;color:var(--fog)">' +
+        '<div class="epi-month-val" style="color:' + (epiMes>0?'var(--harvest)':'var(--fog)') + '">' + (epiMes>0?'+'+epiMes:epiMes) + '</div>' +
+        '</div>';
+    }).join('');
+
+    grid.innerHTML += '<div class="epi-mun-card">' +
+      '<div class="epi-mun-name">📍 ' + mun + '</div>' +
+      '<div class="epi-gauge"><div class="epi-gauge-fill epi-' + lv.cls + '" style="width:' + pct + '%"></div></div>' +
+      '<div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:.5rem">' +
+        '<span class="epi-val ' + lv.cls + '">' + lv.emoji + ' EPI ' + (total>0?'+'+total:total) + '</span>' +
+        '<span class="epi-label">' + lv.label + '</span>' +
+      '</div>' +
+      '<div class="epi-months">' + monthsHtml + '</div>' +
+      '<div style="font-size:.72rem;color:var(--fog);margin-top:.5rem;font-style:italic">' + lv.risk + '</div>' +
+      '</div>';
+  });
+
+  const avgEpi   = Math.round(globalEpi / MUNICIPIS_METEO.length * 10) / 10;
+  const globalLv = epiLevel(avgEpi);
+
+  if(globalBox) {
+    let munList = MUNICIPIS_METEO.map(function(m2) {
+      const d2 = allData[m2]||{};
+      const res = calcEpiMunicipi(d2);
+      const lv2 = epiLevel(res.total);
+      return '<div style="font-family:monospace;font-size:.7rem">' + lv2.emoji + ' ' + m2 + ': ' + (res.total>0?'+'+res.total:res.total) + '</div>';
+    }).join('');
+
+    globalBox.innerHTML = '<div class="epi-global-box">' +
+      '<div><div class="epi-global-num">' + globalLv.emoji + ' ' + (avgEpi>0?'+'+avgEpi:avgEpi) + '</div>' +
+      '<div class="epi-global-lbl">EPI Mitja Finca</div></div>' +
+      '<div class="epi-interpretation"><strong>' + globalLv.label + '</strong> — ' + globalLv.risk + '<br>' +
+      '<span style="opacity:.75;font-size:.78rem">Dades hivernals oct-mar · Campanya ' + (new Date().getFullYear()-1) + '/' + new Date().getFullYear() + '</span></div>' +
+      '<div style="text-align:right"><div style="font-family:monospace;font-size:.65rem;opacity:.6;margin-bottom:.3rem">PER MUNICIPIS</div>' +
+      munList + '</div></div>';
+  }
+}
+
+// ══════════════════════════════════════════════════
 //  TOAST
 // ══════════════════════════════════════════════════
 function showToast(msg,error=false,success=false){
-  const t=document.getElementById('toast');
-  t.textContent=msg;
-  t.className='toast'+(error?' error':success?' success':'');
-  t.classList.add('show');
-  setTimeout(()=>t.classList.remove('show'),3000);
+  const el=document.getElementById('toast');
+  if(!el) return;
+  el.textContent=msg;
+  el.className='toast'+(error?' error':success?' success':'');
+  setTimeout(()=>el.classList.add('show'),10);
+  setTimeout(()=>el.classList.remove('show'),3000);
 }
 </script>
 </body>
