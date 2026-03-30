@@ -2394,22 +2394,23 @@ async function fetchOpenMeteoEPI(mun) {
   const start = `${year-1}-10-01`;
   const end   = `${year}-03-31`;
   try {
+    // HR no disponible a ERA5 daily — usem només T i pluja per EPI
     const url = `https://archive-api.open-meteo.com/v1/archive?latitude=${c.lat}&longitude=${c.lon}` +
       `&start_date=${start}&end_date=${end}` +
-      `&daily=temperature_2m_mean,precipitation_sum,relative_humidity_2m_mean` +
+      `&daily=temperature_2m_mean,precipitation_sum` +
       `&timezone=Europe%2FMadrid`;
     const r = await fetch(url);
+    if(!r.ok) { console.log('EPI fetch error', r.status); return null; }
     const d = await r.json();
-    if(!d.daily) return null;
+    if(!d.daily || !d.daily.time) { console.log('EPI no daily data', d); return null; }
+    console.log('EPI data OK per', mun, '- dies:', d.daily.time.length);
     // Aggregate by month
     const months = {};
     d.daily.time.forEach((date, i) => {
       const m = date.slice(0,7); // YYYY-MM
-      if(!months[m]) months[m] = { pluja:0, tmed:[], hr:[] };
+      if(!months[m]) months[m] = { pluja:0, tmed:[] };
       months[m].pluja += d.daily.precipitation_sum[i] || 0;
       if(d.daily.temperature_2m_mean[i] != null) months[m].tmed.push(d.daily.temperature_2m_mean[i]);
-      if(d.daily.relative_humidity_2m_mean && d.daily.relative_humidity_2m_mean[i] != null)
-        months[m].hr.push(d.daily.relative_humidity_2m_mean[i]);
     });
     // Map to EPI_MONTH_KEYS
     const monthMap = { oct:`${year-1}-10`, nov:`${year-1}-11`, des:`${year-1}-12`,
@@ -2421,7 +2422,7 @@ async function fetchOpenMeteoEPI(mun) {
         result[key] = {
           pluja: Math.round(mv.pluja * 10) / 10,
           tmed:  mv.tmed.length ? Math.round(mv.tmed.reduce((a,b)=>a+b,0)/mv.tmed.length*10)/10 : '',
-          hr:    mv.hr.length  ? Math.round(mv.hr.reduce((a,b)=>a+b,0)/mv.hr.length)           : ''
+          hr:    ''
         };
       }
     });
@@ -2696,7 +2697,8 @@ function epiCoefTemp(tMed) {
 }
 
 function calcEPIMes(pluja, tMed, hrMed) {
-  if(!pluja || parseFloat(pluja) <= 0) return -2;
+  if(!pluja || pluja === '' || isNaN(parseFloat(pluja))) return 0;
+  if(parseFloat(pluja) <= 0) return 0;
   const coefT  = epiCoefTemp(tMed);
   const coefHR = hrMed ? Math.min(1.2, (parseFloat(hrMed)||70) / 70) : 1.0;
   const epi = Math.min(30, parseFloat(pluja) * coefT * coefHR * 0.15) - (parseFloat(pluja)<10 ? 1 : 0);
