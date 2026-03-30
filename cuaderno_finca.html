@@ -2361,10 +2361,12 @@ async function fetchOpenMeteoActual(mun) {
   const c = MUNICIPIS_COORDS[mun];
   if(!c) return null;
   try {
-    const url = `https://api.open-meteo.com/v1/forecast?latitude=${c.lat}&longitude=${c.lon}` +
-      `&current=temperature_2m,relative_humidity_2m,precipitation` +
-      `&hourly=precipitation&past_days=10&forecast_days=1&timezone=Europe%2FMadrid`;
-    const r = await fetch(url);
+    const url = 'https://api.open-meteo.com/v1/forecast' +
+      '?latitude=' + c.lat + '&longitude=' + c.lon +
+      '&current=temperature_2m,relative_humidity_2m,precipitation' +
+      '&hourly=precipitation&past_days=10&forecast_days=1&timezone=auto';
+    console.log('Actual fetch per', mun);
+    const r = await fetch(url, { mode: 'cors' });
     const d = await r.json();
     // Get last 10 days precipitation (daily sums from hourly)
     const rain10 = [];
@@ -2396,52 +2398,49 @@ async function fetchOpenMeteoEPI(mun) {
   const c = MUNICIPIS_COORDS[mun];
   if(!c) return null;
   const year = new Date().getFullYear();
-  // Oct previous year to Mar current year
-  const start = `${year-1}-10-01`;
-  // Use yesterday as end date to ensure data availability
-  const yesterday = new Date(); yesterday.setDate(yesterday.getDate()-2);
-  const endYear  = yesterday.getFullYear();
-  const endMonth = String(yesterday.getMonth()+1).padStart(2,'0');
-  const endDay   = String(yesterday.getDate()).padStart(2,'0');
-  // Cap at end of March current year
-  const endMar = `${year}-03-31`;
-  const end = endMar < `${endYear}-${endMonth}-${endDay}` ? endMar : `${endYear}-${endMonth}-${endDay}`;
+  const start = (year-1) + '-10-01';
+  const end   = year + '-03-28';
+  const url = 'https://archive-api.open-meteo.com/v1/archive' +
+    '?latitude=' + c.lat + '&longitude=' + c.lon +
+    '&start_date=' + start + '&end_date=' + end +
+    '&daily=temperature_2m_mean,precipitation_sum' +
+    '&timezone=auto';
   try {
-    // HR no disponible a ERA5 daily — usem només T i pluja per EPI
-    const url = `https://archive-api.open-meteo.com/v1/archive?latitude=${c.lat}&longitude=${c.lon}` +
-      `&start_date=${start}&end_date=${end}` +
-      `&daily=temperature_2m_mean,precipitation_sum` +
-      `&timezone=Europe%2FMadrid`;
     const r = await fetch(url);
-    if(!r.ok) { console.log('EPI fetch error', r.status); return null; }
+    if(!r.ok) { console.error('EPI HTTP error ' + mun, r.status); return null; }
     const d = await r.json();
-    if(!d.daily || !d.daily.time) { console.log('EPI no daily data', d); return null; }
-    console.log('EPI data OK per', mun, '- dies:', d.daily.time.length);
-    // Aggregate by month
+    if(!d.daily || !d.daily.time || d.daily.time.length === 0) {
+      console.error('EPI no data ' + mun, JSON.stringify(d).slice(0,100));
+      return null;
+    }
     const months = {};
     d.daily.time.forEach((date, i) => {
-      const m = date.slice(0,7); // YYYY-MM
-      if(!months[m]) months[m] = { pluja:0, tmed:[] };
-      months[m].pluja += d.daily.precipitation_sum[i] || 0;
-      if(d.daily.temperature_2m_mean[i] != null) months[m].tmed.push(d.daily.temperature_2m_mean[i]);
+      const ym = date.slice(0,7);
+      if(!months[ym]) months[ym] = { pluja:0, tmed:[] };
+      months[ym].pluja += parseFloat(d.daily.precipitation_sum[i]) || 0;
+      const t = parseFloat(d.daily.temperature_2m_mean[i]);
+      if(!isNaN(t)) months[ym].tmed.push(t);
     });
-    // Map to EPI_MONTH_KEYS
-    const monthMap = { oct:`${year-1}-10`, nov:`${year-1}-11`, des:`${year-1}-12`,
-                       gen:`${year}-01`,   feb:`${year}-02`,   mar:`${year}-03` };
     const result = {};
-    Object.entries(monthMap).forEach(([key, ym]) => {
+    const map = [
+      ['oct', (year-1)+'-10'], ['nov', (year-1)+'-11'], ['des', (year-1)+'-12'],
+      ['gen', year+'-01'],     ['feb', year+'-02'],     ['mar', year+'-03']
+    ];
+    map.forEach(function(pair) {
+      const key = pair[0], ym = pair[1];
       const mv = months[ym];
       if(mv) {
         result[key] = {
           pluja: Math.round(mv.pluja * 10) / 10,
-          tmed:  mv.tmed.length ? Math.round(mv.tmed.reduce((a,b)=>a+b,0)/mv.tmed.length*10)/10 : '',
+          tmed:  mv.tmed.length ? Math.round(mv.tmed.reduce(function(s,v){return s+v;},0)/mv.tmed.length*10)/10 : 10,
           hr:    ''
         };
       }
     });
+    console.log('EPI OK ' + mun + ' - ' + Object.keys(result).length + ' mesos');
     return result;
   } catch(e) {
-    console.log('Open-Meteo EPI error:', e);
+    console.error('EPI error ' + mun + ': ' + e.message);
     return null;
   }
 }
