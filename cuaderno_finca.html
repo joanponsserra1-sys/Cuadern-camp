@@ -2443,32 +2443,42 @@ async function updateAllFromOpenMeteo() {
   const btn = document.getElementById('btnUpdateMeteo');
   if(btn) { btn.textContent = '⏳ Carregant...'; btn.disabled = true; }
 
-  const promises = MUNICIPIS_METEO.map(async mun => {
-    // Fetch current weather
-    const actual = await fetchOpenMeteoActual(mun);
-    if(actual) {
-      const d = getMeteoData();
-      if(!d[mun]) d[mun] = { temp:'', hr:'', rain: Array(10).fill(''), updated:'' };
-      d[mun].temp    = actual.temp;
-      d[mun].hr      = actual.hr;
-      d[mun].rain    = actual.rain;
-      d[mun].updated = actual.updated + ' (Open-Meteo)';
-      localStorage.setItem('meteo_data', JSON.stringify(d));
-    }
-    // Fetch EPI historical
-    const epi = await fetchOpenMeteoEPI(mun);
-    if(epi) {
-      const ed = getEpiData();
-      ed[mun] = epi;
-      localStorage.setItem('epi_data', JSON.stringify(ed));
-    }
-  });
+  // Acumula totes les dades primer, després guarda tot d'un cop
+  const meteoData = getMeteoData();
+  const epiData   = getEpiData();
+  let ok = 0;
 
-  await Promise.all(promises);
+  for(const mun of MUNICIPIS_METEO) {
+    try {
+      // Dades actuals
+      const actual = await fetchOpenMeteoActual(mun);
+      if(actual) {
+        if(!meteoData[mun]) meteoData[mun] = { temp:'', hr:'', rain: Array(10).fill(''), updated:'' };
+        meteoData[mun].temp    = actual.temp;
+        meteoData[mun].hr      = actual.hr;
+        meteoData[mun].rain    = actual.rain;
+        meteoData[mun].updated = actual.updated + ' (Open-Meteo)';
+      }
+      // Historial hivernal EPI
+      const epi = await fetchOpenMeteoEPI(mun);
+      if(epi) {
+        epiData[mun] = epi;
+        ok++;
+        console.log('EPI OK per', mun, epi);
+      }
+    } catch(e) {
+      console.log('Error per', mun, e);
+    }
+  }
+
+  // Guarda tot d'un cop
+  localStorage.setItem('meteo_data', JSON.stringify(meteoData));
+  localStorage.setItem('epi_data',   JSON.stringify(epiData));
+
   renderMeteo();
   renderEPI();
   if(btn) { btn.textContent = '🔄 Actualitzar dades (Open-Meteo)'; btn.disabled = false; }
-  showToast('✅ Dades actualitzades des de Open-Meteo', false, true);
+  showToast('✅ Dades actualitzades · ' + ok + '/' + MUNICIPIS_METEO.length + ' municipis EPI', false, true);
 }
 
 const MUNICIPIS_METEO = [
