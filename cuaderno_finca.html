@@ -678,6 +678,12 @@ footer{text-align:center;margin-top:1.5rem;font-family:monospace;font-size:.65re
 <div class="page" id="page-historial">
   <div class="card">
     <div class="panel-header ph-soil">📚 &nbsp; Historial de parts</div>
+    <div style="padding:.6rem 2rem .2rem;display:flex;justify-content:flex-end">
+      <button onclick="syncTractamentsFromSheets().then(n=>{renderHistorial();renderTracker();updateExportStats();showToast(n>0?'✅ '+n+' parts nous de Sheets':'✅ Ja sincronitzat',false,true);})"
+        style="background:var(--ok);color:white;border:none;border-radius:2px;padding:.45rem 1rem;font-family:monospace;font-size:.68rem;cursor:pointer">
+        🔄 Sincronitzar amb Sheets
+      </button>
+    </div>
     <div class="hist-filters">
       <div class="field"><label>Filtrar per tipus</label>
         <select id="filt-tipo" onchange="renderHistorial()">
@@ -1341,8 +1347,8 @@ function stateFor(d) {
 
 async function syncTractamentsFromSheets() {
   try {
-    const r = await fetch(SCRIPT_URL, { mode: 'cors' });
-    if(!r.ok) return false;
+    const r = await fetch(SCRIPT_URL + '?t=' + Date.now());
+    if(!r.ok) { console.log('Sync error HTTP:', r.status); return false; }
     const data = await r.json();
 
     // Sync tractaments (semàfor)
