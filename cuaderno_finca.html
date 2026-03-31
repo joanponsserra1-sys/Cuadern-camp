@@ -660,9 +660,9 @@ footer{text-align:center;margin-top:1.5rem;font-family:monospace;font-size:.65re
     <div class="tracker-log">
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:.8rem">
         <div class="section-label" style="margin:0">Registrar tractament ràpid</div>
-        <button onclick="syncTractamentsFromSheets().then(()=>renderTracker()).then(()=>showToast('✅ Sincronitzat amb Sheets',false,true))"
+        <button onclick="syncTractamentsFromSheets().then(n=>{renderTracker();renderHistorial();updateExportStats();showToast(n>0?'✅ '+n+' parts sincronitzats':'✅ Tot actualitzat',false,true);})"
           style="background:var(--ok);color:white;border:none;border-radius:2px;padding:.4rem .9rem;font-family:monospace;font-size:.65rem;cursor:pointer;letter-spacing:.06em">
-          🔄 Sincronitzar
+          🔄 Sincronitzar Sheets
         </button>
       </div>
       <div class="log-row">
@@ -935,6 +935,50 @@ function enviarASheets(data) {
   }).catch(err => console.log('Sheets sync error:', err));
 }
 
+// Envia configuració a Sheets
+function syncConfigToSheets(clau, valor) {
+  fetch(SCRIPT_URL, {
+    method: 'POST',
+    mode: 'no-cors',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ tipus: 'config', clau: clau, valor: JSON.stringify(valor) })
+  }).catch(err => console.log('Config sync error:', err));
+}
+
+// Aplica configuració rebuda de Sheets al localStorage
+function applyConfigFromSheets(config) {
+  const CONFIG_KEYS = {
+    'productes_fitosanitaris': true,
+    'custom_accions':          true,
+    'epi_data':                true,
+  };
+  // Also dropdown keys
+  ['lab-tipo','fit-objetivo','fit-tipo','rie-tipo','rie-origen','abo-tipo','abo-forma','lab-fenologia'].forEach(k => {
+    CONFIG_KEYS['dropdown_' + k] = true;
+  });
+  // Cost variables
+  ['v-gasoil','v-salari','v-fertilitzant','v-dosi-fert','v-amort'].forEach(k => {
+    CONFIG_KEYS['cost_' + k] = true;
+  });
+
+  let applied = 0;
+  Object.entries(config).forEach(([clau, valor]) => {
+    if(!CONFIG_KEYS[clau]) return;
+    try {
+      const parsed = typeof valor === 'string' ? JSON.parse(valor) : valor;
+      const local  = localStorage.getItem(clau);
+      // Only apply if Sheets has data and local is empty or different
+      if(parsed !== null && parsed !== undefined) {
+        if(!local) {
+          localStorage.setItem(clau, JSON.stringify(parsed));
+          applied++;
+        }
+      }
+    } catch(e) {}
+  });
+  return applied;
+}
+
 // ══════════════════════════════════════════════════
 //  CONSTANTS
 // ══════════════════════════════════════════════════
@@ -976,6 +1020,15 @@ document.addEventListener('DOMContentLoaded', function() {
   applyAllDropdowns();
   // Sync custom accions to form
   syncCustomAccionsToForm();
+
+  // Sincronitza amb Google Sheets en segon pla
+  syncTractamentsFromSheets().then(added => {
+    if(added > 0) {
+      renderHistorial();
+      updateExportStats();
+      showToast('✅ ' + added + ' parts sincronitzats des de Sheets', false, true);
+    }
+  });
 
   // Poblar filtres de costos
   populateCostFilters();
@@ -1288,21 +1341,55 @@ function stateFor(d) {
 
 async function syncTractamentsFromSheets() {
   try {
-    const r = await fetch(SCRIPT_URL + '?action=tractaments', { mode: 'cors' });
-    if(!r.ok) return;
+    const r = await fetch(SCRIPT_URL, { mode: 'cors' });
+    if(!r.ok) return false;
     const data = await r.json();
+
+    // Sync tractaments (semàfor)
     if(data.tractaments) {
-      // Merge Sheets data with localStorage (Sheets wins if newer)
       const local = getTractaments();
       Object.entries(data.tractaments).forEach(([parcela, dateStr]) => {
-        if(!local[parcela] || dateStr > local[parcela]) {
+        if(!local[parcela] || dateStr > local[parcela])
           local[parcela] = dateStr;
-        }
       });
       localStorage.setItem('tractaments', JSON.stringify(local));
     }
+
+    // Sync parts (historial complet)
+    let added = 0;
+    if(data.parts && data.parts.length > 0) {
+      const localParts = getParts();
+      const localIds   = new Set(localParts.map(p => String(p.id)));
+      data.parts.forEach(sp => {
+        if(!localIds.has(String(sp.id))) {
+          localParts.push(sp);
+          added++;
+        }
+      });
+      if(added > 0) {
+        localParts.sort((a,b) => new Date(b.fecha) - new Date(a.fecha));
+        saveParts(localParts);
+      }
+    }
+
+    // Sync configuració (productes, accions, desplegables, costos)
+    if(data.config && Object.keys(data.config).length > 0) {
+      const cfgApplied = applyConfigFromSheets(data.config);
+      if(cfgApplied > 0) {
+        // Re-render affected modules
+        renderProducteTaula();
+        renderCustomAccions();
+        applyAllDropdowns();
+        syncCustomAccionsToForm();
+        renderDropdownEditors();
+        console.log('Config aplicada des de Sheets:', cfgApplied, 'claus');
+      }
+    }
+
+    return added;
   } catch(e) {
     console.log('Sheets sync error:', e);
+    return false;
   }
 }
 
@@ -1538,7 +1625,7 @@ function getProductes() {
   try { return JSON.parse(localStorage.getItem('productes_fitosanitaris') || 'null') || PRODUCTES_DEFAULT; }
   catch { return PRODUCTES_DEFAULT; }
 }
-function saveProductes(p) { localStorage.setItem('productes_fitosanitaris', JSON.stringify(p)); }
+function saveProductes(p) { localStorage.setItem('productes_fitosanitaris', JSON.stringify(p)); syncConfigToSheets('productes_fitosanitaris', p); }
 
 function renderProducteTaula() {
   const tbody = document.getElementById('producteTbody'); if(!tbody) return;
@@ -2098,6 +2185,7 @@ function getDropdownOptions(id) {
 
 function saveDropdownOptions(id, opts) {
   localStorage.setItem('dropdown_'+id, JSON.stringify(opts));
+  syncConfigToSheets('dropdown_'+id, opts);
 }
 
 function applyDropdownToForm(id) {
@@ -2203,7 +2291,7 @@ function getCustomAccions() {
   try { return JSON.parse(localStorage.getItem('custom_accions') || '[]'); }
   catch { return []; }
 }
-function saveCustomAccions(a) { localStorage.setItem('custom_accions', JSON.stringify(a)); }
+function saveCustomAccions(a) { localStorage.setItem('custom_accions', JSON.stringify(a)); syncConfigToSheets('custom_accions', a); }
 
 function renderCustomAccions() {
   const container = document.getElementById('customAcciosList'); if(!container) return;
