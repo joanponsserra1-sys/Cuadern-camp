@@ -268,6 +268,48 @@ tbody td{padding:.55rem .8rem;color:var(--ink);vertical-align:middle;}
   .epi-months{grid-template-columns:repeat(3,1fr);}
   .epi-mun-grid{grid-template-columns:1fr;}
 }
+.estoc-table{width:100%;border-collapse:collapse;font-size:.83rem;margin-bottom:1rem;}
+.estoc-table thead th{background:var(--vine);color:var(--paper);font-family:'DM Mono',monospace;font-size:.65rem;letter-spacing:.08em;text-transform:uppercase;padding:.55rem .7rem;text-align:right;}
+.estoc-table thead th:first-child,.estoc-table thead th:nth-child(2){text-align:left;}
+.estoc-table tbody tr{border-bottom:1px solid #D8CEBA;}
+.estoc-table tbody tr:hover{background:rgba(245,239,224,.5);}
+.estoc-table tbody td{padding:.5rem .7rem;font-family:'DM Mono',monospace;font-size:.78rem;text-align:right;}
+.estoc-table tbody td:first-child,.estoc-table tbody td:nth-child(2){text-align:left;font-family:'DM Sans',sans-serif;}
+.estoc-table tfoot td{background:var(--parchment);font-weight:700;padding:.6rem .7rem;text-align:right;border-top:2px solid #D8CEBA;font-family:'DM Mono',monospace;font-size:.8rem;}
+.estoc-table tfoot td:first-child{text-align:left;}
+.pmp-badge{display:inline-block;background:var(--ok-bg);border:1px solid #90C890;border-radius:2px;padding:.2rem .5rem;font-family:'DM Mono',monospace;font-size:.68rem;color:var(--ok);margin-left:.4rem;}
+.estoc-form{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:.7rem;margin-bottom:1rem;}
+.compra-row{display:flex;gap:.5rem;align-items:flex-end;flex-wrap:wrap;background:var(--parchment);border-radius:2px;padding:.7rem .9rem;margin-bottom:.4rem;border:1px solid #D8CEBA;}
+.compra-row .field{flex:1;min-width:100px;margin-bottom:0;}
+.compra-del{background:none;border:none;cursor:pointer;color:#CCC;font-size:1rem;}
+.compra-del:hover{color:#E53935;}
+@media(max-width:600px){.estoc-form{grid-template-columns:1fr 1fr;}}
+.tracker-detail{background:var(--paper);border-radius:2px;border:1px solid #D8CEBA;margin:0 2rem 1.2rem;overflow:hidden;}
+.tracker-detail-header{background:var(--vine);color:var(--paper);padding:.7rem 1.2rem;display:flex;justify-content:space-between;align-items:center;}
+.tracker-detail-header h4{font-family:'Playfair Display',serif;font-size:1rem;margin:0;}
+.tracker-detail-close{background:none;border:none;color:var(--paper);font-size:1.2rem;cursor:pointer;opacity:.7;}
+.tracker-detail-close:hover{opacity:1;}
+.tracker-detail-body{padding:.8rem 1.2rem;}
+.fit-history-row{display:grid;grid-template-columns:90px 1fr 1fr auto;gap:.5rem;padding:.4rem 0;border-bottom:1px solid #F0E8D8;font-size:.8rem;align-items:center;}
+.fit-history-row:last-child{border-bottom:none;}
+.fit-history-date{font-family:'DM Mono',monospace;color:var(--fog);font-size:.72rem;}
+.fit-history-prod{font-weight:600;color:var(--ink);}
+.fit-history-dosi{font-family:'DM Mono',monospace;color:var(--fog);font-size:.72rem;}
+.fit-history-empty{color:var(--fog);font-style:italic;font-size:.83rem;padding:.5rem 0;}
+.prow{cursor:pointer;transition:background .15s;}
+.prow:hover{background:rgba(245,239,224,.7);}
+@media(max-width:500px){
+  .fit-history-row{grid-template-columns:80px 1fr auto;}
+  .fit-history-dosi{display:none;}
+  .tracker-detail{margin:0 .5rem 1rem;}
+}
+.plague-badges{display:flex;gap:.3rem;flex-wrap:wrap;margin-top:.3rem;}
+.pbadge{font-family:'DM Mono',monospace;font-size:.6rem;border-radius:2px;padding:.15rem .4rem;letter-spacing:.04em;white-space:nowrap;}
+.pbadge-ok{background:#E8F5E8;color:#2D6A2D;border:1px solid #90C890;}
+.pbadge-warn{background:#FFF8E1;color:#8A6A00;border:1px solid #D4B800;}
+.pbadge-danger{background:#FDE8E8;color:#8A1A1A;border:1px solid #E08080;}
+.pbadge-none{background:#F5F5F5;color:#AAA;border:1px solid #DDD;}
+.fit-history-plagues{display:flex;gap:.3rem;flex-wrap:wrap;margin-top:.2rem;}
 footer{text-align:center;margin-top:1.5rem;font-family:monospace;font-size:.65rem;letter-spacing:.12em;color:rgba(245,239,224,.35);text-transform:uppercase;}
 
 /* COSTOS */
@@ -472,6 +514,7 @@ footer{text-align:center;margin-top:1.5rem;font-family:monospace;font-size:.65re
   <button class="main-nav-btn" onclick="showPage('exportar')" id="nav-exportar"><span class="nav-icon">📥</span>Exportar</button>
   <button class="main-nav-btn" onclick="showPage('costos')" id="nav-costos"><span class="nav-icon">💶</span>Costos</button>
   <button class="main-nav-btn" onclick="showPage('meteo')" id="nav-meteo"><span class="nav-icon">🌡️</span>Risc Meteo</button>
+  <button class="main-nav-btn" onclick="showPage('estoc')" id="nav-estoc"><span class="nav-icon">📦</span>Estoc</button>
 </div>
 
 <!-- ══ REGISTRAR ══ -->
@@ -655,6 +698,15 @@ footer{text-align:center;margin-top:1.5rem;font-family:monospace;font-size:.65re
 
     <!-- Grups -->
     <div id="trackerGrid"></div>
+
+    <!-- Detall parcel·la -->
+    <div class="tracker-detail" id="trackerDetail" style="display:none">
+      <div class="tracker-detail-header">
+        <h4 id="trackerDetailTitle">Historial</h4>
+        <button class="tracker-detail-close" onclick="document.getElementById('trackerDetail').style.display='none'">✕</button>
+      </div>
+      <div class="tracker-detail-body" id="trackerDetailBody"></div>
+    </div>
 
     <!-- Registre ràpid -->
     <div class="tracker-log">
@@ -951,6 +1003,76 @@ footer{text-align:center;margin-top:1.5rem;font-family:monospace;font-size:.65re
   </div>
 </div>
 
+<div class="page" id="page-estoc">
+
+  <!-- Gasoil PMP -->
+  <div class="card" style="margin-bottom:1.2rem">
+    <div class="panel-header ph-harvest">⛽ &nbsp; Estoc Gasoil — Preu Mig Ponderat</div>
+    <div class="card-inner">
+      <div id="gasoilCompres"></div>
+      <div style="display:flex;gap:.6rem;flex-wrap:wrap;align-items:flex-end;margin-top:.5rem">
+        <div class="field" style="margin-bottom:0;width:130px"><label>Data</label><input type="date" id="g-data"></div>
+        <div class="field" style="margin-bottom:0;width:100px"><label>Litres</label><input type="number" id="g-litres" placeholder="0" step="1" min="0"></div>
+        <div class="field" style="margin-bottom:0;width:100px"><label>Preu €/L</label><input type="number" id="g-preu" placeholder="0.000" step="0.001" min="0"></div>
+        <button class="btn btn-harvest" onclick="addCompraGasoil()" style="margin-bottom:1rem">+ Afegir compra</button>
+      </div>
+      <div id="gasoilPMP" style="margin-top:.8rem"></div>
+    </div>
+  </div>
+
+  <!-- Productes fitosanitaris PMP -->
+  <div class="card">
+    <div class="panel-header ph-grape">🧪 &nbsp; Estoc Fitosanitaris — Catàleg i PMP</div>
+    <div class="card-inner">
+
+      <!-- Afegir nou producte al catàleg -->
+      <div class="section-label">Nou producte al catàleg</div>
+      <div style="display:flex;gap:.6rem;flex-wrap:wrap;align-items:flex-end;margin-bottom:1.2rem;background:var(--parchment);padding:.8rem;border-radius:2px;border:1px solid #D8CEBA">
+        <div class="field" style="margin-bottom:0;flex:2;min-width:160px"><label>Nom producte</label><input type="text" id="np-nom" placeholder="ex: Heliosufre, Scala..."></div>
+        <div class="field" style="margin-bottom:0;width:90px">
+          <label>Unitat</label>
+          <select id="np-unitat">
+            <option value="L">L (litres)</option>
+            <option value="kg">kg</option>
+            <option value="g">g</option>
+          </select>
+        </div>
+        <div class="field" style="margin-bottom:0;width:100px"><label>Núm. registre</label><input type="text" id="np-registre" placeholder="ES-..."></div>
+        <button class="btn btn-grape" onclick="addProducteEstoc()" style="margin-bottom:1rem">+ Afegir producte</button>
+      </div>
+
+      <!-- Selector producte existent -->
+      <div class="section-label">Registrar compra</div>
+      <div style="display:flex;gap:.6rem;flex-wrap:wrap;align-items:flex-end;margin-bottom:.8rem">
+        <div class="field" style="margin-bottom:0;flex:2;min-width:180px">
+          <label>Producte</label>
+          <select id="estoc-prod-sel" onchange="renderEstocProd()">
+            <option value="">— Seleccionar producte —</option>
+          </select>
+        </div>
+        <button id="btnDelProd" class="btn" onclick="delProducteEstoc()"
+          style="margin-bottom:1rem;background:#FDE8E8;color:#8A1A1A;border:1px solid #E08080;font-size:.72rem;display:none">
+          🗑 Eliminar producte
+        </button>
+      </div>
+
+      <div id="addCompraProdForm" style="display:none;background:var(--parchment);padding:.8rem;border-radius:2px;border:1px solid #D8CEBA;margin-bottom:.8rem">
+        <div style="display:flex;gap:.6rem;flex-wrap:wrap;align-items:flex-end">
+          <div class="field" style="margin-bottom:0;width:130px"><label>Data compra</label><input type="date" id="ep-data"></div>
+          <div class="field" style="margin-bottom:0;width:100px"><label>Quantitat</label><input type="number" id="ep-qty" placeholder="0" step="0.1" min="0"></div>
+          <div class="field" style="margin-bottom:0;width:100px"><label>Preu €/unitat</label><input type="number" id="ep-preu" placeholder="0.00" step="0.01" min="0"></div>
+          <button class="btn btn-grape" onclick="addCompraProd()" style="margin-bottom:1rem">+ Afegir compra</button>
+        </div>
+      </div>
+
+      <div id="estocProdCompres"></div>
+      <div id="estocProdPMP" style="margin-top:.8rem"></div>
+
+    </div>
+  </div>
+
+</div>
+
 <footer>Cuaderno de Campo · Viñedo · Penedès &nbsp;·&nbsp; Dades guardades al navegador</footer>
 </div>
 <div class="toast" id="toast"></div>
@@ -1063,6 +1185,10 @@ let currentType = 'fitosanitario';
 // ══════════════════════════════════════════════════
 document.addEventListener('DOMContentLoaded', function() {
   document.getElementById('fecha').valueAsDate = new Date();
+  const gDataEl = document.getElementById('g-data');
+  if(gDataEl) gDataEl.valueAsDate = new Date();
+  const epDataEl = document.getElementById('ep-data');
+  if(epDataEl) epDataEl.valueAsDate = new Date();
   document.getElementById('log-fecha').valueAsDate = new Date();
   populateParceles();
   renderTracker();
@@ -1402,6 +1528,54 @@ function daysSince(d) {
   const t=new Date(d+'T12:00:00'), n=new Date(); n.setHours(12,0,0,0);
   return Math.floor((n-t)/86400000);
 }
+
+// Plagues que volem rastrejar individualment
+const PLAGUES_TRACK = [
+  { key:'mildiu',  label:'Míldiu',  icon:'💧', keywords:['mildiu','mildew','plasmopara'] },
+  { key:'oidi',    label:'Oïdi',    icon:'⬜', keywords:['oidi','oidium','uncinula','powdery'] },
+  { key:'botrytis',label:'Botrytis',icon:'🍇', keywords:['botrytis','botritis','podrit'] },
+  { key:'acars',   label:'Àcars',   icon:'🕷', keywords:['acar','tetranyc','aranya'] },
+  { key:'polilla', label:'Polilla', icon:'🦋', keywords:['polilla','lobesia','eupoecilia'] },
+];
+
+function detectaPlagues(c6text) {
+  // Retorna array de keys de plagues detectades al camp objectiu
+  if(!c6text) return [];
+  const low = c6text.toLowerCase();
+  return PLAGUES_TRACK
+    .filter(pg => pg.keywords.some(kw => low.includes(kw)))
+    .map(pg => pg.key);
+}
+
+function getUltimsPerPlaga(nomParcela) {
+  // Retorna { mildiu: 'YYYY-MM-DD', oidi: 'YYYY-MM-DD', ... } últim tractament per plaga
+  const result = {};
+  getParts()
+    .filter(p => p.tipo === 'fitosanitario' && p.parcela &&
+      p.parcela.split(' / ').some(n => n.trim() === nomParcela))
+    .forEach(p => {
+      const plagues = detectaPlagues(p.c6);
+      // Si no s'especifica plaga però és fitosanitari, compta com a general
+      const keys = plagues.length ? plagues : ['general'];
+      keys.forEach(k => {
+        if(!result[k] || p.fecha > result[k]) result[k] = p.fecha;
+      });
+    });
+  return result;
+}
+
+function plaguesBadgesHtml(nomParcela) {
+  const ultims = getUltimsPerPlaga(nomParcela);
+  if(Object.keys(ultims).length === 0) return '';
+  return PLAGUES_TRACK.map(pg => {
+    const last = ultims[pg.key];
+    if(!last) return '';
+    const dies = daysSince(last);
+    const state = dies === null ? 'none' : dies < 7 ? 'ok' : dies <= 14 ? 'warn' : 'danger';
+    const dTxt  = dies === null ? '—' : dies + 'd';
+    return '<span class="pbadge pbadge-' + state + '">' + pg.icon + ' ' + pg.label + ' ' + dTxt + '</span>';
+  }).join('');
+}
 function stateFor(d) {
   if(d===null) return 'none'; if(d<7) return 'ok'; if(d<=14) return 'warn'; return 'danger';
 }
@@ -1512,14 +1686,17 @@ function renderTracker() {
       if(state==='danger') badges.push(`<span class="prow-badge">URGENT</span>`);
       if(sensible)         badges.push(`<span class="sensible-badge">⚠ Sensible oïdi/míldiu</span>`);
       const badgesHtml = badges.length ? `<div class="prow-badges">${badges.join('')}</div>` : '';
+      const plBadges = plaguesBadgesHtml(p.nom);
       return `
-        <div class="prow pr-${state}${extraCls}">
+        <div class="prow pr-${state}${extraCls}" onclick="showParcelaDetail('${p.nom.replace(/'/g,"\'")}')">
           <div class="prow-days">${dTxt}</div>
           <div class="prow-info">
             <div class="prow-name">${p.nom}${sensible ? ' 🌡️' : ''}</div>
             <div class="prow-meta">${meta} · ${lastTxt}</div>
+            ${plBadges ? '<div class="plague-badges">' + plBadges + '</div>' : ''}
           </div>
           ${badgesHtml}
+          <div style="font-family:'DM Mono',monospace;font-size:.6rem;color:var(--fog);opacity:.6;align-self:center">▶</div>
         </div>`;
     }).join('');
 
@@ -1539,6 +1716,73 @@ function renderTracker() {
     renderGroup('warn',  '🟡','A vigilar — entre 7 i 14 dies',          groups.warn)  +
     renderGroup('ok',    '🟢','Correctes — menys de 7 dies',             groups.ok)   +
     (groups.none.length ? renderGroup('none','⚪','Sense dades registrades', groups.none) : '');
+}
+
+function showParcelaDetail(nom) {
+  const panel = document.getElementById('trackerDetail');
+  const title = document.getElementById('trackerDetailTitle');
+  const body  = document.getElementById('trackerDetailBody');
+  if(!panel || !title || !body) return;
+
+  // Filtra parts fitosanitaris d'aquesta parcel·la
+  const parts = getParts().filter(function(p) {
+    return p.tipo === 'fitosanitario' &&
+      p.parcela && p.parcela.split(' / ').some(function(n){ return n.trim() === nom; });
+  }).sort(function(a,b){ return b.fecha.localeCompare(a.fecha); });
+
+  title.textContent = nom + ' — Historial fitosanitari';
+
+  // Resum per plaga
+  const ultims = getUltimsPerPlaga(nom);
+  var plagueResumHtml = '';
+  if(Object.keys(ultims).length > 0) {
+    var plagueItems = PLAGUES_TRACK.filter(function(pg){ return ultims[pg.key]; }).map(function(pg) {
+      const dies  = daysSince(ultims[pg.key]);
+      const state = dies < 7 ? 'ok' : dies <= 14 ? 'warn' : 'danger';
+      const data  = new Date(ultims[pg.key]+'T12:00:00').toLocaleDateString('ca-ES',{day:'numeric',month:'short'});
+      return '<div style="display:flex;justify-content:space-between;align-items:center;padding:.35rem 0;border-bottom:1px solid #F0E8D8">' +
+        '<span>' + pg.icon + ' <strong>' + pg.label + '</strong></span>' +
+        '<span class="pbadge pbadge-' + state + '">' + dies + ' dies · últim ' + data + '</span>' +
+        '</div>';
+    }).join('');
+    if(plagueItems) {
+      plagueResumHtml = '<div style="background:var(--parchment);border-radius:2px;padding:.6rem .8rem;margin-bottom:.8rem;border:1px solid #D8CEBA">' +
+        '<div style="font-family:monospace;font-size:.65rem;color:var(--fog);margin-bottom:.4rem;text-transform:uppercase;letter-spacing:.08em">Dies des de l\u00FAltim tractament per plaga</div>' +
+        plagueItems + '</div>';
+    }
+  }
+
+  if(parts.length === 0) {
+    body.innerHTML = plagueResumHtml + '<div class="fit-history-empty">Cap tractament fitosanitari registrat per aquesta parcel·la.</div>';
+  } else {
+    var rows = parts.map(function(p) {
+      const data  = new Date(p.fecha + 'T12:00:00').toLocaleDateString('ca-ES',{day:'numeric',month:'short',year:'numeric'});
+      const prod  = p.c1 || '—';
+      const dosi  = p.c3 ? p.c3 + (p.c4 ? ' · ' + p.c4 : '') : '—';
+      const obj   = p.c6 || '';
+      // Badges per a cada plaga detectada en aquest tractament
+      const plagues = detectaPlagues(obj);
+      const pgBadges = plagues.map(function(k) {
+        const pg = PLAGUES_TRACK.find(function(x){ return x.key === k; });
+        return pg ? '<span class="pbadge pbadge-ok" style="font-size:.58rem">' + pg.icon + ' ' + pg.label + '</span>' : '';
+      }).join('');
+      return '<div class="fit-history-row">' +
+        '<span class="fit-history-date">' + data + '</span>' +
+        '<span class="fit-history-prod">' + prod +
+          (obj ? ' <span style="font-weight:400;color:var(--fog);font-size:.7rem">(' + obj + ')</span>' : '') +
+          (pgBadges ? '<div class="fit-history-plagues">' + pgBadges + '</div>' : '') +
+        '</span>' +
+        '<span class="fit-history-dosi">' + dosi + '</span>' +
+        '<span style="font-family:monospace;font-size:.65rem;color:var(--ok)">✓</span>' +
+        '</div>';
+    }).join('');
+    body.innerHTML = plagueResumHtml +
+      '<div style="font-family:monospace;font-size:.65rem;color:var(--fog);margin-bottom:.5rem">' + parts.length + ' tractaments registrats</div>' +
+      rows;
+  }
+
+  panel.style.display = 'block';
+  panel.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
 }
 
 function logTractament() {
@@ -3080,7 +3324,7 @@ function renderEPI() {
 //  EDICIÓ DE PARTS
 // ══════════════════════════════════════════════════
 function editarPartModal(id) {
-  const p = getParts().find(p => p.id === id);
+  const p = getParts().find(p => String(p.id) === String(id));
   if(!p) return;
   document.getElementById('edit-id').value      = id;
   document.getElementById('edit-fecha').value   = p.fecha||'';
@@ -3136,6 +3380,315 @@ function guardarEdicio() {
 document.getElementById('editModal')?.addEventListener('click', function(e) {
   if(e.target === this) this.style.display = 'none';
 });
+
+// ══════════════════════════════════════════════════
+//  MÒDUL D'ESTOCATGE I PMP
+// ══════════════════════════════════════════════════
+
+function getEstocGasoil() {
+  try { return JSON.parse(localStorage.getItem('estoc_gasoil') || '[]'); } catch { return []; }
+}
+function saveEstocGasoil(d) {
+  localStorage.setItem('estoc_gasoil', JSON.stringify(d));
+  syncConfigToSheets('estoc_gasoil', d);
+}
+function getEstocProds() {
+  try { return JSON.parse(localStorage.getItem('estoc_prods') || '{}'); } catch { return {}; }
+}
+function saveEstocProds(d) {
+  localStorage.setItem('estoc_prods', JSON.stringify(d));
+  syncConfigToSheets('estoc_prods', d);
+}
+
+function calcPMP(compres) {
+  // PMP = Preu Mig Ponderat = Σ(qty*preu) / Σ(qty)
+  let totalQty = 0, totalImport = 0;
+  compres.forEach(c => {
+    totalQty    += parseFloat(c.qty)  || 0;
+    totalImport += (parseFloat(c.qty) || 0) * (parseFloat(c.preu) || 0);
+  });
+  return totalQty > 0 ? totalImport / totalQty : 0;
+}
+
+// ── Gasoil ───────────────────────────────────────────────────────────────────
+function addCompraGasoil() {
+  const data   = document.getElementById('g-data')?.value;
+  const litres = parseFloat(document.getElementById('g-litres')?.value) || 0;
+  const preu   = parseFloat(document.getElementById('g-preu')?.value)   || 0;
+  if(!data || litres <= 0 || preu <= 0) { showToast('⚠ Omple tots els camps', true); return; }
+  const compres = getEstocGasoil();
+  compres.push({ data, qty: litres, preu });
+  compres.sort((a,b) => b.data.localeCompare(a.data));
+  saveEstocGasoil(compres);
+  document.getElementById('g-litres').value = '';
+  document.getElementById('g-preu').value   = '';
+  renderEstoc();
+  // Auto-aplica PMP actualitzat a costos
+  const pmpG = calcPMP(getEstocGasoil());
+  if(pmpG > 0) {
+    const elG = document.getElementById('v-gasoil');
+    if(elG) { elG.value = pmpG.toFixed(3); }
+    localStorage.setItem('cost_v-gasoil', pmpG.toFixed(3));
+    syncConfigToSheets('cost_v-gasoil', pmpG.toFixed(3));
+  }
+  showToast('✅ Compra gasoil afegida · PMP: ' + pmpG.toFixed(3) + ' €/L', false, true);
+}
+
+function renderGasoilEstoc() {
+  const compres = getEstocGasoil();
+  const pmp     = calcPMP(compres);
+  const totalL  = compres.reduce((s,c) => s + (parseFloat(c.qty)||0), 0);
+
+  const container = document.getElementById('gasoilCompres');
+  if(!container) return;
+
+  if(compres.length === 0) {
+    container.innerHTML = '<p style="font-size:.83rem;color:var(--fog);font-style:italic">Cap compra registrada</p>';
+  } else {
+    let rows = compres.map((c,i) => `<tr>
+      <td>${c.data}</td>
+      <td>${parseFloat(c.qty).toFixed(0)} L</td>
+      <td>${parseFloat(c.preu).toFixed(3)} €/L</td>
+      <td>${(parseFloat(c.qty)*parseFloat(c.preu)).toFixed(2)} €</td>
+      <td><button class="compra-del" onclick="delCompraGasoil(${i})">✕</button></td>
+    </tr>`).join('');
+    container.innerHTML = `<table class="estoc-table">
+      <thead><tr><th style="text-align:left">Data</th><th style="text-align:left">Litres</th><th>€/L</th><th>Import</th><th></th></tr></thead>
+      <tbody>${rows}</tbody>
+      <tfoot><tr><td>TOTAL</td><td>${totalL.toFixed(0)} L</td><td></td><td>${compres.reduce((s,c)=>s+(parseFloat(c.qty)||0)*(parseFloat(c.preu)||0),0).toFixed(2)} €</td><td></td></tr></tfoot>
+    </table>`;
+  }
+
+  const pmpDiv = document.getElementById('gasoilPMP');
+  if(pmpDiv) {
+    pmpDiv.innerHTML = pmp > 0
+      ? `<div style="background:var(--ok-bg);border:1px solid #90C890;border-radius:2px;padding:.7rem 1rem;display:flex;justify-content:space-between;align-items:center">
+          <span style="font-family:'DM Mono',monospace;font-size:.8rem;color:var(--ok)">PMP Gasoil</span>
+          <strong style="font-family:'DM Mono',monospace;font-size:1.4rem;color:var(--ok)">${pmp.toFixed(3)} €/L</strong>
+          <button class="btn btn-vine" onclick="aplicarPMPGasoil(${pmp.toFixed(3)})" style="font-size:.7rem;padding:.35rem .8rem">Aplicar a Costos</button>
+        </div>`
+      : '<p style="font-size:.83rem;color:var(--fog);font-style:italic">Afegeix compres per calcular el PMP</p>';
+  }
+}
+
+function delCompraGasoil(i) {
+  const compres = getEstocGasoil();
+  compres.splice(i, 1);
+  saveEstocGasoil(compres);
+  renderEstoc();
+}
+
+function aplicarPMPGasoil(pmp) {
+  const el = document.getElementById('v-gasoil');
+  if(el) { el.value = pmp; renderCostos(); }
+  // Guarda també al localStorage de variables de cost
+  localStorage.setItem('cost_v-gasoil', pmp);
+  syncConfigToSheets('cost_v-gasoil', pmp);
+  showPage('costos');
+  showToast('✅ PMP gasoil aplicat a Costos: ' + pmp + ' €/L', false, true);
+}
+
+// ── Productes fitosanitaris ─────────────────────────────────────────────────
+function renderEstoc() {
+  renderGasoilEstoc();
+  const sel = document.getElementById('estoc-prod-sel'); if(!sel) return;
+  const cur = sel.value;
+  sel.innerHTML = '<option value="">— Seleccionar producte —</option>';
+  getProductes().forEach(p => {
+    const o = document.createElement('option');
+    o.value = p.nom;
+    o.textContent = p.nom + ' (' + (p.unitat||'L') + ')';
+    sel.appendChild(o);
+  });
+  if(cur) sel.value = cur;
+  renderEstocProd();
+}
+
+function addProducteEstoc() {
+  const nom      = document.getElementById('np-nom')?.value.trim();
+  const unitat   = document.getElementById('np-unitat')?.value || 'L';
+  const registre = document.getElementById('np-registre')?.value.trim() || '';
+  if(!nom) { showToast('⚠ Indica el nom del producte', true); return; }
+  const prods = getProductes();
+  if(prods.find(p => p.nom.toLowerCase() === nom.toLowerCase())) {
+    showToast('⚠ El producte ja existeix', true); return;
+  }
+  prods.push({ nom, preu: 0, unitat, registre });
+  saveProductes(prods);
+  document.getElementById('np-nom').value = '';
+  document.getElementById('np-registre').value = '';
+  renderEstoc();
+  // Selecciona el nou producte
+  const sel = document.getElementById('estoc-prod-sel');
+  if(sel) { sel.value = nom; renderEstocProd(); }
+  showToast('✅ Producte afegit al catàleg', false, true);
+}
+
+function delProducteEstoc() {
+  const nom = document.getElementById('estoc-prod-sel')?.value;
+  if(!nom) return;
+  if(!confirm('Eliminar ' + nom + ' del catàleg i tot el seu historial de compres?')) return;
+  // Elimina del catàleg
+  saveProductes(getProductes().filter(p => p.nom !== nom));
+  // Elimina historial compres
+  const estoc = getEstocProds();
+  delete estoc[nom];
+  saveEstocProds(estoc);
+  renderEstoc();
+  showToast('🗑 Producte eliminat', false, false);
+}
+
+function renderEstocProd() {
+  const sel  = document.getElementById('estoc-prod-sel');
+  const nom  = sel ? sel.value : '';
+  const form = document.getElementById('addCompraProdForm');
+  const comp = document.getElementById('estocProdCompres');
+  const pmpD = document.getElementById('estocProdPMP');
+  const btnD = document.getElementById('btnDelProd');
+
+  if(!nom) {
+    if(form) form.style.display = 'none';
+    if(comp) comp.innerHTML = '';
+    if(pmpD) pmpD.innerHTML = '';
+    if(btnD) btnD.style.display = 'none';
+    return;
+  }
+  if(form) form.style.display = 'block';
+  if(btnD) btnD.style.display = 'inline-block';
+
+  const prod    = getProductes().find(function(p){ return p.nom === nom; });
+  const unitat  = prod ? (prod.unitat || 'L') : 'L';
+  const estoc   = getEstocProds();
+  const compres = (estoc[nom] || []).slice().sort(function(a,b){ return b.data.localeCompare(a.data); });
+  const pmp     = calcPMP(compres);
+
+  if(!comp) return;
+
+  if(compres.length === 0) {
+    comp.innerHTML = '<p style="font-size:.83rem;color:var(--fog);font-style:italic">Cap compra registrada — afegeix la primera compra per calcular el PMP</p>';
+  } else {
+    var totalQty = compres.reduce(function(s,c){ return s+(parseFloat(c.qty)||0); }, 0);
+    var totalImp = compres.reduce(function(s,c){ return s+(parseFloat(c.qty)||0)*(parseFloat(c.preu)||0); }, 0);
+    var rows = compres.map(function(c,i) {
+      return '<tr><td>' + c.data + '</td>' +
+        '<td>' + parseFloat(c.qty).toFixed(1) + ' ' + unitat + '</td>' +
+        '<td>' + parseFloat(c.preu).toFixed(2) + ' €/' + unitat + '</td>' +
+        '<td>' + (parseFloat(c.qty)*parseFloat(c.preu)).toFixed(2) + ' €</td>' +
+        '<td><button class="compra-del" onclick="delCompraProdIdx(' + i + ')">&#x2715;</button></td></tr>';
+    }).join('');
+    comp.innerHTML = '<table class="estoc-table">' +
+      '<thead><tr>' +
+        '<th style="text-align:left">Data</th>' +
+        '<th style="text-align:left">Quantitat</th>' +
+        '<th>€/' + unitat + '</th>' +
+        '<th>Import</th>' +
+        '<th></th>' +
+      '</tr></thead>' +
+      '<tbody>' + rows + '</tbody>' +
+      '<tfoot><tr>' +
+        '<td>TOTAL</td>' +
+        '<td>' + totalQty.toFixed(1) + ' ' + unitat + '</td>' +
+        '<td></td>' +
+        '<td>' + totalImp.toFixed(2) + ' €</td>' +
+        '<td></td>' +
+      '</tr></tfoot>' +
+      '</table>';
+  }
+
+  if(pmpD) {
+    if(pmp > 0) {
+      pmpD.innerHTML = '<div style="background:var(--ok-bg);border:1px solid #90C890;border-radius:2px;padding:.7rem 1rem;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:.5rem">' +
+        '<div>' +
+          '<div style="font-family:monospace;font-size:.75rem;color:var(--fog)">PMP calculat</div>' +
+          '<strong style="font-family:monospace;font-size:1.5rem;color:var(--ok)">' + pmp.toFixed(2) + ' €/' + unitat + '</strong>' +
+        '</div>' +
+        '<div style="font-family:monospace;font-size:.75rem;color:var(--fog);text-align:center">' +
+          'Preu actual al catàleg<br>' +
+          '<strong style="color:var(--ink)">' + ((prod && prod.preu)||0).toFixed(2) + ' €/' + unitat + '</strong>' +
+        '</div>' +
+        '<button class="btn btn-ok" onclick="aplicarPMPSelProd(' + pmp.toFixed(2) + ')" style="font-size:.72rem;padding:.4rem .9rem">' +
+          '✅ Aplicar PMP al catàleg' +
+        '</button>' +
+      '</div>';
+    } else {
+      pmpD.innerHTML = '';
+    }
+  }
+}
+
+
+function addCompraProd() {
+  const nom  = document.getElementById('estoc-prod-sel')?.value;
+  const data = document.getElementById('ep-data')?.value;
+  const qty  = parseFloat(document.getElementById('ep-qty')?.value)  || 0;
+  const preu = parseFloat(document.getElementById('ep-preu')?.value) || 0;
+  if(!nom || !data || qty <= 0 || preu <= 0) { showToast('⚠ Omple tots els camps', true); return; }
+
+  const estoc = getEstocProds();
+  if(!estoc[nom]) estoc[nom] = [];
+  estoc[nom].push({ data, qty, preu });
+  saveEstocProds(estoc);
+  document.getElementById('ep-qty').value  = '';
+  document.getElementById('ep-preu').value = '';
+
+  const compres = estoc[nom];
+  const pmp     = calcPMP(compres);
+  const prods   = getProductes();
+  const prod    = prods.find(p => p.nom === nom);
+  const unitat  = prod ? (prod.unitat || 'L') : 'L';
+
+  // Aplica PMP automàticament al catàleg sempre que hi hagi dades
+  if(pmp > 0) {
+    const idx = prods.findIndex(p => p.nom === nom);
+    if(idx >= 0) {
+      prods[idx].preu = Math.round(pmp * 100) / 100;
+      saveProductes(prods);
+    }
+  }
+
+  renderEstoc();
+
+  // Missatge diferent si és la primera compra o ja té historial
+  if(compres.length === 1) {
+    showToast('✅ Primera compra registrada: ' + preu.toFixed(2) + ' €/' + unitat, false, true);
+  } else {
+    showToast('✅ PMP actualitzat automàticament: ' + pmp.toFixed(2) + ' €/' + unitat + ' (' + compres.length + ' compres)', false, true);
+  }
+}
+
+function delCompraProd(nom, i) {
+  const estoc = getEstocProds();
+  if(!estoc[nom]) return;
+  estoc[nom].splice(i, 1);
+  saveEstocProds(estoc);
+  // Recalcula PMP i actualitza catàleg
+  const pmp   = calcPMP(estoc[nom]);
+  const prods = getProductes();
+  const idx   = prods.findIndex(function(p){ return p.nom === nom; });
+  if(idx >= 0) {
+    prods[idx].preu = pmp > 0 ? Math.round(pmp * 100) / 100 : 0;
+    saveProductes(prods);
+  }
+  renderEstoc();
+}
+
+function aplicarPMPProducte(nom, pmp) {
+  const prods = getProductes();
+  const idx   = prods.findIndex(p => p.nom === nom);
+  if(idx >= 0) { prods[idx].preu = pmp; saveProductes(prods); }
+  showPage('costos');
+  showToast('✅ PMP aplicat al catàleg: ' + pmp + ' €', false, true);
+}
+function aplicarPMPSelProd(pmp) {
+  const nom = document.getElementById('estoc-prod-sel')?.value;
+  if(!nom) return;
+  aplicarPMPProducte(nom, pmp);
+}
+function delCompraProdIdx(i) {
+  const nom = document.getElementById('estoc-prod-sel')?.value;
+  if(!nom) return;
+  delCompraProd(nom, i);
+}
 
 // ══════════════════════════════════════════════════
 //  TOAST
