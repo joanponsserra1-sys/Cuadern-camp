@@ -1414,21 +1414,27 @@ async function syncTractamentsFromSheets() {
       localStorage.setItem('tractaments', JSON.stringify(local));
     }
 
-    // Sync parts (historial complet)
+    // Sync parts — Sheets és la font de veritat
+    // Afegim parts nous de Sheets, però també eliminem els que ja no hi són
     let added = 0;
-    if(data.parts && data.parts.length > 0) {
-      const localParts = getParts();
-      const localIds   = new Set(localParts.map(p => String(p.id)));
+    if(data.parts !== undefined) {
+      const localParts  = getParts();
+      const sheetIds    = new Set(data.parts.map(p => String(p.id)));
+      const localIds    = new Set(localParts.map(p => String(p.id)));
+
+      // Parts nous de Sheets que no tenim localment
       data.parts.forEach(sp => {
         if(!localIds.has(String(sp.id))) {
           localParts.push(sp);
           added++;
         }
       });
-      if(added > 0) {
-        localParts.sort((a,b) => new Date(b.fecha) - new Date(a.fecha));
-        saveParts(localParts);
-      }
+
+      // Elimina locals que ja no són a Sheets (han estat esborrats des d'un altre dispositiu)
+      const syncedParts = localParts.filter(p => sheetIds.has(String(p.id)));
+
+      syncedParts.sort((a,b) => new Date(b.fecha) - new Date(a.fecha));
+      saveParts(syncedParts);
     }
 
     // Sync configuració (productes, accions, desplegables, costos)
@@ -1579,11 +1585,15 @@ function renderHistorial() {
 
 function eliminarPart(id) {
   if(!confirm('Segur que vols eliminar aquest part?')) return;
-  eliminarASheets(id);
-  saveParts(getParts().filter(p=>p.id!==id));
+  // Esborra localment de forma immediata
+  const nousParts = getParts().filter(p => String(p.id) !== String(id));
+  saveParts(nousParts);
   renderHistorial();
+  renderTracker();
   updateExportStats();
-  showToast('Part eliminat');
+  showToast('🗑 Part eliminat');
+  // Esborra a Sheets en segon pla
+  eliminarASheets(id);
 }
 
 // ══════════════════════════════════════════════════
@@ -3099,13 +3109,14 @@ function guardarEdicio() {
     saveTractament(updated.parcela, updated.fecha);
   }
 
-  // Sincronitza amb Sheets
-  editarASheets(updated);
-
+  // Tanca modal i re-renderitza instantàniament
   document.getElementById('editModal').style.display = 'none';
   renderHistorial();
   renderTracker();
+  updateExportStats();
   showToast('✅ Part actualitzat', false, true);
+  // Sincronitza a Sheets en segon pla
+  editarASheets(updated);
 }
 
 // Tancar modal en clicar fora
