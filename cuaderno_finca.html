@@ -917,6 +917,40 @@ footer{text-align:center;margin-top:1.5rem;font-family:monospace;font-size:.65re
 
 </div>
 
+<!-- Modal d'edició de parts -->
+<div id="editModal" style="display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.6);z-index:200;overflow-y:auto;padding:1rem">
+  <div style="background:var(--paper);border-radius:2px;max-width:560px;margin:2rem auto;overflow:hidden">
+    <div class="panel-header ph-harvest">✏️ &nbsp; Editar part de treball</div>
+    <div style="padding:1.5rem">
+      <div class="row row-2">
+        <div class="field"><label>Data</label><input type="date" id="edit-fecha"></div>
+        <div class="field"><label>Parcel·la</label><input type="text" id="edit-parcela" style="font-size:.85rem"></div>
+      </div>
+      <div class="row row-2">
+        <div class="field"><label>Operari</label><input type="text" id="edit-operario" placeholder="Nom"></div>
+        <div class="field"><label>Tipus</label><input type="text" id="edit-tipo" readonly style="background:#F5F5F5;color:var(--fog)"></div>
+      </div>
+      <div class="field"><label>Producte / Acció (C1)</label><input type="text" id="edit-c1"></div>
+      <div class="row row-3">
+        <div class="field"><label>C2</label><input type="text" id="edit-c2"></div>
+        <div class="field"><label>C3 (Dosi)</label><input type="text" id="edit-c3"></div>
+        <div class="field"><label>C4</label><input type="text" id="edit-c4"></div>
+      </div>
+      <div class="row row-3">
+        <div class="field"><label>C5 (Sup)</label><input type="text" id="edit-c5"></div>
+        <div class="field"><label>C6</label><input type="text" id="edit-c6"></div>
+        <div class="field"><label>C7</label><input type="text" id="edit-c7"></div>
+      </div>
+      <div class="field"><label>Observacions</label><textarea id="edit-obs" style="min-height:60px"></textarea></div>
+      <input type="hidden" id="edit-id">
+      <div style="display:flex;gap:.6rem;margin-top:1rem">
+        <button class="btn btn-harvest" onclick="guardarEdicio()" style="flex:1">💾 Guardar canvis</button>
+        <button class="btn btn-vine" onclick="document.getElementById('editModal').style.display='none'">Cancel·lar</button>
+      </div>
+    </div>
+  </div>
+</div>
+
 <footer>Cuaderno de Campo · Viñedo · Penedès &nbsp;·&nbsp; Dades guardades al navegador</footer>
 </div>
 <div class="toast" id="toast"></div>
@@ -933,12 +967,31 @@ const PARCEL_DATA = [{"nom": "Cabernet Café", "sup": 0.5147, "municipi": "Santa
 const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzddnBiSeAd_NWm9QswrLBbb2qA5gmqHYg3kyH3HFhgq4elxN4q88C9Mi6M-iYNvAmg/exec';
 
 function enviarASheets(data) {
+  // Sempre inclou l'id original per poder sincronitzar
   fetch(SCRIPT_URL, {
     method: 'POST',
     mode: 'no-cors',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(data)
   }).catch(err => console.log('Sheets sync error:', err));
+}
+
+function editarASheets(part) {
+  fetch(SCRIPT_URL, {
+    method: 'POST',
+    mode: 'no-cors',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ ...part, tipus: 'editar' })
+  }).catch(err => console.log('Edit sync error:', err));
+}
+
+function eliminarASheets(id) {
+  fetch(SCRIPT_URL, {
+    method: 'POST',
+    mode: 'no-cors',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ tipus: 'eliminar', id: id })
+  }).catch(err => console.log('Delete sync error:', err));
 }
 
 // Envia configuració a Sheets
@@ -1516,13 +1569,17 @@ function renderHistorial() {
       <td>${p.parcela||'—'}</td>
       <td style="max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="${detall}">${detall}</td>
       <td>${p.operari||p.operario||'—'}</td>
-      <td><button class="del-btn" onclick="eliminarPart(${p.id})" title="Eliminar">✕</button></td>`;
+      <td style="white-space:nowrap">
+        <button class="del-btn" onclick="editarPartModal(${p.id})" title="Editar" style="color:#4CAF50;margin-right:4px">✏️</button>
+        <button class="del-btn" onclick="eliminarPart(${p.id})" title="Eliminar">✕</button>
+      </td>`;
     tbody.appendChild(tr);
   });
 }
 
 function eliminarPart(id) {
   if(!confirm('Segur que vols eliminar aquest part?')) return;
+  eliminarASheets(id);
   saveParts(getParts().filter(p=>p.id!==id));
   renderHistorial();
   updateExportStats();
@@ -2995,6 +3052,66 @@ function renderEPI() {
       munList + '</div></div>';
   }
 }
+
+// ══════════════════════════════════════════════════
+//  EDICIÓ DE PARTS
+// ══════════════════════════════════════════════════
+function editarPartModal(id) {
+  const p = getParts().find(p => p.id === id);
+  if(!p) return;
+  document.getElementById('edit-id').value      = id;
+  document.getElementById('edit-fecha').value   = p.fecha||'';
+  document.getElementById('edit-parcela').value = p.parcela||'';
+  document.getElementById('edit-operario').value= p.operario||'';
+  document.getElementById('edit-tipo').value    = p.tipo||'';
+  document.getElementById('edit-c1').value      = p.c1||'';
+  document.getElementById('edit-c2').value      = p.c2||'';
+  document.getElementById('edit-c3').value      = p.c3||'';
+  document.getElementById('edit-c4').value      = p.c4||'';
+  document.getElementById('edit-c5').value      = p.c5||'';
+  document.getElementById('edit-c6').value      = p.c6||'';
+  document.getElementById('edit-c7').value      = p.c7||'';
+  document.getElementById('edit-obs').value     = p.obs||'';
+  document.getElementById('editModal').style.display = 'block';
+}
+
+function guardarEdicio() {
+  const id = document.getElementById('edit-id').value;
+  const g  = k => document.getElementById('edit-'+k)?.value||'';
+  const parts = getParts();
+  const idx = parts.findIndex(p => String(p.id) === String(id));
+  if(idx === -1) { showToast('⚠ Part no trobat', true); return; }
+
+  const updated = { ...parts[idx],
+    fecha:    g('fecha'),
+    parcela:  g('parcela'),
+    operario: g('operario'),
+    c1: g('c1'), c2: g('c2'), c3: g('c3'),
+    c4: g('c4'), c5: g('c5'), c6: g('c6'), c7: g('c7'),
+    obs: g('obs')
+  };
+
+  parts[idx] = updated;
+  saveParts(parts);
+
+  // Actualitza semàfor si fitosanitari
+  if(updated.tipo === 'fitosanitario' && updated.parcela && updated.fecha) {
+    saveTractament(updated.parcela, updated.fecha);
+  }
+
+  // Sincronitza amb Sheets
+  editarASheets(updated);
+
+  document.getElementById('editModal').style.display = 'none';
+  renderHistorial();
+  renderTracker();
+  showToast('✅ Part actualitzat', false, true);
+}
+
+// Tancar modal en clicar fora
+document.getElementById('editModal')?.addEventListener('click', function(e) {
+  if(e.target === this) this.style.display = 'none';
+});
 
 // ══════════════════════════════════════════════════
 //  TOAST
