@@ -1321,6 +1321,14 @@ function getParts() {
 function saveParts(parts) {
   localStorage.setItem('parts', JSON.stringify(parts));
 }
+function getDeletedIds() {
+  try { return JSON.parse(localStorage.getItem('parts_deleted') || '[]'); } catch { return []; }
+}
+function addDeletedId(id) {
+  const ids = getDeletedIds();
+  if(!ids.includes(String(id))) ids.push(String(id));
+  localStorage.setItem('parts_deleted', JSON.stringify(ids));
+}
 function getTractaments() {
   try { return JSON.parse(localStorage.getItem('tractaments') || '{}'); } catch { return {}; }
 }
@@ -1430,8 +1438,11 @@ async function syncTractamentsFromSheets() {
         }
       });
 
-      // Elimina locals que ja no són a Sheets (han estat esborrats des d'un altre dispositiu)
-      const syncedParts = localParts.filter(p => sheetIds.has(String(p.id)));
+      // Filtra: no sincronitzar parts que hem esborrat nosaltres (llista negra)
+      const deletedIds  = new Set(getDeletedIds());
+      const syncedParts = localParts.filter(p => !deletedIds.has(String(p.id)));
+      // Eliminar de Sheets els que tenim a la llista negra (reintent)
+      deletedIds.forEach(did => { if(sheetIds.has(did)) eliminarASheets(did); });
 
       syncedParts.sort((a,b) => new Date(b.fecha) - new Date(a.fecha));
       saveParts(syncedParts);
@@ -1585,14 +1596,16 @@ function renderHistorial() {
 
 function eliminarPart(id) {
   if(!confirm('Segur que vols eliminar aquest part?')) return;
-  // Esborra localment de forma immediata
+  // Guarda a llista negra per no tornar-lo a sincronitzar
+  addDeletedId(id);
+  // Esborra localment
   const nousParts = getParts().filter(p => String(p.id) !== String(id));
   saveParts(nousParts);
   renderHistorial();
   renderTracker();
   updateExportStats();
   showToast('🗑 Part eliminat');
-  // Esborra a Sheets en segon pla
+  // Intenta esborrar a Sheets (best effort)
   eliminarASheets(id);
 }
 
