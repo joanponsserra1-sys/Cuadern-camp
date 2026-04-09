@@ -4128,15 +4128,17 @@ function openMiniMp(prefix) {
   if(!dd) return;
   if(dd.style.display !== 'none') { dd.style.display = 'none'; return; }
 
-  // Build dropdown
+  // Build dropdown using DOM
+  dd.innerHTML = '';
   const selected = getMiniMpSelected(prefix);
-  let html2 = '';
 
   // "Tota la finca" option
-  const allSel = selected.length === 0;
-  html2 += '<div onclick="toggleMiniMpOption(\"' + prefix + '\",\"\")" style="padding:.5rem .8rem;cursor:pointer;background:' +
-    (allSel?'var(--vine)':'') + ';color:' + (allSel?'white':'var(--ink)') + ';font-size:.8rem;border-bottom:1px solid #F0E8D8">' +
-    (allSel?'✓ ':'') + '🍇 Tota la finca</div>';
+  const allDiv = document.createElement('div');
+  allDiv.style.cssText = 'padding:.5rem .8rem;cursor:pointer;font-size:.8rem;border-bottom:1px solid #F0E8D8;' +
+    (selected.length === 0 ? 'background:var(--vine);color:white' : '');
+  allDiv.textContent = (selected.length === 0 ? '✓ ' : '') + '🍇 Tota la finca';
+  allDiv.addEventListener('click', function(e) { e.stopPropagation(); toggleMiniMpOption(prefix, ''); });
+  dd.appendChild(allDiv);
 
   // Group by municipality
   const byMun = {};
@@ -4145,7 +4147,53 @@ function openMiniMp(prefix) {
     byMun[p.municipi].push(p);
   });
 
-  // (duplicate removed)
+  Object.keys(byMun).sort().forEach(function(mun) {
+    const munLbl = document.createElement('div');
+    munLbl.style.cssText = 'padding:.3rem .8rem;font-family:monospace;font-size:.62rem;color:var(--fog);letter-spacing:.06em;text-transform:uppercase;background:#F8F4EC';
+    munLbl.textContent = '📍 ' + mun;
+    dd.appendChild(munLbl);
+
+    byMun[mun].forEach(function(p) {
+      const isSel = selected.includes(p.nom);
+      const item  = document.createElement('div');
+      item.style.cssText = 'padding:.4rem .8rem;cursor:pointer;font-size:.78rem;display:flex;align-items:center;gap:.4rem;' +
+        (isSel ? 'background:#E8F5E8' : '');
+
+      const check = document.createElement('span');
+      check.style.cssText = 'color:var(--ok);width:14px;flex-shrink:0';
+      check.textContent = isSel ? '✓' : '';
+
+      const lbl = document.createElement('span');
+      lbl.textContent = p.nom;
+
+      const meta = document.createElement('span');
+      meta.style.cssText = 'color:var(--fog);font-size:.7rem;margin-left:.2rem';
+      meta.textContent = '· ' + p.sup.toFixed(2) + ' ha';
+
+      item.appendChild(check);
+      item.appendChild(lbl);
+      item.appendChild(meta);
+
+      item.addEventListener('click', (function(nom) {
+        return function(e) { e.stopPropagation(); toggleMiniMpOption(prefix, nom); };
+      })(p.nom));
+      dd.appendChild(item);
+    });
+  });
+
+  dd.style.display = 'block';
+
+  // Tanca en clicar fora
+  setTimeout(function() {
+    function closeMiniMp(e) {
+      const wrap = document.getElementById(prefix + '-mp-wrap');
+      if(!dd.contains(e.target) && !(wrap && wrap.contains(e.target))) {
+        dd.style.display = 'none';
+        document.removeEventListener('click', closeMiniMp);
+      }
+    }
+    document.addEventListener('click', closeMiniMp);
+  }, 50);
 }
 
 function toggleMiniMpOption(prefix, nom) {
