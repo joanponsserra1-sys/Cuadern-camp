@@ -1307,8 +1307,9 @@ function applyConfigFromSheets(config) {
         localStorage.setItem(clau, newVal);
         applied++;
         // Accions especials post-apply
-        if(clau === 'campanya_activa' && typeof parsed === 'string') {
-          // No canviem campanya activa automàticament — l'usuari tria
+        if(clau === 'campanya_activa') {
+          // No sobreescrivim la campanya activa — l'usuari tria
+          // Però sí afegim la campanya a la llista si no hi és
         }
         if(clau === 'campanyes_list') {
           renderCampanyaSelector();
@@ -1348,7 +1349,12 @@ function applyConfigFromSheets(config) {
 //  CAMPANYES
 // ══════════════════════════════════════════════════
 function getCampanyaActual() {
-  return localStorage.getItem('campanya_activa') || '2025-26';
+  const c = localStorage.getItem('campanya_activa');
+  if(!c || c === 'null' || c === 'undefined') {
+    localStorage.setItem('campanya_activa', '2025-26');
+    return '2025-26';
+  }
+  return c;
 }
 function setCampanyaActiva(c) {
   localStorage.setItem('campanya_activa', c);
@@ -1457,7 +1463,8 @@ let currentType = 'fitosanitario';
 // ══════════════════════════════════════════════════
 document.addEventListener('DOMContentLoaded', function() {
   document.getElementById('fecha').valueAsDate = new Date();
-  // Inicialitza selector de campanya
+  // Assegura que sempre hi ha una campanya activa
+  getCampanyaActual(); // inicialitza si cal
   renderCampanyaSelector();
 
   // Restaura variables de cost guardades
@@ -1861,30 +1868,43 @@ async function syncTractamentsFromSheets() {
       localStorage.setItem(ck('tractaments'), JSON.stringify(local));
     }
 
-    // Sync parts — Sheets és la font de veritat
-    // Afegim parts nous de Sheets, però també eliminem els que ja no hi són
+    // Sync parts
     let added = 0;
     if(data.parts !== undefined) {
-      const localParts  = getParts();
-      const sheetIds    = new Set(data.parts.map(p => String(p.id)));
-      const localIds    = new Set(localParts.map(p => String(p.id)));
+      const deletedIds = new Set(getDeletedIds());
+      const localParts = getParts();
+      const localIds   = new Set(localParts.map(p => String(p.id)));
 
-      // Parts nous de Sheets que no tenim localment
+      // Reintenta esborrar de Sheets els que tenim a la llista negra
       data.parts.forEach(sp => {
-        if(!localIds.has(String(sp.id))) {
+        if(deletedIds.has(String(sp.id))) {
+          eliminarASheets(sp.id);
+          return; // no afegir
+        }
+      });
+
+      // Afegeix NOMÉS els parts de Sheets que NO estan esborrats i NO els tenim
+      data.parts.forEach(sp => {
+        const sid = String(sp.id);
+        if(!localIds.has(sid) && !deletedIds.has(sid)) {
           localParts.push(sp);
           added++;
         }
       });
 
-      // Filtra: no sincronitzar parts que hem esborrat nosaltres (llista negra)
-      const deletedIds  = new Set(getDeletedIds());
-      const syncedParts = localParts.filter(p => !deletedIds.has(String(p.id)));
-      // Eliminar de Sheets els que tenim a la llista negra (reintent)
-      deletedIds.forEach(did => { if(sheetIds.has(did)) eliminarASheets(did); });
-
-      syncedParts.sort((a,b) => new Date(b.fecha) - new Date(a.fecha));
-      saveParts(syncedParts);
+      // Elimina locals que estan a la llista negra
+      const cleanParts = localParts.filter(p => !deletedIds.has(String(p.id)));
+      cleanParts.sort((a,b) => new Date(b.fecha) - new Date(a.fecha));
+      saveParts(cleanParts);
+      
+      // Si tenim parts locals que NO estan al Sheets i NO estan a la llista negra
+      // → els enviem a Sheets (per si s'han perdut)
+      const sheetIdsArr = data.parts.map(p => String(p.id));
+      cleanParts.forEach(p => {
+        if(!sheetIdsArr.includes(String(p.id)) && !deletedIds.has(String(p.id))) {
+          enviarASheets(p);
+        }
+      });
     }
 
     // Sync configuració (productes, accions, desplegables, costos)
