@@ -535,15 +535,16 @@ footer{text-align:center;margin-top:1.5rem;font-family:monospace;font-size:.65re
   <button class="main-nav-btn" onclick="showPage('meteo')" id="nav-meteo"><span class="nav-icon">🌡️</span>Risc Meteo</button>
   <button class="main-nav-btn" onclick="showPage('estoc')" id="nav-estoc"><span class="nav-icon">📦</span>Estoc</button>
 </div>
-<div style="background:var(--vine);padding:.35rem 1rem;display:flex;align-items:center;gap:.6rem;font-family:monospace;font-size:.7rem;color:rgba(245,239,224,.7)">
-  <span>📅</span>
+<div style="background:var(--vine);padding:.35rem 1rem;display:flex;align-items:center;gap:.6rem;font-family:monospace;font-size:.7rem;color:rgba(245,239,224,.7);border-top:1px solid rgba(255,255,255,.1)">
+  <span style="opacity:.7">📅 Campanya:</span>
   <select id="campanya-sel" onchange="canviarCampanya(this.value)"
-    style="background:rgba(255,255,255,.1);color:var(--paper);border:1px solid rgba(255,255,255,.2);border-radius:2px;padding:.2rem .4rem;font-family:monospace;font-size:.7rem;cursor:pointer">
+    style="background:rgba(255,255,255,.15);color:var(--paper);border:1px solid rgba(255,255,255,.3);border-radius:2px;padding:.25rem .5rem;font-family:monospace;font-size:.72rem;cursor:pointer;font-weight:600">
   </select>
   <button onclick="novaCampanya()"
-    style="background:none;border:1px solid rgba(255,255,255,.3);color:var(--paper);border-radius:2px;padding:.2rem .5rem;font-family:monospace;font-size:.65rem;cursor:pointer;opacity:.8">
-    + Nova
+    style="background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.25);color:var(--paper);border-radius:2px;padding:.2rem .6rem;font-family:monospace;font-size:.65rem;cursor:pointer">
+    + Nova campanya
   </button>
+  <span id="camp-indicator" style="margin-left:auto;opacity:.5;font-size:.6rem;letter-spacing:.06em;text-transform:uppercase">ACTIVA</span>
 </div>
 
 <!-- ══ REGISTRAR ══ -->
@@ -1279,6 +1280,7 @@ function applyConfigFromSheets(config) {
   const CONFIG_KEYS = [
     'productes_fitosanitaris', 'custom_accions', 'epi_data',
     'estoc_gasoil', 'estoc_prods',
+    'campanyes_list', 'campanya_activa',
     'lab-tipo','fit-objetivo','fit-tipo','rie-tipo','rie-origen',
     'abo-tipo','abo-forma','lab-fenologia'
   ];
@@ -1288,8 +1290,9 @@ function applyConfigFromSheets(config) {
   ['v-gasoil','v-salari','v-fertilitzant','v-dosi-fert','v-amort','v-poda','v-altres-fixos'].forEach(k => {
     CONFIG_KEYS.push('cost_' + k);
   });
-  // Afegir clau d'ingressos de la campanya actual
+  // Afegir claus per campanya actual
   CONFIG_KEYS.push('ingres_' + getCampanyaActual());
+  CONFIG_KEYS.push('parts_deleted_' + getCampanyaActual());
   const ALLOWED = new Set(CONFIG_KEYS);
 
   let applied = 0;
@@ -1299,11 +1302,42 @@ function applyConfigFromSheets(config) {
       const parsed   = typeof valor === 'string' ? JSON.parse(valor) : valor;
       if(parsed === null || parsed === undefined) return;
       const localRaw = localStorage.getItem(clau);
-      // Aplica sempre — Sheets és la font de veritat per a configuració
-      const newVal = JSON.stringify(parsed);
+      const newVal   = JSON.stringify(parsed);
       if(localRaw !== newVal) {
         localStorage.setItem(clau, newVal);
         applied++;
+        // Accions especials post-apply
+        if(clau === 'campanya_activa' && typeof parsed === 'string') {
+          // No canviem campanya activa automàticament — l'usuari tria
+        }
+        if(clau === 'campanyes_list') {
+          renderCampanyaSelector();
+        }
+        if(clau.startsWith('ingres_')) {
+          if(clau === 'ingres_' + getCampanyaActual()) {
+            renderIngressos();
+          }
+        }
+        if(clau.startsWith('parts_deleted_')) {
+          // Actualitza llista negra — la sincronitzacio la respectarà
+          if(clau === 'parts_deleted_' + getCampanyaActual()) {
+            // parts_deleted ja s'ha guardat al localStorage via ck()
+            // però els ck() i les claus directes son diferents
+            // Guardem també amb ck() per coherència
+            try {
+              const delIds = JSON.parse(localStorage.getItem(clau) || '[]');
+              localStorage.setItem(ck('parts_deleted'), JSON.stringify(delIds));
+            } catch(e) {}
+          }
+        }
+        if(clau === 'estoc_gasoil' || clau === 'estoc_prods') {
+          if(document.getElementById('page-estoc')?.classList.contains('visible')) {
+            renderEstoc();
+          }
+        }
+        if(clau === 'productes_fitosanitaris') {
+          renderProducteTaula();
+        }
       }
     } catch(e) { console.log('Config apply error', clau, e); }
   });
@@ -1318,6 +1352,7 @@ function getCampanyaActual() {
 }
 function setCampanyaActiva(c) {
   localStorage.setItem('campanya_activa', c);
+  syncConfigToSheets('campanya_activa', c);
 }
 function getCampanyes() {
   try { return JSON.parse(localStorage.getItem('campanyes_list') || '["2025-26"]'); }
@@ -1325,6 +1360,7 @@ function getCampanyes() {
 }
 function saveCampanyes(list) {
   localStorage.setItem('campanyes_list', JSON.stringify(list));
+  syncConfigToSheets('campanyes_list', list);
 }
 // Clau de localStorage prefixada per campanya
 function ck(key) {
@@ -1344,6 +1380,8 @@ function addDeletedId(id) {
   const ids = getDeletedIds();
   if(!ids.includes(String(id))) ids.push(String(id));
   localStorage.setItem(ck('parts_deleted'), JSON.stringify(ids));
+  // Sync deleted list so other devices don't re-add deleted parts
+  syncConfigToSheets('parts_deleted_' + getCampanyaActual(), ids);
 }
 function getTractaments() {
   try { return JSON.parse(localStorage.getItem(ck('tractaments')) || '{}'); } catch { return {}; }
@@ -1368,10 +1406,15 @@ function renderCampanyaSelector() {
 
 function canviarCampanya(val) {
   setCampanyaActiva(val);
+  // Re-renderitza TOTES les pestanyes que depenen de la campanya
   renderHistorial();
   renderTracker();
   updateExportStats();
-  showToast('📅 Campanya ' + val + ' activada', false, true);
+  renderCostParceles();
+  renderIngressos();
+  populateCostFilters();
+  renderCampanyaSelector();
+  showToast('📅 Campanya ' + val + ' — totes les pestanyes actualitzades', false, true);
 }
 
 function novaCampanya() {
@@ -1386,10 +1429,7 @@ function novaCampanya() {
   saveCampanyes(list);
   setCampanyaActiva(nom.trim());
   renderCampanyaSelector();
-  renderHistorial();
-  renderTracker();
-  updateExportStats();
-  showToast('✅ Campanya ' + nom.trim() + ' creada i activada', false, true);
+  canviarCampanya(nom.trim()); // Usa canviarCampanya per re-renderitzar tot
 }
 
 // ══════════════════════════════════════════════════
@@ -1484,6 +1524,7 @@ function showPage(name) {
     renderCostos();
     renderDropdownEditors();
   }
+  if(name==='estoc')   { renderEstoc(); }
   if(name==='meteo') {
     renderMeteo();
     renderEPI();
