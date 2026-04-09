@@ -185,6 +185,9 @@ tbody td{padding:.55rem .8rem;color:var(--ink);vertical-align:middle;}
 .bt-labor{background:rgba(90,122,58,.12);color:var(--leaf);}
 .bt-riego{background:rgba(42,84,114,.12);color:#2A5472;}
 .bt-abonado{background:rgba(196,120,58,.12);color:var(--harvest);}
+.plague-pill-btn{background:#F5EFE0;border:1px solid #D8CEBA;border-radius:20px;padding:.25rem .65rem;font-size:.72rem;cursor:pointer;transition:all .15s;color:var(--ink);}
+.plague-pill-btn:hover{background:#E8DFC8;}
+.plague-pill-btn.active{background:var(--vine);color:var(--paper);border-color:var(--vine);}
 .del-btn{background:none;border:none;cursor:pointer;color:#CCC;font-size:1rem;padding:.1rem .3rem;transition:color .2s;}
 .del-btn:hover{color:#E53935;}
 .empty-hist{text-align:center;padding:2.5rem;color:var(--fog);font-family:monospace;font-size:.8rem;letter-spacing:.08em;}
@@ -310,6 +313,22 @@ tbody td{padding:.55rem .8rem;color:var(--ink);vertical-align:middle;}
 .pbadge-danger{background:#FDE8E8;color:#8A1A1A;border:1px solid #E08080;}
 .pbadge-none{background:#F5F5F5;color:#AAA;border:1px solid #DDD;}
 .fit-history-plagues{display:flex;gap:.3rem;flex-wrap:wrap;margin-top:.2rem;}
+.ingres-card{background:var(--paper);border:1px solid #D8CEBA;border-radius:2px;margin-bottom:.6rem;}
+.ingres-row{display:flex;gap:.5rem;align-items:flex-end;flex-wrap:wrap;padding:.7rem .9rem;background:var(--parchment);border-radius:2px;margin-bottom:.4rem;border:1px solid #D8CEBA;}
+.ingres-row .field{flex:1;min-width:90px;margin-bottom:0;}
+.ingres-table{width:100%;border-collapse:collapse;font-size:.82rem;margin-bottom:.6rem;}
+.ingres-table thead th{background:var(--ok);color:white;font-family:monospace;font-size:.65rem;letter-spacing:.06em;text-transform:uppercase;padding:.5rem .7rem;text-align:right;}
+.ingres-table thead th:first-child,.ingres-table thead th:nth-child(2){text-align:left;}
+.ingres-table tbody td{padding:.45rem .7rem;border-bottom:1px solid #F0E8D8;text-align:right;font-family:monospace;font-size:.78rem;}
+.ingres-table tbody td:first-child,.ingres-table tbody td:nth-child(2){text-align:left;font-family:inherit;}
+.ingres-table tfoot td{background:#E8F5E8;font-weight:700;padding:.55rem .7rem;text-align:right;border-top:2px solid #90C890;font-family:monospace;font-size:.8rem;}
+.ingres-table tfoot td:first-child{text-align:left;}
+.balanc-box{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:.8rem;padding:1rem;background:var(--parchment);border-radius:2px;border:1px solid #D8CEBA;margin-top:1rem;}
+.balanc-item{text-align:center;}
+.balanc-num{font-family:monospace;font-size:1.3rem;font-weight:700;}
+.balanc-lbl{font-family:monospace;font-size:.62rem;color:var(--fog);letter-spacing:.06em;text-transform:uppercase;margin-top:.2rem;}
+.balanc-pos{color:var(--ok);}
+.balanc-neg{color:var(--danger);}
 footer{text-align:center;margin-top:1.5rem;font-family:monospace;font-size:.65rem;letter-spacing:.12em;color:rgba(245,239,224,.35);text-transform:uppercase;}
 
 /* COSTOS */
@@ -516,6 +535,16 @@ footer{text-align:center;margin-top:1.5rem;font-family:monospace;font-size:.65re
   <button class="main-nav-btn" onclick="showPage('meteo')" id="nav-meteo"><span class="nav-icon">🌡️</span>Risc Meteo</button>
   <button class="main-nav-btn" onclick="showPage('estoc')" id="nav-estoc"><span class="nav-icon">📦</span>Estoc</button>
 </div>
+<div style="background:var(--vine);padding:.35rem 1rem;display:flex;align-items:center;gap:.6rem;font-family:monospace;font-size:.7rem;color:rgba(245,239,224,.7)">
+  <span>📅</span>
+  <select id="campanya-sel" onchange="canviarCampanya(this.value)"
+    style="background:rgba(255,255,255,.1);color:var(--paper);border:1px solid rgba(255,255,255,.2);border-radius:2px;padding:.2rem .4rem;font-family:monospace;font-size:.7rem;cursor:pointer">
+  </select>
+  <button onclick="novaCampanya()"
+    style="background:none;border:1px solid rgba(255,255,255,.3);color:var(--paper);border-radius:2px;padding:.2rem .5rem;font-family:monospace;font-size:.65rem;cursor:pointer;opacity:.8">
+    + Nova
+  </button>
+</div>
 
 <!-- ══ REGISTRAR ══ -->
 <div class="page visible" id="page-registro">
@@ -582,7 +611,20 @@ footer{text-align:center;margin-top:1.5rem;font-family:monospace;font-size:.65re
         </div>
         <div class="row row-2">
           <div class="field"><label>Plaga / Malaltia objectiu</label>
-            <select id="fit-objetivo"><option value="">— Seleccionar —</option><option>Míldiu</option><option>Oïdi</option><option>Botrytis</option><option>Àcars</option><option>Polilla del raïm</option><option>Cigarrera</option><option>Flavescència daurada</option><option>Herbicida</option><option>Preventiu general</option><option>Altre</option></select>
+            <div id="fit-objetivo-pills" style="display:flex;flex-wrap:wrap;gap:.3rem;margin-top:.3rem"></div>
+            <input type="hidden" id="fit-objetivo" value="">
+            <div style="display:flex;flex-wrap:wrap;gap:.3rem;margin-top:.4rem" id="fit-objetivo-opts">
+              <button type="button" class="plague-pill-btn" onclick="togglePlagaPill(this,'Míldiu')">💧 Míldiu</button>
+              <button type="button" class="plague-pill-btn" onclick="togglePlagaPill(this,'Oïdi')">⬜ Oïdi</button>
+              <button type="button" class="plague-pill-btn" onclick="togglePlagaPill(this,'Botrytis')">🍇 Botrytis</button>
+              <button type="button" class="plague-pill-btn" onclick="togglePlagaPill(this,'Àcars')">🕷 Àcars</button>
+              <button type="button" class="plague-pill-btn" onclick="togglePlagaPill(this,'Polilla del raïm')">🦋 Polilla</button>
+              <button type="button" class="plague-pill-btn" onclick="togglePlagaPill(this,'Cigarrera')">🪲 Cigarrera</button>
+              <button type="button" class="plague-pill-btn" onclick="togglePlagaPill(this,'Flavescència daurada')">🟡 Flavescència</button>
+              <button type="button" class="plague-pill-btn" onclick="togglePlagaPill(this,'Herbicida')">🌿 Herbicida</button>
+              <button type="button" class="plague-pill-btn" onclick="togglePlagaPill(this,'Preventiu general')">🛡 Preventiu</button>
+              <button type="button" class="plague-pill-btn" onclick="togglePlagaPill(this,'Altre')">➕ Altre</button>
+            </div>
           </div>
           <div class="field"><label>Tipus d'aplicació</label>
             <select id="fit-tipo"><option>Polvorització foliar</option><option>Polvorització sòl</option><option>Tractament tronc</option></select>
@@ -825,6 +867,16 @@ footer{text-align:center;margin-top:1.5rem;font-family:monospace;font-size:.65re
           <input type="number" id="v-amort" value="332.19" step="0.01" min="0" oninput="renderCostos()">
           <div class="var-unit">€ / ha / any · <span style="color:var(--fog)">Total: 24.409€ ÷ 73,48ha SCP</span></div>
         </div>
+        <div class="var-box" style="border:1.5px solid #5B8A5B">
+          <label>Cost fix poda / ha <span style="color:var(--ok);font-size:.65rem">(assignació estimada)</span></label>
+          <input type="number" id="v-poda" value="0" step="1" min="0" oninput="renderCostos()">
+          <div class="var-unit">€ / ha · <span style="color:var(--fog)">Basat en any anterior</span></div>
+        </div>
+        <div class="var-box" style="border:1.5px solid #5B8A5B">
+          <label>Altres costos fixos / ha</label>
+          <input type="number" id="v-altres-fixos" value="0" step="1" min="0" oninput="renderCostos()">
+          <div class="var-unit">€ / ha / any · <span style="color:var(--fog)">Arrendaments, assegurances...</span></div>
+        </div>
       </div>
       <button class="btn btn-vine" onclick="resetVariables()">↺ Restaurar valors 2024</button>
     </div>
@@ -911,6 +963,10 @@ footer{text-align:center;margin-top:1.5rem;font-family:monospace;font-size:.65re
       </div>
     </div>
     <div class="cost-parcela-wrap">
+      <div style="font-family:monospace;font-size:.65rem;color:var(--fog);margin-bottom:.4rem;padding:.3rem .5rem;background:var(--parchment);border-radius:2px;border-left:3px solid var(--ok)">
+        ℹ️ Els costos de tractaments fitosanitaris s'actualitzen automàticament quan canvia el PMP dels productes a l'Estoc.
+        El gasoil també s'actualitza automàticament des de l'Estoc.
+      </div>
       <div class="cost-table-wrap">
         <table class="cost-table" id="costTable">
           <thead id="costTableHead"></thead>
@@ -920,6 +976,97 @@ footer{text-align:center;margin-top:1.5rem;font-family:monospace;font-size:.65re
       </div>
     </div>
     <div class="cost-total-finca" id="costTotalFinca"></div>
+  </div>
+
+  <!-- Ingressos -->
+  <div class="card" style="margin-top:1.2rem">
+    <div class="panel-header" style="background:#2D6A2D">💰 &nbsp; Ingressos de la campanya</div>
+    <div class="card-inner">
+
+      <!-- Venda de raïm -->
+      <div class="section-label">🍇 Venda de raïm</div>
+      <div style="background:var(--parchment);padding:.8rem;border-radius:2px;border:1px solid #D8CEBA;margin-bottom:.8rem">
+        <div style="display:flex;gap:.6rem;flex-wrap:wrap;align-items:flex-end">
+          <div class="field" style="margin-bottom:0;flex:2;min-width:180px;position:relative">
+            <label>Parcel·la / Varietat</label>
+            <div class="mini-mp-wrap" id="ir-mp-wrap" onclick="openMiniMp('ir')" style="cursor:pointer;background:white;border:1px solid #D8CEBA;border-radius:2px;padding:.35rem .6rem;min-height:32px;font-size:.83rem">
+              <span id="ir-mp-placeholder" style="color:#AAA">— Seleccionar o escriure —</span>
+              <span id="ir-mp-pills" style="display:flex;flex-wrap:wrap;gap:.2rem"></span>
+            </div>
+            <input type="text" id="ir-nom-manual" placeholder="O escriu varietat/descripció lliure"
+              style="margin-top:.3rem;font-size:.78rem;border:1px solid #D8CEBA;border-radius:2px;padding:.25rem .5rem;width:100%;color:var(--fog)">
+            <div class="mini-mp-dropdown" id="ir-mp-dropdown" style="display:none;position:absolute;top:100%;left:0;z-index:200;background:white;border:1px solid #D8CEBA;border-radius:2px;max-height:220px;overflow-y:auto;box-shadow:0 4px 16px rgba(0,0,0,.15);min-width:280px;width:max-content"></div>
+          </div>
+          <div class="field" style="margin-bottom:0;width:100px">
+            <label>kg totals</label>
+            <input type="number" id="ir-kg" placeholder="0" step="1" min="0">
+          </div>
+          <div class="field" style="margin-bottom:0;width:100px">
+            <label>€ / kg</label>
+            <input type="number" id="ir-preu" placeholder="0.00" step="0.01" min="0">
+          </div>
+          <button class="btn btn-ok" onclick="addIngresRaim()" style="margin-bottom:1rem">+ Afegir</button>
+        </div>
+      </div>
+      <div id="ingres-raim-taula"></div>
+
+      <!-- Subvencions -->
+      <div class="section-label" style="margin-top:1rem">📋 Subvencions</div>
+      <div style="background:var(--parchment);padding:.8rem;border-radius:2px;border:1px solid #D8CEBA;margin-bottom:.8rem">
+        <div style="display:flex;gap:.6rem;flex-wrap:wrap;align-items:flex-end">
+          <div class="field" style="margin-bottom:0;flex:2;min-width:140px">
+            <label>Concepte</label>
+            <input type="text" id="is-nom" placeholder="ex: PAC, POSEI, Ecorregim...">
+          </div>
+          <div class="field" style="margin-bottom:0;width:110px">
+            <label>€ / ha (o total)</label>
+            <input type="number" id="is-import" placeholder="0.00" step="0.01" min="0">
+          </div>
+          <div class="field" style="margin-bottom:0;width:90px">
+            <label>Ha aplicades</label>
+            <input type="number" id="is-ha" placeholder="73.48" step="0.01" min="0">
+          </div>
+          <button class="btn btn-ok" onclick="addIngresSubvencio()" style="margin-bottom:1rem">+ Afegir</button>
+        </div>
+      </div>
+      <div id="ingres-subv-taula"></div>
+
+      <!-- Sinistres / Assegurances -->
+      <div class="section-label" style="margin-top:1rem">🛡 Sinistres / Assegurança</div>
+      <div style="background:var(--parchment);padding:.8rem;border-radius:2px;border:1px solid #D8CEBA;margin-bottom:.8rem">
+        <div style="display:flex;gap:.6rem;flex-wrap:wrap;align-items:flex-end">
+          <div class="field" style="margin-bottom:0;flex:2;min-width:140px">
+            <label>Tipus sinistre</label>
+            <select id="isin-tipus">
+              <option>Gelada</option><option>Pedregada</option><option>Sequera</option>
+              <option>Malaltia</option><option>Altre</option>
+            </select>
+          </div>
+          <div class="field" style="margin-bottom:0;flex:2;min-width:180px;position:relative">
+            <label>Parcel·les afectades</label>
+            <div class="mini-mp-wrap" id="isin-mp-wrap" onclick="openMiniMp('isin')" style="cursor:pointer;background:white;border:1px solid #D8CEBA;border-radius:2px;padding:.35rem .6rem;min-height:32px;font-size:.83rem">
+              <span id="isin-mp-placeholder" style="color:#AAA">— Totes o seleccionar —</span>
+              <span id="isin-mp-pills" style="display:flex;flex-wrap:wrap;gap:.2rem"></span>
+            </div>
+            <div class="mini-mp-dropdown" id="isin-mp-dropdown" style="display:none;position:absolute;top:100%;left:0;z-index:200;background:white;border:1px solid #D8CEBA;border-radius:2px;max-height:220px;overflow-y:auto;box-shadow:0 4px 16px rgba(0,0,0,.15);min-width:280px;width:max-content"></div>
+          </div>
+          <div class="field" style="margin-bottom:0;width:130px">
+            <label>Data sinistre</label>
+            <input type="date" id="isin-data">
+          </div>
+          <div class="field" style="margin-bottom:0;width:110px">
+            <label>Import cobrat €</label>
+            <input type="number" id="isin-import" placeholder="0.00" step="0.01" min="0">
+          </div>
+          <button class="btn btn-ok" onclick="addIngresSinistre()" style="margin-bottom:1rem">+ Afegir</button>
+        </div>
+      </div>
+      <div id="ingres-sin-taula"></div>
+
+      <!-- Balanç total -->
+      <div id="ingres-balanc" style="margin-top:1rem"></div>
+
+    </div>
   </div>
 
 </div>
@@ -1128,36 +1275,121 @@ function syncConfigToSheets(clau, valor) {
 
 // Aplica configuració rebuda de Sheets al localStorage
 function applyConfigFromSheets(config) {
-  const CONFIG_KEYS = {
-    'productes_fitosanitaris': true,
-    'custom_accions':          true,
-    'epi_data':                true,
-  };
-  // Also dropdown keys
+  // Totes les claus que es sincronitzen des de Sheets
+  const CONFIG_KEYS = [
+    'productes_fitosanitaris', 'custom_accions', 'epi_data',
+    'estoc_gasoil', 'estoc_prods',
+    'lab-tipo','fit-objetivo','fit-tipo','rie-tipo','rie-origen',
+    'abo-tipo','abo-forma','lab-fenologia'
+  ];
   ['lab-tipo','fit-objetivo','fit-tipo','rie-tipo','rie-origen','abo-tipo','abo-forma','lab-fenologia'].forEach(k => {
-    CONFIG_KEYS['dropdown_' + k] = true;
+    CONFIG_KEYS.push('dropdown_' + k);
   });
-  // Cost variables
-  ['v-gasoil','v-salari','v-fertilitzant','v-dosi-fert','v-amort'].forEach(k => {
-    CONFIG_KEYS['cost_' + k] = true;
+  ['v-gasoil','v-salari','v-fertilitzant','v-dosi-fert','v-amort','v-poda','v-altres-fixos'].forEach(k => {
+    CONFIG_KEYS.push('cost_' + k);
   });
+  // Afegir clau d'ingressos de la campanya actual
+  CONFIG_KEYS.push('ingres_' + getCampanyaActual());
+  const ALLOWED = new Set(CONFIG_KEYS);
 
   let applied = 0;
   Object.entries(config).forEach(([clau, valor]) => {
-    if(!CONFIG_KEYS[clau]) return;
+    if(!ALLOWED.has(clau)) return;
     try {
-      const parsed = typeof valor === 'string' ? JSON.parse(valor) : valor;
-      const local  = localStorage.getItem(clau);
-      // Only apply if Sheets has data and local is empty or different
-      if(parsed !== null && parsed !== undefined) {
-        if(!local) {
-          localStorage.setItem(clau, JSON.stringify(parsed));
-          applied++;
-        }
+      const parsed   = typeof valor === 'string' ? JSON.parse(valor) : valor;
+      if(parsed === null || parsed === undefined) return;
+      const localRaw = localStorage.getItem(clau);
+      // Aplica sempre — Sheets és la font de veritat per a configuració
+      const newVal = JSON.stringify(parsed);
+      if(localRaw !== newVal) {
+        localStorage.setItem(clau, newVal);
+        applied++;
       }
-    } catch(e) {}
+    } catch(e) { console.log('Config apply error', clau, e); }
   });
   return applied;
+}
+
+// ══════════════════════════════════════════════════
+//  CAMPANYES
+// ══════════════════════════════════════════════════
+function getCampanyaActual() {
+  return localStorage.getItem('campanya_activa') || '2025-26';
+}
+function setCampanyaActiva(c) {
+  localStorage.setItem('campanya_activa', c);
+}
+function getCampanyes() {
+  try { return JSON.parse(localStorage.getItem('campanyes_list') || '["2025-26"]'); }
+  catch { return ['2025-26']; }
+}
+function saveCampanyes(list) {
+  localStorage.setItem('campanyes_list', JSON.stringify(list));
+}
+// Clau de localStorage prefixada per campanya
+function ck(key) {
+  return getCampanyaActual() + '_' + key;
+}
+// Funcions de parts amb campanya
+function getParts() {
+  try { return JSON.parse(localStorage.getItem(ck('parts')) || '[]'); } catch { return []; }
+}
+function saveParts(parts) {
+  localStorage.setItem(ck('parts'), JSON.stringify(parts));
+}
+function getDeletedIds() {
+  try { return JSON.parse(localStorage.getItem(ck('parts_deleted')) || '[]'); } catch { return []; }
+}
+function addDeletedId(id) {
+  const ids = getDeletedIds();
+  if(!ids.includes(String(id))) ids.push(String(id));
+  localStorage.setItem(ck('parts_deleted'), JSON.stringify(ids));
+}
+function getTractaments() {
+  try { return JSON.parse(localStorage.getItem(ck('tractaments')) || '{}'); } catch { return {}; }
+}
+function saveTractament(parcela, dateStr) {
+  const data = getTractaments();
+  if(!data[parcela] || dateStr > data[parcela]) {
+    data[parcela] = dateStr;
+    localStorage.setItem(ck('tractaments'), JSON.stringify(data));
+  }
+}
+
+function renderCampanyaSelector() {
+  const sel = document.getElementById('campanya-sel');
+  if(!sel) return;
+  const list = getCampanyes();
+  const act  = getCampanyaActual();
+  sel.innerHTML = list.map(c =>
+    '<option value="' + c + '"' + (c===act?' selected':'') + '>' + c + '</option>'
+  ).join('');
+}
+
+function canviarCampanya(val) {
+  setCampanyaActiva(val);
+  renderHistorial();
+  renderTracker();
+  updateExportStats();
+  showToast('📅 Campanya ' + val + ' activada', false, true);
+}
+
+function novaCampanya() {
+  const now   = new Date();
+  const any   = now.getMonth() >= 9 ? now.getFullYear() : now.getFullYear() - 1;
+  const sugg  = any + '-' + String(any+1).slice(2);
+  const nom   = prompt('Nom de la nova campanya (ex: ' + sugg + '):', sugg);
+  if(!nom || !nom.trim()) return;
+  const list  = getCampanyes();
+  if(list.includes(nom.trim())) { showToast('⚠ Ja existeix aquesta campanya', true); return; }
+  list.unshift(nom.trim());
+  saveCampanyes(list);
+  setCampanyaActiva(nom.trim());
+  renderCampanyaSelector();
+  renderHistorial();
+  renderTracker();
+  updateExportStats();
+  showToast('✅ Campanya ' + nom.trim() + ' creada i activada', false, true);
 }
 
 // ══════════════════════════════════════════════════
@@ -1185,10 +1417,23 @@ let currentType = 'fitosanitario';
 // ══════════════════════════════════════════════════
 document.addEventListener('DOMContentLoaded', function() {
   document.getElementById('fecha').valueAsDate = new Date();
+  // Inicialitza selector de campanya
+  renderCampanyaSelector();
+
+  // Restaura variables de cost guardades
+  ['v-gasoil','v-salari','v-fertilitzant','v-dosi-fert','v-amort','v-poda','v-altres-fixos'].forEach(function(k) {
+    const saved = localStorage.getItem('cost_' + k);
+    if(saved) {
+      const el = document.getElementById(k);
+      if(el) el.value = saved;
+    }
+  });
   const gDataEl = document.getElementById('g-data');
   if(gDataEl) gDataEl.valueAsDate = new Date();
   const epDataEl = document.getElementById('ep-data');
   if(epDataEl) epDataEl.valueAsDate = new Date();
+  const isinDataEl = document.getElementById('isin-data');
+  if(isinDataEl) isinDataEl.valueAsDate = new Date();
   document.getElementById('log-fecha').valueAsDate = new Date();
   populateParceles();
   renderTracker();
@@ -1213,6 +1458,7 @@ document.addEventListener('DOMContentLoaded', function() {
       updateExportStats();
       showToast('✅ ' + added + ' parts sincronitzats des de Sheets', false, true);
     }
+    renderCampanyaSelector();
   });
 
   // Poblar filtres de costos
@@ -1441,20 +1687,7 @@ function onParcelaChange(nom) {
 // ══════════════════════════════════════════════════
 //  STORAGE
 // ══════════════════════════════════════════════════
-function getParts() {
-  try { return JSON.parse(localStorage.getItem('parts') || '[]'); } catch { return []; }
-}
-function saveParts(parts) {
-  localStorage.setItem('parts', JSON.stringify(parts));
-}
-function getDeletedIds() {
-  try { return JSON.parse(localStorage.getItem('parts_deleted') || '[]'); } catch { return []; }
-}
-function addDeletedId(id) {
-  const ids = getDeletedIds();
-  if(!ids.includes(String(id))) ids.push(String(id));
-  localStorage.setItem('parts_deleted', JSON.stringify(ids));
-}
+// getParts/saveParts/getDeletedIds/addDeletedId definits a CAMPANYES
 function getTractaments() {
   try { return JSON.parse(localStorage.getItem('tractaments') || '{}'); } catch { return {}; }
 }
@@ -1511,6 +1744,7 @@ function resetForm() {
   document.querySelectorAll('.card-inner input, .card-inner textarea').forEach(el=>{
     if(el.type==='date') el.valueAsDate=new Date(); else el.value='';
   });
+  resetPlagaPills();
   document.querySelectorAll('#parcela,#sec-fitosanitario select,#sec-labor select,#sec-riego select,#sec-abonado select').forEach(s=>s.selectedIndex=0);
   // Reset multi-parcel selection
   mpSelected_list = [];
@@ -1593,7 +1827,7 @@ async function syncTractamentsFromSheets() {
         if(!local[parcela] || dateStr > local[parcela])
           local[parcela] = dateStr;
       });
-      localStorage.setItem('tractaments', JSON.stringify(local));
+      localStorage.setItem(ck('tractaments'), JSON.stringify(local));
     }
 
     // Sync parts — Sheets és la font de veritat
@@ -1636,6 +1870,9 @@ async function syncTractamentsFromSheets() {
       }
     }
 
+    // Rebuild tractaments cache from synced parts
+    // (no cal fer res — renderTracker() ja llegeix de getParts())
+
     return added;
   } catch(e) {
     console.log('Sheets sync error:', e);
@@ -1643,8 +1880,27 @@ async function syncTractamentsFromSheets() {
   }
 }
 
+function buildTractamentsFromParts() {
+  // Recalcula l'ultim tractament fitosanitari per parcel·la
+  // directament des dels parts actuals (ignora la cache)
+  const tr = {};
+  getParts().forEach(function(part) {
+    if(part.tipo !== 'fitosanitario') return;
+    if(!part.fecha || !part.parcela) return;
+    const parceles = part.parcela.split(' / ').map(function(n){ return n.trim(); });
+    parceles.forEach(function(nom) {
+      if(!nom) return;
+      if(!tr[nom] || part.fecha > tr[nom]) tr[nom] = part.fecha;
+    });
+  });
+  // Also include manual log-parcela entries from tractaments cache
+  // but only if the part still exists (cross-check)
+  return tr;
+}
+
 function renderTracker() {
-  const tr   = getTractaments();
+  // Sempre recalcula des dels parts — mai des de la cache de tractaments
+  const tr   = buildTractamentsFromParts();
   const grid = document.getElementById('trackerGrid');
   grid.innerHTML = '';
 
@@ -1733,7 +1989,7 @@ function showParcelaDetail(nom) {
   title.textContent = nom + ' — Historial fitosanitari';
 
   // Resum per plaga
-  const ultims = getUltimsPerPlaga(nom);
+  const ultims = getUltimsPerPlaga(nom); // Already reads from getParts()
   var plagueResumHtml = '';
   if(Object.keys(ultims).length > 0) {
     var plagueItems = PLAGUES_TRACK.filter(function(pg){ return ultims[pg.key]; }).map(function(pg) {
@@ -1790,6 +2046,21 @@ function logTractament() {
   const fecha   = document.getElementById('log-fecha').value;
   if(!parcela) { showToast('⚠ Selecciona una parcel·la',true); return; }
   if(!fecha)   { showToast('⚠ Indica la data',true); return; }
+  // Guarda com a part fitosanitari minimal per que aparegui al semàfor
+  const partManual = {
+    id: Date.now(),
+    tipo: 'fitosanitario',
+    fecha: fecha,
+    parcela: parcela,
+    operario: '',
+    c1: 'Tractament manual', c2:'', c3:'', c4:'', c5:'',
+    c6: document.getElementById('log-producte')?.value || '',
+    c7:'', c8:'', c9:'', obs: 'Registre manual des del seguiment'
+  };
+  const parts = getParts();
+  parts.push(partManual);
+  saveParts(parts);
+  enviarASheets(partManual);
   saveTractament(parcela, fecha);
   renderTracker();
   showToast('✓ Tractament registrat — '+parcela,false,true);
@@ -2161,11 +2432,15 @@ const ACCIONS_COST = [
                detail: `Gasoil: ${gasoilHa.toFixed(2)}€ · M.O.: ${maObraHa.toFixed(2)}€` };
     }
   },
-  { id:'poda',       label:'Poda',       icon:'✂️',
+  { id:'poda', label:'Poda', icon:'✂️',
     calcul: v => {
+      // Si hi ha cost fix de poda definit, usar-lo; sinó càlcul proporcional
+      if(v.poda && v.poda > 0) {
+        return { total: v.poda, detail: 'Cost fix poda assignat: ' + v.poda.toFixed(2) + '€/ha' };
+      }
       const costHora = v.salari / 160;
-      const base = 228.37 * (costHora / 12.5); // ajust proporcional al salari
-      return { total: base, detail: `Mà d'obra poda (proporcional)` };
+      const base = 228.37 * (costHora / 12.5);
+      return { total: base, detail: "Ma d'obra poda (proporcional al salari)" };
     }
   },
   { id:'fitosanitario', label:'Tractament', icon:'🌡️',
@@ -2249,7 +2524,8 @@ function getVars() {
   return {
     gasoil: n('v-gasoil'), salari: n('v-salari'),
     fertilitzant: n('v-fertilitzant'), dosiFert: n('v-dosi-fert'),
-    amort: n('v-amort')
+    amort: n('v-amort'), poda: n('v-poda'),
+    altresFixos: n('v-altres-fixos')
   };
 }
 
@@ -2267,6 +2543,14 @@ function renderCostos() {
   renderCustomAccions();
   renderCostAccions();
   renderCostParceles();
+  // Guarda variables de cost a localStorage per persistir entre sessions
+  ['v-gasoil','v-salari','v-fertilitzant','v-dosi-fert','v-amort','v-poda','v-altres-fixos'].forEach(function(k) {
+    const el = document.getElementById(k);
+    if(el && el.value) {
+      localStorage.setItem('cost_' + k, el.value);
+      syncConfigToSheets('cost_' + k, el.value);
+    }
+  });
 }
 
 function renderCostAccions() {
@@ -2307,6 +2591,54 @@ function populateCostFilters() {
   });
 }
 
+// Calcula ingressos imputats per parcel·la
+function calcIngresPerParcela(nomP, sup) {
+  const d = getIngres();
+  const supTotal = PARCEL_DATA.reduce(function(s,p){ return s+p.sup; }, 0);
+  let totalIngres = 0;
+
+  // Venda de raïm
+  d.raim.forEach(function(r) {
+    const total = r.kg * r.preu;
+    if(r.parceles && r.parceles.length > 0) {
+      // Imputar proporcional a ha si la parcel·la hi és
+      if(r.parceles.includes(nomP)) {
+        const haGrup = r.ha || r.parceles.reduce(function(s,n){
+          const p = PARCEL_DATA.find(function(x){ return x.nom===n; });
+          return s + (p ? p.sup : 0);
+        }, 0);
+        totalIngres += haGrup > 0 ? (total * sup / haGrup) : 0;
+      }
+    } else {
+      // Tota la finca: imputar per ha
+      totalIngres += supTotal > 0 ? (total * sup / supTotal) : 0;
+    }
+  });
+
+  // Subvencions: per ha
+  d.subv.forEach(function(s2) {
+    const totalSubv = s2.importHa * (s2.ha || supTotal);
+    totalIngres += supTotal > 0 ? (totalSubv * sup / supTotal) : 0;
+  });
+
+  // Sinistres: per ha si tota finca, o per ha del grup si parceles
+  d.sin.forEach(function(s3) {
+    if(s3.parceles && s3.parceles.length > 0) {
+      if(s3.parceles.includes(nomP)) {
+        const haGrup = s3.parceles.reduce(function(s,n){
+          const p = PARCEL_DATA.find(function(x){ return x.nom===n; });
+          return s + (p ? p.sup : 0);
+        }, 0);
+        totalIngres += haGrup > 0 ? (s3.import * sup / haGrup) : 0;
+      }
+    } else {
+      totalIngres += supTotal > 0 ? (s3.import * sup / supTotal) : 0;
+    }
+  });
+
+  return totalIngres;
+}
+
 function renderCostParceles() {
   const v      = getVars();
   const filtP  = document.getElementById('cost-filt-parcela')?.value || '';
@@ -2316,7 +2648,7 @@ function renderCostParceles() {
 
   // ── Build cost map: parcela → { accioId: cost€ } ──────────────────────
   const costMap = {};
-  const accioIds = new Set(); // track which accions appear
+  const accioIds = new Set();
 
   parts.forEach(part => {
     const parceles = part.parcela ? part.parcela.split(' / ').map(p=>p.trim()) : [];
@@ -2346,7 +2678,6 @@ function renderCostParceles() {
   });
 
   // ── Define column groups ───────────────────────────────────────────────
-  // Fixed columns always shown + dynamic columns from data
   const FIXED_COLS = [
     { id:'llaurar',       label:'Llaurar',      ids:['llaurar','triturar','triturar_vergues'] },
     { id:'poda',          label:'Poda',          ids:['poda'] },
@@ -2355,12 +2686,10 @@ function renderCostParceles() {
     { id:'riego',         label:'Reg',           ids:['riego'] },
   ];
 
-  // Dynamic columns: accions that appear in data but aren't in fixed cols
   const fixedIds = new Set(FIXED_COLS.flatMap(c=>c.ids));
   const dynamicCols = [];
   accioIds.forEach(id => {
     if(!fixedIds.has(id)) {
-      // Get label from ACCIONS_COST or custom accions
       const builtin = ACCIONS_COST.find(a=>a.id===id);
       let label = builtin ? builtin.label : id.replace('custom_','');
       dynamicCols.push({ id, label, ids:[id] });
@@ -2368,6 +2697,10 @@ function renderCostParceles() {
   });
 
   const allCols = [...FIXED_COLS, ...dynamicCols];
+
+  // ── Check if ingressos exist ───────────────────────────────────────────
+  const ingres = getIngres();
+  const hasIngres = ingres.raim.length > 0 || ingres.subv.length > 0 || ingres.sin.length > 0;
 
   // ── Build table header ─────────────────────────────────────────────────
   const table = document.getElementById('costTable'); if(!table) return;
@@ -2378,9 +2711,10 @@ function renderCostParceles() {
   thead.innerHTML = '<tr>' +
     '<th style="text-align:left">Parcel·la</th>' +
     '<th>Sup (ha)</th>' +
-    allCols.map(c => `<th>${c.label}</th>`).join('') +
+    allCols.map(c => '<th>' + c.label + '</th>').join('') +
     '<th style="color:var(--harvest)">Amortitz.</th>' +
-    '<th><strong>Total €</strong></th>' +
+    '<th><strong>Total cost</strong></th>' +
+    (hasIngres ? '<th style="color:var(--ok)">Ingressos</th><th style="color:var(--ok)">Raïm</th><th style="color:var(--ok)">Subv.</th><th style="color:var(--ok)">Sinistres</th><th style="font-weight:700">Marge</th>' : '') +
     '<th>€/ha</th>' +
     '</tr>';
 
@@ -2391,9 +2725,11 @@ function renderCostParceles() {
   const totals = {};
   allCols.forEach(c => totals[c.id] = 0);
   totals.amort = 0; totals.total = 0; totals.sup = 0;
+  totals.ingres = 0; totals.raim = 0; totals.subv = 0; totals.sin = 0; totals.marge = 0;
 
   const parceles = filtP ? [filtP] : PARCEL_DATA.map(p=>p.nom);
-  const fmt = n => n > 0 ? n.toFixed(0)+'€' : '—';
+  const fmt  = n => n > 0 ? n.toFixed(0)+'€' : '—';
+  const fmtI = n => n !== 0 ? (n>0?'+':'')+n.toFixed(0)+'€' : '—';
 
   parceles.forEach(nomP => {
     const cm  = costMap[nomP] || {};
@@ -2401,7 +2737,6 @@ function renderCostParceles() {
     if(!pi) return;
     const sup = pi.sup;
 
-    // Calc each column
     const colVals = {};
     let totalOps = 0;
     allCols.forEach(c => {
@@ -2412,55 +2747,114 @@ function renderCostParceles() {
 
     const amort = sup * v.amort;
     const total = totalOps + amort;
+
+    // Ingressos per parcel·la
+    let ingresRaim = 0, ingresSubv = 0, ingresSin = 0;
+    if(hasIngres) {
+      const supTotal = PARCEL_DATA.reduce(function(s,p){ return s+p.sup; }, 0);
+      ingres.raim.forEach(function(r) {
+        const t = r.kg * r.preu;
+        if(r.parceles && r.parceles.length > 0) {
+          if(r.parceles.includes(nomP)) {
+            const haG = r.ha || r.parceles.reduce(function(s2,n){ const p=PARCEL_DATA.find(function(x){return x.nom===n;}); return s2+(p?p.sup:0); }, 0);
+            ingresRaim += haG > 0 ? t * sup / haG : 0;
+          }
+        } else { ingresRaim += supTotal > 0 ? t * sup / supTotal : 0; }
+      });
+      ingres.subv.forEach(function(s2) {
+        const t = s2.importHa * (s2.ha || supTotal);
+        ingresSubv += supTotal > 0 ? t * sup / supTotal : 0;
+      });
+      ingres.sin.forEach(function(s3) {
+        if(s3.parceles && s3.parceles.length > 0) {
+          if(s3.parceles.includes(nomP)) {
+            const haG = s3.parceles.reduce(function(s2,n){ const p=PARCEL_DATA.find(function(x){return x.nom===n;}); return s2+(p?p.sup:0); }, 0);
+            ingresSin += haG > 0 ? s3.import * sup / haG : 0;
+          }
+        } else { ingresSin += supTotal > 0 ? s3.import * sup / supTotal : 0; }
+      });
+    }
+    const totalIngres = ingresRaim + ingresSubv + ingresSin;
+    const marge = totalIngres - total;
     const costHa = sup > 0 ? total / sup : 0;
 
-    if(totalOps === 0 && !filtP) return;
+    if(totalOps === 0 && !filtP && !hasIngres) return;
+    if(totalOps === 0 && totalIngres === 0 && !filtP) return;
 
-    // Accumulate totals
     allCols.forEach(c => totals[c.id] += colVals[c.id]);
-    totals.amort += amort; totals.total += total; totals.sup += sup;
+    totals.amort   += amort;
+    totals.total   += total;
+    totals.sup     += sup;
+    totals.ingres  += totalIngres;
+    totals.raim    += ingresRaim;
+    totals.subv    += ingresSubv;
+    totals.sin     += ingresSin;
+    totals.marge   += marge;
 
-    // Color dynamic cols differently
     const colCells = allCols.map((c,i) => {
       const isDynamic = i >= FIXED_COLS.length;
       const style = isDynamic ? ' style="color:#2A5472"' : '';
-      return `<td${style}>${fmt(colVals[c.id])}</td>`;
+      return '<td' + style + '>' + fmt(colVals[c.id]) + '</td>';
     }).join('');
 
-    tbody.innerHTML += `<tr>
-      <td>${nomP}</td>
-      <td>${sup.toFixed(2)}</td>
-      ${colCells}
-      <td style="color:var(--harvest)">${fmt(amort)}</td>
-      <td><strong>${fmt(total)}</strong></td>
-      <td>${costHa>0?costHa.toFixed(0)+'€':'—'}</td>
-    </tr>`;
+    const margeColor = marge >= 0 ? 'color:var(--ok)' : 'color:var(--danger)';
+    const ingresCells = hasIngres
+      ? '<td style="color:var(--ok)">' + fmt(totalIngres) + '</td>' +
+        '<td style="color:var(--ok);font-size:.75rem">' + fmt(ingresRaim) + '</td>' +
+        '<td style="color:var(--ok);font-size:.75rem">' + fmt(ingresSubv) + '</td>' +
+        '<td style="color:var(--ok);font-size:.75rem">' + fmt(ingresSin) + '</td>' +
+        '<td style="' + margeColor + ';font-weight:700">' + fmtI(marge) + '</td>'
+      : '';
+
+    tbody.innerHTML += '<tr>' +
+      '<td>' + nomP + '</td>' +
+      '<td>' + sup.toFixed(2) + '</td>' +
+      colCells +
+      '<td style="color:var(--harvest)">' + fmt(amort) + '</td>' +
+      '<td><strong>' + fmt(total) + '</strong></td>' +
+      ingresCells +
+      '<td>' + (costHa>0?costHa.toFixed(0)+'€':'—') + '</td>' +
+      '</tr>';
   });
 
-  // ── Footer totals ──────────────────────────────────────────────────────
+  // ── Footer ─────────────────────────────────────────────────────────────
   const avgHa = totals.sup > 0 ? totals.total / totals.sup : 0;
   const footCols = allCols.map((c,i) => {
     const isDynamic = i >= FIXED_COLS.length;
     const style = isDynamic ? ' style="color:#2A5472"' : '';
-    return `<td${style}>${fmt(totals[c.id])}</td>`;
+    return '<td' + style + '>' + fmt(totals[c.id]) + '</td>';
   }).join('');
 
-  tfoot.innerHTML = `<tr>
-    <td>TOTAL</td>
-    <td>${totals.sup.toFixed(2)}</td>
-    ${footCols}
-    <td style="color:var(--harvest)">${fmt(totals.amort)}</td>
-    <td><strong>${fmt(totals.total)}</strong></td>
-    <td>${avgHa>0?avgHa.toFixed(0)+'€':'—'}</td>
-  </tr>`;
+  const margeColor2 = totals.marge >= 0 ? 'color:var(--ok)' : 'color:var(--danger)';
+  const ingresFoot = hasIngres
+    ? '<td style="color:var(--ok)"><strong>' + fmt(totals.ingres) + '</strong></td>' +
+      '<td style="color:var(--ok)">' + fmt(totals.raim) + '</td>' +
+      '<td style="color:var(--ok)">' + fmt(totals.subv) + '</td>' +
+      '<td style="color:var(--ok)">' + fmt(totals.sin) + '</td>' +
+      '<td style="' + margeColor2 + ';font-weight:700">' + fmtI(totals.marge) + '</td>'
+    : '';
+
+  tfoot.innerHTML = '<tr>' +
+    '<td>TOTAL</td>' +
+    '<td>' + totals.sup.toFixed(2) + '</td>' +
+    footCols +
+    '<td style="color:var(--harvest)">' + fmt(totals.amort) + '</td>' +
+    '<td><strong>' + fmt(totals.total) + '</strong></td>' +
+    ingresFoot +
+    '<td>' + (avgHa>0?avgHa.toFixed(0)+'€':'—') + '</td>' +
+    '</tr>';
 
   // ── Summary boxes ──────────────────────────────────────────────────────
   const finca = document.getElementById('costTotalFinca'); if(!finca) return;
-  finca.innerHTML = `
-    <div class="ctf-box"><div class="ctf-num">${totals.total.toFixed(0)}€</div><div class="ctf-lbl">Cost total</div></div>
-    <div class="ctf-box"><div class="ctf-num">${avgHa.toFixed(0)}€</div><div class="ctf-lbl">Mitjana €/ha</div></div>
-    <div class="ctf-box"><div class="ctf-num">${Object.keys(costMap).length}</div><div class="ctf-lbl">Parcel·les actives</div></div>
-    <div class="ctf-box"><div class="ctf-num">${parts.length}</div><div class="ctf-lbl">Parts registrats</div></div>`;
+  const margeTotal = totals.ingres - totals.total;
+  const margeClr = margeTotal >= 0 ? 'var(--ok)' : 'var(--danger)';
+  finca.innerHTML =
+    '<div class="ctf-box"><div class="ctf-num">' + totals.total.toFixed(0) + '€</div><div class="ctf-lbl">Cost total</div></div>' +
+    '<div class="ctf-box"><div class="ctf-num">' + avgHa.toFixed(0) + '€</div><div class="ctf-lbl">Mitjana €/ha</div></div>' +
+    (hasIngres ? '<div class="ctf-box"><div class="ctf-num" style="color:var(--ok)">' + totals.ingres.toFixed(0) + '€</div><div class="ctf-lbl">Ingressos totals</div></div>' +
+    '<div class="ctf-box"><div class="ctf-num" style="color:' + margeClr + '">' + (margeTotal>=0?'+':'') + margeTotal.toFixed(0) + '€</div><div class="ctf-lbl">Marge net</div></div>' : '') +
+    '<div class="ctf-box"><div class="ctf-num">' + Object.keys(costMap).length + '</div><div class="ctf-lbl">Parcel·les actives</div></div>' +
+    '<div class="ctf-box"><div class="ctf-num">' + parts.length + '</div><div class="ctf-lbl">Parts registrats</div></div>';
 }
 
 // ══════════════════════════════════════════════════
@@ -2655,11 +3049,21 @@ function renderCustomAccions() {
 
     row.innerHTML = `
       <div style="flex:2;min-width:130px">
-        <input type="text" value="${acc.nom}" placeholder="Nom de l'acció"
+        <input type="text" value="${acc.nom}" placeholder="Nom de l'accio"
           oninput="updateCustomAccioNom(${i},this.value)"
           style="width:100%;font-size:.88rem;font-weight:500;border:1px solid #D8CEBA;border-radius:2px;padding:.35rem .6rem;margin-bottom:.4rem">
+        <div style="font-family:monospace;font-size:.6rem;color:var(--fog);letter-spacing:.06em;text-transform:uppercase;margin-bottom:.2rem">
+          Categoria
+        </div>
+        <select onchange="updateCustomAccioCategoria(${i},this.value)"
+          style="width:100%;font-size:.8rem;border:1px solid #D8CEBA;border-radius:2px;padding:.3rem .6rem;margin-bottom:.4rem;color:var(--ink)">
+          <option value="labor" ${(acc.categoria||'labor')==='labor'?'selected':''}>🚜 Labor del sol</option>
+          <option value="fitosanitario" ${acc.categoria==='fitosanitario'?'selected':''}>🌿 Tractament fitosanitari</option>
+          <option value="riego" ${acc.categoria==='riego'?'selected':''}>💧 Reg</option>
+          <option value="abonado" ${acc.categoria==='abonado'?'selected':''}>🌱 Adob / Fertilitzacio</option>
+        </select>
         <div style="font-family:monospace;font-size:.6rem;color:var(--fog);letter-spacing:.06em;text-transform:uppercase">
-          Tipus de labor associat
+          Clau de labor associada
         </div>
         <input type="text" value="${acc.laborKey||''}" placeholder="ex: Verema, Esporga..."
           oninput="updateCustomAccioLaborKey(${i},this.value)"
@@ -2686,10 +3090,18 @@ function calcCustomAccioCost(acc, v) {
 
 function addCustomAccio() {
   const accions = getCustomAccions();
-  accions.push({ nom:'Nova acció', laborKey:'', components:[{type:'maobra',qty:''}] });
+  accions.push({ nom:'Nova accio', laborKey:'', categoria:'labor', components:[{type:'maobra',qty:''}] });
   saveCustomAccions(accions);
   renderCustomAccions();
   syncCustomAccionsToForm();
+}
+
+function updateCustomAccioCategoria(i, val) {
+  const accions = getCustomAccions();
+  accions[i].categoria = val;
+  saveCustomAccions(accions);
+  syncCustomAccionsToForm();
+  renderCostos();
 }
 
 function deleteCustomAccio(i) {
@@ -3430,8 +3842,12 @@ function addCompraGasoil() {
     if(elG) { elG.value = pmpG.toFixed(3); }
     localStorage.setItem('cost_v-gasoil', pmpG.toFixed(3));
     syncConfigToSheets('cost_v-gasoil', pmpG.toFixed(3));
+    // Re-render costos automàticament
+    if(document.getElementById('page-costos')?.classList.contains('visible')) {
+      renderCostParceles();
+    }
   }
-  showToast('✅ Compra gasoil afegida · PMP: ' + pmpG.toFixed(3) + ' €/L', false, true);
+  showToast('✅ Gasoil: PMP ' + pmpG.toFixed(3) + ' €/L aplicat — Costos recalculats', false, true);
 }
 
 function renderGasoilEstoc() {
@@ -3648,11 +4064,15 @@ function addCompraProd() {
 
   renderEstoc();
 
-  // Missatge diferent si és la primera compra o ja té historial
+  // Re-render costos si la pàgina costos és visible (PMP actualitzat)
+  if(document.getElementById('page-costos')?.classList.contains('visible')) {
+    renderCostParceles();
+  }
+
   if(compres.length === 1) {
-    showToast('✅ Primera compra registrada: ' + preu.toFixed(2) + ' €/' + unitat, false, true);
+    showToast('✅ Primera compra: ' + preu.toFixed(2) + ' €/' + unitat + ' — PMP aplicat al catàleg', false, true);
   } else {
-    showToast('✅ PMP actualitzat automàticament: ' + pmp.toFixed(2) + ' €/' + unitat + ' (' + compres.length + ' compres)', false, true);
+    showToast('✅ PMP actualitzat: ' + pmp.toFixed(2) + ' €/' + unitat + ' (' + compres.length + ' compres) — Costos recalculats', false, true);
   }
 }
 
@@ -3688,6 +4108,298 @@ function delCompraProdIdx(i) {
   const nom = document.getElementById('estoc-prod-sel')?.value;
   if(!nom) return;
   delCompraProd(nom, i);
+}
+
+// ══════════════════════════════════════════════════
+//  MINI MULTIPARCEL SELECTOR (per ingressos)
+// ══════════════════════════════════════════════════
+const miniMpState = {}; // { 'ir': [noms], 'isin': [noms] }
+
+function getMiniMpSelected(prefix) {
+  return miniMpState[prefix] || [];
+}
+
+function openMiniMp(prefix) {
+  // Close others
+  document.querySelectorAll('.mini-mp-dropdown').forEach(d => {
+    if(d.id !== prefix + '-mp-dropdown') d.style.display = 'none';
+  });
+  const dd = document.getElementById(prefix + '-mp-dropdown');
+  if(!dd) return;
+  if(dd.style.display !== 'none') { dd.style.display = 'none'; return; }
+
+  // Build dropdown
+  const selected = getMiniMpSelected(prefix);
+  let html2 = '';
+
+  // "Tota la finca" option
+  const allSel = selected.length === 0;
+  html2 += '<div onclick="toggleMiniMpOption(\"' + prefix + '\",\"\")" style="padding:.5rem .8rem;cursor:pointer;background:' +
+    (allSel?'var(--vine)':'') + ';color:' + (allSel?'white':'var(--ink)') + ';font-size:.8rem;border-bottom:1px solid #F0E8D8">' +
+    (allSel?'✓ ':'') + '🍇 Tota la finca</div>';
+
+  // Group by municipality
+  const byMun = {};
+  PARCEL_DATA.forEach(function(p) {
+    if(!byMun[p.municipi]) byMun[p.municipi] = [];
+    byMun[p.municipi].push(p);
+  });
+
+  // (duplicate removed)
+}
+
+function toggleMiniMpOption(prefix, nom) {
+  if(!miniMpState[prefix]) miniMpState[prefix] = [];
+  if(nom === '') {
+    // Tota la finca — clear selection
+    miniMpState[prefix] = [];
+  } else {
+    const idx = miniMpState[prefix].indexOf(nom);
+    if(idx === -1) miniMpState[prefix].push(nom);
+    else miniMpState[prefix].splice(idx, 1);
+  }
+  updateMiniMpUI(prefix);
+  openMiniMp(prefix); // re-render dropdown
+}
+
+function updateMiniMpUI(prefix) {
+  const selected = getMiniMpSelected(prefix);
+  const pillsEl  = document.getElementById(prefix + '-mp-pills');
+  const phEl     = document.getElementById(prefix + '-mp-placeholder');
+  if(!pillsEl) return;
+
+  pillsEl.innerHTML = '';
+  if(selected.length === 0) {
+    if(phEl) phEl.style.display = '';
+  } else {
+    if(phEl) phEl.style.display = 'none';
+    selected.forEach(function(nom) {
+      const pill = document.createElement('span');
+      pill.style.cssText = 'background:var(--vine);color:white;border-radius:2px;padding:.1rem .4rem;font-size:.68rem;font-family:monospace;display:inline-flex;align-items:center;gap:.2rem';
+      pill.textContent = nom;
+      const x = document.createElement('span');
+      x.textContent = '×';
+      x.style.cssText = 'cursor:pointer;opacity:.8;margin-left:.2rem';
+      x.onclick = function(e) { e.stopPropagation(); toggleMiniMpOption(prefix, nom); };
+      pill.appendChild(x);
+      pillsEl.appendChild(pill);
+    });
+  }
+}
+
+function getMiniMpLabel(prefix) {
+  const sel = getMiniMpSelected(prefix);
+  if(sel.length === 0) return 'Tota la finca';
+  if(sel.length === 1) return sel[0];
+  return sel.length + ' parcel·les';
+}
+
+// ══════════════════════════════════════════════════
+//  INGRESSOS
+// ══════════════════════════════════════════════════
+function getIngres() {
+  try { return JSON.parse(localStorage.getItem(ck('ingres')) || '{"raim":[],"subv":[],"sin":[]}'); }
+  catch { return {raim:[],subv:[],sin:[]}; }
+}
+function saveIngres(d) {
+  localStorage.setItem(ck('ingres'), JSON.stringify(d));
+  syncConfigToSheets('ingres_' + getCampanyaActual(), d);
+}
+
+function addIngresRaim() {
+  // Get parcel from mini MP or manual text
+  const mpSel  = getMiniMpSelected('ir');
+  const manual = document.getElementById('ir-nom-manual')?.value.trim() || '';
+  const nom    = mpSel.length > 0 ? getMiniMpLabel('ir') : (manual || 'Raim');
+  const kg     = parseFloat(document.getElementById('ir-kg')?.value)   || 0;
+  const preu   = parseFloat(document.getElementById('ir-preu')?.value) || 0;
+  if(kg <= 0 || preu <= 0) { showToast('⚠ Indica kg i preu', true); return; }
+
+  // Calc ha from selected parcels
+  let ha = 0;
+  if(mpSel.length > 0) {
+    mpSel.forEach(function(n) {
+      const p = PARCEL_DATA.find(function(x){ return x.nom === n; });
+      if(p) ha += p.sup;
+    });
+  } else {
+    ha = PARCEL_DATA.reduce(function(s,p){ return s+p.sup; }, 0);
+  }
+
+  const d = getIngres();
+  d.raim.push({ nom, kg, preu, ha: Math.round(ha*100)/100, parceles: mpSel });
+  saveIngres(d);
+
+  // Reset
+  miniMpState['ir'] = [];
+  updateMiniMpUI('ir');
+  if(document.getElementById('ir-nom-manual')) document.getElementById('ir-nom-manual').value = '';
+  document.getElementById('ir-kg').value   = '';
+  document.getElementById('ir-preu').value = '';
+  renderIngressos();
+  showToast('✅ Venda afegida · ' + nom + ': ' + (kg*preu).toFixed(0) + '€', false, true);
+}
+
+function addIngresSubvencio() {
+  const nom    = document.getElementById('is-nom')?.value.trim() || 'Subvencio';
+  const imp    = parseFloat(document.getElementById('is-import')?.value) || 0;
+  const ha     = parseFloat(document.getElementById('is-ha')?.value) || 73.48;
+  if(imp <= 0) { showToast('⚠ Indica import', true); return; }
+  const d = getIngres();
+  d.subv.push({ nom, importHa: imp, ha });
+  saveIngres(d);
+  document.getElementById('is-nom').value    = '';
+  document.getElementById('is-import').value = '';
+  renderIngressos();
+  showToast('✅ Subvencio afegida', false, true);
+}
+
+function addIngresSinistre() {
+  const tipus   = document.getElementById('isin-tipus')?.value || 'Gelada';
+  const data    = document.getElementById('isin-data')?.value  || '';
+  const imp     = parseFloat(document.getElementById('isin-import')?.value) || 0;
+  if(imp <= 0) { showToast('⚠ Indica import cobrat', true); return; }
+  const mpSel   = getMiniMpSelected('isin');
+  const parceles = mpSel.length > 0 ? mpSel : [];
+  const nom     = mpSel.length > 0 ? getMiniMpLabel('isin') : 'Tota la finca';
+  const d = getIngres();
+  d.sin.push({ tipus, data, import: imp, nom, parceles });
+  saveIngres(d);
+  miniMpState['isin'] = [];
+  updateMiniMpUI('isin');
+  document.getElementById('isin-import').value = '';
+  renderIngressos();
+  showToast('✅ Sinistre afegit', false, true);
+}
+
+function delIngres(tipus, i) {
+  const d = getIngres();
+  d[tipus].splice(i, 1);
+  saveIngres(d);
+  renderIngressos();
+}
+function delIngresRaim(i) { delIngres('raim', i); }
+function delIngresSubv(i) { delIngres('subv', i); }
+function delIngresSin(i)  { delIngres('sin',  i); }
+
+function renderIngressos() {
+  const d = getIngres();
+  const v = getVars();
+
+  // Raim
+  const raimEl = document.getElementById('ingres-raim-taula');
+  let totalRaim = 0;
+  if(raimEl) {
+    if(d.raim.length === 0) {
+      raimEl.innerHTML = '<p style="font-size:.82rem;color:var(--fog);font-style:italic">Cap venda registrada</p>';
+    } else {
+      let rows = d.raim.map(function(r, i) {
+        const total = r.kg * r.preu;
+        totalRaim += total;
+        const haStr = r.ha ? r.ha.toFixed(2) + ' ha' : '';
+        return '<tr><td>' + r.nom + (haStr ? ' <span style="font-size:.7rem;color:var(--fog)">(' + haStr + ')</span>' : '') + '</td>' +
+          '<td>' + r.kg.toLocaleString('ca-ES') + ' kg</td>' +
+          '<td>' + r.preu.toFixed(2) + ' €/kg</td>' +
+          '<td>' + total.toFixed(0) + ' €</td>' +
+          '<td><button class="compra-del" onclick="delIngresRaim(' + i + ')">&#x2715;</button></td></tr>';
+      }).join('');
+      raimEl.innerHTML = '<table class="ingres-table"><thead><tr>' +
+        '<th style="text-align:left">Varietat/Parcel·la</th>' +
+        '<th style="text-align:left">kg</th><th>€/kg</th><th>Total</th><th></th>' +
+        '</tr></thead><tbody>' + rows + '</tbody>' +
+        '<tfoot><tr><td>TOTAL RAIM</td><td></td><td></td>' +
+        '<td><strong>' + totalRaim.toFixed(0) + ' €</strong></td><td></td></tr></tfoot></table>';
+    }
+  }
+
+  // Subvencions
+  const subvEl = document.getElementById('ingres-subv-taula');
+  let totalSubv = 0;
+  if(subvEl) {
+    if(d.subv.length === 0) {
+      subvEl.innerHTML = '<p style="font-size:.82rem;color:var(--fog);font-style:italic">Cap subvencio registrada</p>';
+    } else {
+      let rows = d.subv.map(function(s, i) {
+        const total = s.importHa * s.ha;
+        totalSubv += total;
+        return '<tr><td>' + s.nom + '</td>' +
+          '<td>' + s.importHa.toFixed(2) + ' €/ha</td>' +
+          '<td>' + s.ha.toFixed(2) + ' ha</td>' +
+          '<td>' + total.toFixed(0) + ' €</td>' +
+          '<td><button class="compra-del" onclick="delIngresSubv(' + i + ')">&#x2715;</button></td></tr>';
+      }).join('');
+      subvEl.innerHTML = '<table class="ingres-table"><thead><tr>' +
+        '<th style="text-align:left">Concepte</th><th>€/ha</th><th>Ha</th><th>Total</th><th></th>' +
+        '</tr></thead><tbody>' + rows + '</tbody>' +
+        '<tfoot><tr><td>TOTAL SUBVENCIONS</td><td></td><td></td>' +
+        '<td><strong>' + totalSubv.toFixed(0) + ' €</strong></td><td></td></tr></tfoot></table>';
+    }
+  }
+
+  // Sinistres
+  const sinEl = document.getElementById('ingres-sin-taula');
+  let totalSin = 0;
+  if(sinEl) {
+    if(d.sin.length === 0) {
+      sinEl.innerHTML = '<p style="font-size:.82rem;color:var(--fog);font-style:italic">Cap sinistre registrat</p>';
+    } else {
+      let rows = d.sin.map(function(s, i) {
+        totalSin += s.import;
+        const dataTxt = s.data ? new Date(s.data+'T12:00:00').toLocaleDateString('ca-ES',{day:'numeric',month:'short',year:'numeric'}) : '—';
+        const sinNom = s.nom || 'Tota la finca';
+        return '<tr><td>' + s.tipus + '</td>' +
+          '<td style="text-align:left">' + dataTxt + '</td>' +
+          '<td style="text-align:left;font-size:.72rem;color:var(--fog)">' + sinNom + '</td>' +
+          '<td>' + s.import.toFixed(0) + ' €</td>' +
+          '<td><button class="compra-del" onclick="delIngresSin(' + i + ')">&#x2715;</button></td></tr>';
+      }).join('');
+      sinEl.innerHTML = '<table class="ingres-table"><thead><tr>' +
+        '<th style="text-align:left">Tipus</th><th style="text-align:left">Data</th><th style="text-align:left">Parcel·les</th><th>Import</th><th></th>' +
+        '</tr></thead><tbody>' + rows + '</tbody>' +
+        '<tfoot><tr><td>TOTAL SINISTRES</td><td></td>' +
+        '<td><strong>' + totalSin.toFixed(0) + ' €</strong></td><td></td></tr></tfoot></table>';
+    }
+  }
+
+  // Balanc
+  const balancEl = document.getElementById('ingres-balanc');
+  if(balancEl) {
+    const totalIngres = totalRaim + totalSubv + totalSin;
+    // Get total costos from costTotalFinca
+    const costEl = document.getElementById('costTotalFinca');
+    const costTxt = costEl ? costEl.textContent : '';
+    const costMatch = costTxt.match(/[0-9.,]+/);
+    const totalCost = costMatch ? parseFloat(costMatch[0].replace('.','').replace(',','.')) : 0;
+    const marge = totalIngres - totalCost;
+    balancEl.innerHTML = '<div class="balanc-box">' +
+      '<div class="balanc-item"><div class="balanc-num balanc-pos">' + totalRaim.toFixed(0) + ' €</div><div class="balanc-lbl">Venda Raïm</div></div>' +
+      '<div class="balanc-item"><div class="balanc-num balanc-pos">' + totalSubv.toFixed(0) + ' €</div><div class="balanc-lbl">Subvencions</div></div>' +
+      '<div class="balanc-item"><div class="balanc-num balanc-pos">' + totalSin.toFixed(0) + ' €</div><div class="balanc-lbl">Sinistres</div></div>' +
+      '<div class="balanc-item" style="border-top:2px solid #90C890;padding-top:.4rem"><div class="balanc-num balanc-pos">' + totalIngres.toFixed(0) + ' €</div><div class="balanc-lbl">Total Ingressos</div></div>' +
+      (totalCost > 0 ? '<div class="balanc-item" style="border-top:2px solid ' + (marge>=0?'#90C890':'#E08080') + ';padding-top:.4rem">' +
+        '<div class="balanc-num ' + (marge>=0?'balanc-pos':'balanc-neg') + '">' + (marge>=0?'+':'') + marge.toFixed(0) + ' €</div>' +
+        '<div class="balanc-lbl">Marge net estimat</div></div>' : '') +
+      '</div>';
+  }
+}
+
+// ══════════════════════════════════════════════════
+//  SELECCIÓ MÚLTIPLE PLAGUES
+// ══════════════════════════════════════════════════
+function togglePlagaPill(btn, plaga) {
+  btn.classList.toggle('active');
+  btn.dataset.plaga = plaga;
+  // Recalcula el valor del hidden input
+  const actives = Array.from(document.querySelectorAll('#fit-objetivo-opts .plague-pill-btn.active'))
+    .map(b => b.dataset.plaga || plaga);
+  const hidden = document.getElementById('fit-objetivo');
+  if(hidden) hidden.value = actives.join(' / ');
+}
+
+function resetPlagaPills() {
+  document.querySelectorAll('#fit-objetivo-opts .plague-pill-btn').forEach(b => b.classList.remove('active'));
+  const hidden = document.getElementById('fit-objetivo');
+  if(hidden) hidden.value = '';
 }
 
 // ══════════════════════════════════════════════════
