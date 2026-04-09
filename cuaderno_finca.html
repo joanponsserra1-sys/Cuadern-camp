@@ -1687,17 +1687,7 @@ function onParcelaChange(nom) {
 // ══════════════════════════════════════════════════
 //  STORAGE
 // ══════════════════════════════════════════════════
-// getParts/saveParts/getDeletedIds/addDeletedId definits a CAMPANYES
-function getTractaments() {
-  try { return JSON.parse(localStorage.getItem('tractaments') || '{}'); } catch { return {}; }
-}
-function saveTractament(parcela, dateStr) {
-  const data = getTractaments();
-  const parceles = parcela==='Tota la finca' ? PARCEL_DATA.map(p=>p.nom) : [parcela];
-  parceles.forEach(p => { if(!data[p]||dateStr>=data[p]) data[p]=dateStr; });
-  localStorage.setItem('tractaments', JSON.stringify(data));
-}
-
+// getTractaments/saveTractament: vegeu seccio CAMPANYES (ck())
 // ══════════════════════════════════════════════════
 //  GUARDAR PART
 // ══════════════════════════════════════════════════
@@ -2172,7 +2162,7 @@ function importJSON(input) {
       if(!data.parts) throw new Error('Format incorrecte');
       if(!confirm('Això substituirà les dades actuals. Continuar?')) return;
       saveParts(data.parts);
-      if(data.tractaments) localStorage.setItem('tractaments',JSON.stringify(data.tractaments));
+      if(data.tractaments) localStorage.setItem(ck('tractaments'),JSON.stringify(data.tractaments));
       renderHistorial(); renderTracker(); updateExportStats();
       showToast('✅ Còpia de seguretat restaurada',false,true);
     } catch(err) { showToast('✗ Error al llegir el fitxer',true); }
