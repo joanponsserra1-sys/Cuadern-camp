@@ -1,19 +1,20 @@
-// Service Worker — Cuaderno de Camp
-const CACHE = 'cuaderno-camp-v1';
+// Service Worker — Cuaderno de Camp v20260409-0516
+const CACHE = 'cuaderno-camp-20260409-0516';
 const ASSETS = [
-  '/Cuadern-camp/cuaderno_finca.html',
   '/Cuadern-camp/manifest.json',
+  '/Cuadern-camp/icon-192.png',
+  '/Cuadern-camp/icon-512.png',
 ];
 
-// Install: cache assets
+// Install: cache only static assets (NOT the HTML)
 self.addEventListener('install', e => {
   e.waitUntil(
-    caches.open(CACHE).then(c => c.addAll(ASSETS))
+    caches.open(CACHE).then(c => c.addAll(ASSETS).catch(() => {}))
   );
   self.skipWaiting();
 });
 
-// Activate: clean old caches
+// Activate: delete ALL old caches
 self.addEventListener('activate', e => {
   e.waitUntil(
     caches.keys().then(keys =>
@@ -23,15 +24,37 @@ self.addEventListener('activate', e => {
   self.clients.claim();
 });
 
-// Fetch: cache first, then network
+// Fetch strategy:
+// - HTML: network first, cache fallback (sempre versió fresca)
+// - APIs: network only
+// - Assets: cache first
 self.addEventListener('fetch', e => {
-  // Always fetch API calls from network
-  if(e.request.url.includes('api.open-meteo') ||
-     e.request.url.includes('script.google.com') ||
-     e.request.url.includes('api.sencrop.com')) {
+  const url = e.request.url;
+
+  // APIs: sempre xarxa
+  if(url.includes('api.open-meteo') ||
+     url.includes('archive-api.open-meteo') ||
+     url.includes('script.google.com') ||
+     url.includes('api.sencrop.com')) {
     e.respondWith(fetch(e.request).catch(() => new Response('', {status: 503})));
     return;
   }
+
+  // HTML: network first (sempre versió fresca)
+  if(url.includes('.html')) {
+    e.respondWith(
+      fetch(e.request).then(resp => {
+        if(resp.ok) {
+          const clone = resp.clone();
+          caches.open(CACHE).then(c => c.put(e.request, clone));
+        }
+        return resp;
+      }).catch(() => caches.match(e.request))
+    );
+    return;
+  }
+
+  // Assets (icones, manifest): cache first
   e.respondWith(
     caches.match(e.request).then(cached => {
       if(cached) return cached;
@@ -41,7 +64,7 @@ self.addEventListener('fetch', e => {
           caches.open(CACHE).then(c => c.put(e.request, clone));
         }
         return resp;
-      }).catch(() => caches.match('/Cuadern-camp/cuaderno_finca.html'));
+      });
     })
   );
 });

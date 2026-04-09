@@ -845,12 +845,12 @@ footer{text-align:center;margin-top:1.5rem;font-family:monospace;font-size:.65re
       <div class="var-grid">
         <div class="var-box">
           <label>Preu gasoil</label>
-          <input type="number" id="v-gasoil" value="1.035" step="0.001" min="0" oninput="renderCostos()">
+          <input type="number" id="v-gasoil" value="1.035" step="0.001" min="0" oninput="saveCostVars();renderCostos()">
           <div class="var-unit">€ / litre</div>
         </div>
         <div class="var-box">
           <label>Salari tractorista</label>
-          <input type="number" id="v-salari" value="2000" step="10" min="0" oninput="renderCostos()">
+          <input type="number" id="v-salari" value="2000" step="10" min="0" oninput="saveCostVars();renderCostos()">
           <div class="var-unit">€ / mes (160h)</div>
         </div>
         <div class="var-box">
@@ -1338,6 +1338,12 @@ function applyConfigFromSheets(config) {
         }
         if(clau === 'productes_fitosanitaris') {
           renderProducteTaula();
+        }
+        if(clau.startsWith('cost_')) {
+          // Aplica variable de cost a l'input corresponent
+          const varId = clau.replace('cost_', '');
+          const el = document.getElementById(varId);
+          if(el && parsed) el.value = parsed;
         }
       }
     } catch(e) { console.log('Config apply error', clau, e); }
