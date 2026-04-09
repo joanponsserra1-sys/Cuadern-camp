@@ -1467,14 +1467,7 @@ document.addEventListener('DOMContentLoaded', function() {
   getCampanyaActual(); // inicialitza si cal
   renderCampanyaSelector();
 
-  // Restaura variables de cost guardades
-  ['v-gasoil','v-salari','v-fertilitzant','v-dosi-fert','v-amort','v-poda','v-altres-fixos'].forEach(function(k) {
-    const saved = localStorage.getItem('cost_' + k);
-    if(saved) {
-      const el = document.getElementById(k);
-      if(el) el.value = saved;
-    }
-  });
+  // Variables de cost: es carreguen quan s'obre la pestanya (loadCostVars)
   const gDataEl = document.getElementById('g-data');
   if(gDataEl) gDataEl.valueAsDate = new Date();
   const epDataEl = document.getElementById('ep-data');
@@ -1528,8 +1521,10 @@ function showPage(name) {
   if(name==='historial')   renderHistorial();
   if(name==='exportar')    updateExportStats();
   if(name==='costos') {
+    loadCostVars();
     renderCostos();
     renderDropdownEditors();
+    populateCostFilters();
   }
   if(name==='estoc')   { renderEstoc(); }
   if(name==='meteo') {
@@ -2589,19 +2584,48 @@ function resetVariables() {
   renderCostos();
 }
 
-function renderCostos() {
-  renderProducteTaula();
-  renderCustomAccions();
-  renderCostAccions();
-  renderCostParceles();
-  // Guarda variables de cost a localStorage per persistir entre sessions
+function loadCostVars() {
+  // Carrega variables guardades (localStorage > PMP gasoil > defaults)
+  const VARS = ['v-gasoil','v-salari','v-fertilitzant','v-dosi-fert','v-amort','v-poda','v-altres-fixos'];
+  VARS.forEach(function(k) {
+    const saved = localStorage.getItem('cost_' + k);
+    const el = document.getElementById(k);
+    if(!el) return;
+    if(saved && saved !== 'NaN' && saved !== 'null') {
+      el.value = saved;
+    }
+  });
+  // Aplica PMP gasoil automàticament si existeix
+  const pmpG = calcPMP(getEstocGasoil());
+  if(pmpG > 0) {
+    const elG = document.getElementById('v-gasoil');
+    const savedG = localStorage.getItem('cost_v-gasoil');
+    // Aplica PMP si no hi ha valor guardat o si el PMP ha canviat
+    if(!savedG || Math.abs(parseFloat(savedG) - pmpG) > 0.001) {
+      if(elG) elG.value = pmpG.toFixed(3);
+      localStorage.setItem('cost_v-gasoil', pmpG.toFixed(3));
+    }
+  }
+}
+
+function saveCostVars() {
   ['v-gasoil','v-salari','v-fertilitzant','v-dosi-fert','v-amort','v-poda','v-altres-fixos'].forEach(function(k) {
     const el = document.getElementById(k);
-    if(el && el.value) {
+    if(el && el.value && el.value !== '') {
       localStorage.setItem('cost_' + k, el.value);
       syncConfigToSheets('cost_' + k, el.value);
     }
   });
+}
+
+function renderCostos() {
+  loadCostVars();
+  renderProducteTaula();
+  renderCustomAccions();
+  renderCostAccions();
+  renderCostParceles();
+  renderIngressos();
+  saveCostVars();
 }
 
 function renderCostAccions() {
