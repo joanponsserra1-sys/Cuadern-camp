@@ -600,6 +600,27 @@ footer{text-align:center;margin-top:1.5rem;font-family:monospace;font-size:.65re
           <strong id="fit-cost-total">— €/ha</strong>
         </div>
 
+        <!-- Cost total real del tractament -->
+        <div style="background:var(--parchment);border:1px solid #D8CEBA;border-radius:2px;padding:.6rem 1rem;margin-bottom:.8rem">
+          <div style="font-family:monospace;font-size:.65rem;color:var(--fog);letter-spacing:.06em;text-transform:uppercase;margin-bottom:.5rem">Cost real del tractament</div>
+          <div style="display:flex;gap:.8rem;align-items:flex-end;flex-wrap:wrap">
+            <div class="field" style="margin-bottom:0;flex:1;min-width:120px">
+              <label style="font-size:.72rem">Cost total (€)</label>
+              <input type="number" id="fit-cost-total-input" placeholder="0.00" step="0.01" min="0"
+                oninput="calcCostHaFromTotal()" style="font-size:.9rem">
+            </div>
+            <div style="font-family:monospace;font-size:.75rem;color:var(--fog);padding-bottom:.7rem">=</div>
+            <div class="field" style="margin-bottom:0;flex:1;min-width:120px">
+              <label style="font-size:.72rem">Cost calculat (€/ha)</label>
+              <input type="number" id="fit-cost-ha-auto" placeholder="—" step="0.01" min="0" readonly
+                style="background:#F5F5F5;color:var(--vine);font-weight:600;font-size:.9rem">
+            </div>
+            <div style="font-family:monospace;font-size:.7rem;color:var(--fog);padding-bottom:.7rem">
+              ÷ <span id="fit-sup-display">— ha</span>
+            </div>
+          </div>
+        </div>
+
         <!-- Hidden field for legacy collectData compat -->
         <input type="hidden" id="fit-producto" value="">
         <input type="hidden" id="fit-registro" value="">
@@ -608,7 +629,10 @@ footer{text-align:center;margin-top:1.5rem;font-family:monospace;font-size:.65re
 
         <div class="row row-2">
           <div class="field"><label>Volum brou (L/Ha)</label><input type="number" id="fit-caldo" placeholder="300" step="1" min="0"></div>
-          <div class="field"><label>Superfície (Ha)</label><input type="number" id="fit-superficie" placeholder="0.00" step="0.01" min="0"></div>
+          <div class="field">
+            <label>Superfície (Ha) <span style="color:var(--ok);font-size:.65rem">● automàtic</span></label>
+            <input type="number" id="fit-superficie" step="0.0001" min="0" style="background:#F0F7F0;color:var(--ok);font-weight:600" readonly placeholder="selecciona parcel·les">
+          </div>
         </div>
         <div class="row row-2">
           <div class="field"><label>Plaga / Malaltia objectiu</label>
@@ -655,7 +679,22 @@ footer{text-align:center;margin-top:1.5rem;font-family:monospace;font-size:.65re
         <div class="row row-3">
           <div class="field"><label>Hora inici</label><input type="time" id="lab-hora-ini"></div>
           <div class="field"><label>Hora fi</label><input type="time" id="lab-hora-fin"></div>
-          <div class="field"><label>Superfície (Ha)</label><input type="number" id="lab-superficie" placeholder="0.00" step="0.01" min="0"></div>
+          <div class="field">
+            <label>Superfície (Ha) <span style="color:var(--ok);font-size:.65rem">● automàtic</span></label>
+            <input type="number" id="lab-superficie" step="0.0001" min="0" style="background:#F0F7F0;color:var(--ok);font-weight:600" readonly placeholder="selecciona parcel·les">
+          </div>
+          <div style="display:flex;gap:.6rem;align-items:flex-end;margin-top:.4rem;flex-wrap:wrap">
+            <div class="field" style="margin-bottom:0;flex:1;min-width:130px">
+              <label style="font-size:.72rem">Cost total (€)</label>
+              <input type="number" id="lab-cost-total" placeholder="0.00" step="0.01" min="0"
+                oninput="calcCostHaGeneric('lab')" style="font-size:.9rem">
+            </div>
+            <div class="field" style="margin-bottom:0;flex:1;min-width:130px">
+              <label style="font-size:.72rem">Cost (€/ha)</label>
+              <input type="number" id="lab-cost-ha" placeholder="—" readonly
+                style="background:#F5F5F5;color:var(--vine);font-weight:600;font-size:.9rem">
+            </div>
+          </div>
         </div>
         <div class="field"><label>Estat fenològic de la vinya</label>
           <select id="lab-fenologia"><option>— Seleccionar —</option><option>Repòs vegetatiu</option><option>Plor</option><option>Brotació</option><option>2-3 fulles</option><option>Inflorescències visibles</option><option>Floració</option><option>Quallat</option><option>Envero</option><option>Maduració</option><option>Post-verema</option></select>
@@ -675,7 +714,22 @@ footer{text-align:center;margin-top:1.5rem;font-family:monospace;font-size:.65re
         </div>
         <div class="row row-2">
           <div class="field"><label>Volum total (m³)</label><input type="number" id="rie-volumen" placeholder="0.0" step="0.1" min="0"></div>
-          <div class="field"><label>Superfície (Ha)</label><input type="number" id="rie-superficie" placeholder="0.00" step="0.01" min="0"></div>
+          <div class="field">
+            <label>Superfície (Ha) <span style="color:var(--ok);font-size:.65rem">● automàtic</span></label>
+            <input type="number" id="rie-superficie" step="0.0001" min="0" style="background:#F0F7F0;color:var(--ok);font-weight:600" readonly placeholder="selecciona parcel·les">
+          </div>
+          <div style="display:flex;gap:.6rem;align-items:flex-end;margin-top:.4rem;flex-wrap:wrap">
+            <div class="field" style="margin-bottom:0;flex:1;min-width:130px">
+              <label style="font-size:.72rem">Cost total (€)</label>
+              <input type="number" id="rie-cost-total" placeholder="0.00" step="0.01" min="0"
+                oninput="calcCostHaGeneric('rie')" style="font-size:.9rem">
+            </div>
+            <div class="field" style="margin-bottom:0;flex:1;min-width:130px">
+              <label style="font-size:.72rem">Cost (€/ha)</label>
+              <input type="number" id="rie-cost-ha" placeholder="—" readonly
+                style="background:#F5F5F5;color:var(--vine);font-weight:600;font-size:.9rem">
+            </div>
+          </div>
         </div>
         <div class="field"><label>Motiu del reg</label>
           <select id="rie-motivo"><option>Aportació hídrica de manteniment</option><option>Estrès hídric sever</option><option>Post-trasplantament</option><option>Suport a tractament (fertirrigació)</option><option>Gelada (aspersió antigelada)</option></select>
@@ -693,7 +747,22 @@ footer{text-align:center;margin-top:1.5rem;font-family:monospace;font-size:.65re
         <div class="row row-3">
           <div class="field"><label>Dosi (Kg o L/Ha)</label><input type="number" id="abo-dosis" placeholder="0.0" step="0.1" min="0"></div>
           <div class="field"><label>Quantitat total (Kg o L)</label><input type="number" id="abo-cantidad" placeholder="0.0" step="0.1" min="0"></div>
-          <div class="field"><label>Superfície (Ha)</label><input type="number" id="abo-superficie" placeholder="0.00" step="0.01" min="0"></div>
+          <div class="field">
+            <label>Superfície (Ha) <span style="color:var(--ok);font-size:.65rem">● automàtic</span></label>
+            <input type="number" id="abo-superficie" step="0.0001" min="0" style="background:#F0F7F0;color:var(--ok);font-weight:600" readonly placeholder="selecciona parcel·les">
+          </div>
+          <div style="display:flex;gap:.6rem;align-items:flex-end;margin-top:.4rem;flex-wrap:wrap">
+            <div class="field" style="margin-bottom:0;flex:1;min-width:130px">
+              <label style="font-size:.72rem">Cost total (€)</label>
+              <input type="number" id="abo-cost-total" placeholder="0.00" step="0.01" min="0"
+                oninput="calcCostHaGeneric('abo')" style="font-size:.9rem">
+            </div>
+            <div class="field" style="margin-bottom:0;flex:1;min-width:130px">
+              <label style="font-size:.72rem">Cost (€/ha)</label>
+              <input type="number" id="abo-cost-ha" placeholder="—" readonly
+                style="background:#F5F5F5;color:var(--vine);font-weight:600;font-size:.9rem">
+            </div>
+          </div>
         </div>
         <div class="field"><label>Forma d'aplicació</label>
           <select id="abo-forma"><option>Incorporació al sòl (fresadora)</option><option>Superfície (al vol)</option><option>Localitzat en línia</option><option>Fertirrigació</option><option>Polvorització foliar</option></select>
@@ -1114,30 +1183,126 @@ footer{text-align:center;margin-top:1.5rem;font-family:monospace;font-size:.65re
 
 <!-- Modal d'edició de parts -->
 <div id="editModal" style="display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.6);z-index:200;overflow-y:auto;padding:1rem">
-  <div style="background:var(--paper);border-radius:2px;max-width:560px;margin:2rem auto;overflow:hidden">
-    <div class="panel-header ph-harvest">✏️ &nbsp; Editar part de treball</div>
+  <div style="background:var(--paper);border-radius:2px;max-width:600px;margin:2rem auto;overflow:hidden">
+    <div class="panel-header ph-harvest" id="edit-modal-title">✏️ &nbsp; Editar part de treball</div>
     <div style="padding:1.5rem">
+      <!-- Camps comuns -->
       <div class="row row-2">
         <div class="field"><label>Data</label><input type="date" id="edit-fecha"></div>
-        <div class="field"><label>Parcel·la</label><input type="text" id="edit-parcela" style="font-size:.85rem"></div>
-      </div>
-      <div class="row row-2">
         <div class="field"><label>Operari</label><input type="text" id="edit-operario" placeholder="Nom"></div>
-        <div class="field"><label>Tipus</label><input type="text" id="edit-tipo" readonly style="background:#F5F5F5;color:var(--fog)"></div>
       </div>
-      <div class="field"><label>Producte / Acció (C1)</label><input type="text" id="edit-c1"></div>
-      <div class="row row-3">
-        <div class="field"><label>C2</label><input type="text" id="edit-c2"></div>
-        <div class="field"><label>C3 (Dosi)</label><input type="text" id="edit-c3"></div>
-        <div class="field"><label>C4</label><input type="text" id="edit-c4"></div>
+      <div class="field">
+        <label>Parcel·la(es)</label>
+        <textarea id="edit-parcela" style="font-size:.78rem;min-height:50px;color:var(--fog)" readonly></textarea>
       </div>
-      <div class="row row-3">
-        <div class="field"><label>C5 (Sup)</label><input type="text" id="edit-c5"></div>
-        <div class="field"><label>C6</label><input type="text" id="edit-c6"></div>
-        <div class="field"><label>C7</label><input type="text" id="edit-c7"></div>
+
+      <!-- Fitosanitari -->
+      <div id="edit-sec-fit" style="display:none">
+        <div class="row row-2">
+          <div class="field">
+            <label>Producte fitosanitari</label>
+            <select id="edit-fit-prod"><option value="">— Seleccionar —</option></select>
+          </div>
+          <div class="field"><label>Núm. Registre</label><input type="text" id="edit-fit-reg" placeholder="ES-..."></div>
+        </div>
+        <div class="row row-3">
+          <div class="field"><label>Dosi (L/kg·ha)</label><input type="number" id="edit-fit-dosi" step="0.01" min="0"></div>
+          <div class="field"><label>Caldo (L/ha)</label><input type="number" id="edit-fit-caldo" step="1" min="0"></div>
+          <div class="field"><label>Superfície (ha)</label><input type="number" id="edit-fit-sup" step="0.01" min="0"></div>
+        </div>
+        <div class="row row-2">
+          <div class="field">
+            <label>Plaga / Malaltia objectiu</label>
+            <input type="text" id="edit-fit-obj" placeholder="ex: Míldiu / Oïdi">
+          </div>
+          <div class="field">
+            <label>Tipus tractament</label>
+            <select id="edit-fit-tipo">
+              <option>Polvorització foliar</option>
+              <option>Polvorització terra</option>
+              <option>Endoteràpia</option>
+              <option>Manual</option>
+              <option>Altre</option>
+            </select>
+          </div>
+        </div>
+        <div class="row row-2">
+          <div class="field"><label>Hora inici</label><input type="time" id="edit-fit-hi"></div>
+          <div class="field"><label>Hora fi</label><input type="time" id="edit-fit-hf"></div>
+        </div>
+        <div class="row row-3">
+          <div class="field"><label>Temp (°C)</label><input type="number" id="edit-fit-temp" step="0.5"></div>
+          <div class="field"><label>HR (%)</label><input type="number" id="edit-fit-hr" step="1" min="0" max="100"></div>
+          <div class="field">
+            <label>Vent</label>
+            <select id="edit-fit-vent"><option>Calma</option><option>Fluix</option><option>Moderat</option><option>Fort</option></select>
+          </div>
+        </div>
+        <div class="field">
+          <label>Mà d'obra addicional / cost extra</label>
+          <input type="text" id="edit-fit-extra" placeholder="ex: Tractorista extern 80€, peó 4h...">
+        </div>
       </div>
-      <div class="field"><label>Observacions</label><textarea id="edit-obs" style="min-height:60px"></textarea></div>
+
+      <!-- Labor -->
+      <div id="edit-sec-labor" style="display:none">
+        <div class="row row-2">
+          <div class="field">
+            <label>Tipus de labor</label>
+            <select id="edit-lab-tipo">
+              <option>Poda d'hivern</option><option>Poda en verd / despuntat</option>
+              <option>Desfullat</option><option>Aclarida de raïms</option>
+              <option>Llaurada / Cultivador</option><option>Desbrossada mecànica</option>
+              <option>Sega de coberta vegetal</option><option>Triturar vergues</option>
+              <option>Lligada / Agobio</option><option>Verema</option><option>Altre</option>
+            </select>
+          </div>
+          <div class="field"><label>Maquinària / Eina</label><input type="text" id="edit-lab-maq" placeholder="Tractor, podadora..."></div>
+        </div>
+        <div class="row row-2">
+          <div class="field"><label>Hora inici</label><input type="time" id="edit-lab-hi"></div>
+          <div class="field"><label>Hora fi</label><input type="time" id="edit-lab-hf"></div>
+        </div>
+      </div>
+
+      <!-- Reg -->
+      <div id="edit-sec-riego" style="display:none">
+        <div class="row row-2">
+          <div class="field">
+            <label>Tipus reg</label>
+            <select id="edit-rie-tipo"><option>Degoteig</option><option>Aspersió</option><option>Superficial</option></select>
+          </div>
+          <div class="field"><label>Origen</label>
+            <select id="edit-rie-origen"><option>Pou</option><option>Xarxa</option><option>Bassa</option><option>Riu</option></select>
+          </div>
+        </div>
+        <div class="row row-3">
+          <div class="field"><label>Hora inici</label><input type="time" id="edit-rie-hi"></div>
+          <div class="field"><label>Hora fi</label><input type="time" id="edit-rie-hf"></div>
+          <div class="field"><label>Cabal (m³/h)</label><input type="number" id="edit-rie-cabal" step="0.1" min="0"></div>
+        </div>
+      </div>
+
+      <!-- Adob -->
+      <div id="edit-sec-abonado" style="display:none">
+        <div class="row row-2">
+          <div class="field">
+            <label>Tipus adob</label>
+            <select id="edit-abo-tipo"><option>Mineral</option><option>Orgànic</option><option>Foliar</option><option>Fertirigació</option></select>
+          </div>
+          <div class="field"><label>Producte</label><input type="text" id="edit-abo-prod" placeholder="Nom del fertilitzant"></div>
+        </div>
+        <div class="row row-3">
+          <div class="field"><label>Dosi (kg/ha)</label><input type="number" id="edit-abo-dosi" step="0.1" min="0"></div>
+          <div class="field"><label>Quantitat total</label><input type="number" id="edit-abo-qty" step="1" min="0"></div>
+          <div class="field"><label>Superfície (ha)</label><input type="number" id="edit-abo-sup" step="0.01" min="0"></div>
+        </div>
+      </div>
+
+      <div class="field" style="margin-top:.8rem"><label>Observacions</label><textarea id="edit-obs" style="min-height:50px"></textarea></div>
       <input type="hidden" id="edit-id">
+      <input type="hidden" id="edit-tipo">
+
       <div style="display:flex;gap:.6rem;margin-top:1rem">
         <button class="btn btn-harvest" onclick="guardarEdicio()" style="flex:1">💾 Guardar canvis</button>
         <button class="btn btn-vine" onclick="document.getElementById('editModal').style.display='none'">Cancel·lar</button>
@@ -1674,8 +1839,23 @@ function updateMpUI() {
       pill.appendChild(removeBtn);
       box.appendChild(pill);
     });
-    if(cnt) cnt.textContent = '(' + mpSelected_list.length + ' sel.)';
-    if(info) info.textContent = mpSelected_list.length + ' parcel·la' + (mpSelected_list.length>1?'es':'') + ' seleccionada' + (mpSelected_list.length>1?'es':'');
+    // Calcula superfície total de les parcel·les seleccionades
+    const supTotal = mpSelected_list.reduce(function(s, nom) {
+      const p = PARCEL_DATA.find(function(x){ return x.nom === nom; });
+      return s + (p ? p.sup : 0);
+    }, 0);
+    const supStr = supTotal > 0 ? supTotal.toFixed(4) + ' ha' : '';
+    if(cnt) cnt.textContent = '(' + mpSelected_list.length + ' parc. · ' + supStr + ')';
+    if(info) info.textContent = mpSelected_list.length + ' parcel·la' + (mpSelected_list.length>1?'es':'') +
+      ' · ' + supStr + ' totals';
+
+    // Omple automàticament els camps de superfície de tots els formularis
+    ['fit-superficie','lab-superficie','rie-superficie','abo-superficie'].forEach(function(id) {
+      const el = document.getElementById(id);
+      if(el && supTotal > 0) el.value = supTotal.toFixed(4);
+    });
+    // Recalcula €/ha amb la nova superfície
+    recalcAllCostHa();
   }
 }
 
@@ -1759,8 +1939,8 @@ function collectData() {
     fitosanitario: ()=>({ c1:g('fit-producto'), c2:g('fit-registro'), c3:g('fit-dosis'),
       c4:g('fit-caldo'), c5:g('fit-superficie'), c6:g('fit-objetivo'), c7:g('fit-tipo'),
       c8:g('fit-hora-ini')+'–'+g('fit-hora-fin'), c9:'T:'+g('fit-temp')+'°C HR:'+g('fit-hr')+'% V:'+g('fit-viento')+' PS:'+g('fit-plazo')+'d',
-      c10: g('fit-preu') }),
-    labor:   ()=>({ c1:g('lab-tipo'), c2:g('lab-maquina'), c3:g('lab-hora-ini')+'–'+g('lab-hora-fin'), c4:g('lab-superficie'), c5:g('lab-fenologia') }),
+      c10: g('fit-preu'), costTotal: g('fit-cost-total-input'), costHa: g('fit-cost-ha-auto') }),
+    labor:   ()=>({ c1:g('lab-tipo'), c2:g('lab-maquina'), c3:g('lab-hora-ini')+'–'+g('lab-hora-fin'), c4:g('lab-superficie'), c5:g('lab-fenologia'), costTotal: g('lab-cost-total'), costHa: g('lab-cost-ha') }),
     riego:   ()=>({ c1:g('rie-tipo'), c2:g('rie-origen'), c3:g('rie-hora-ini')+'–'+g('rie-hora-fin'), c4:g('rie-caudal'), c5:g('rie-volumen'), c6:g('rie-superficie'), c7:g('rie-motivo') }),
     abonado: ()=>({ c1:g('abo-tipo'), c2:g('abo-producto'), c3:g('abo-dosis'), c4:g('abo-cantidad'), c5:g('abo-superficie'), c6:g('abo-forma'), c7:'N:'+g('abo-n')+' P:'+g('abo-p')+' K:'+g('abo-k') }),
   };
@@ -2463,6 +2643,38 @@ function calcCostTractament() {
   const costHa = dosi * preu;
   const field = document.getElementById('fit-cost-ha-input');
   if(field) field.value = costHa > 0 ? costHa.toFixed(2) : '';
+}
+
+function calcCostHaFromTotal() {
+  const total = parseFloat(document.getElementById('fit-cost-total-input')?.value)||0;
+  const sup   = parseFloat(document.getElementById('fit-superficie')?.value)||0;
+  const haEl  = document.getElementById('fit-cost-ha-auto');
+  const supEl = document.getElementById('fit-sup-display');
+  if(supEl) supEl.textContent = sup > 0 ? sup.toFixed(4)+' ha' : '— ha';
+  if(haEl) {
+    if(total > 0 && sup > 0) {
+      haEl.value = (total / sup).toFixed(2);
+    } else {
+      haEl.value = '';
+    }
+  }
+}
+
+function calcCostHaGeneric(prefix) {
+  const total = parseFloat(document.getElementById(prefix+'-cost-total')?.value)||0;
+  const sup   = parseFloat(document.getElementById(prefix+'-superficie')?.value)||0;
+  const haEl  = document.getElementById(prefix+'-cost-ha');
+  if(haEl) haEl.value = (total > 0 && sup > 0) ? (total/sup).toFixed(2) : '';
+}
+
+// Recalcula cost €/ha quan canvia la superfície automàticament
+function recalcAllCostHa() {
+  calcCostHaFromTotal();
+  ['lab','rie','abo'].forEach(function(p) { calcCostHaGeneric(p); });
+  // Actualitza display superfície fitosanitari
+  const sup = parseFloat(document.getElementById('fit-superficie')?.value)||0;
+  const supEl = document.getElementById('fit-sup-display');
+  if(supEl) supEl.textContent = sup > 0 ? sup.toFixed(4)+' ha' : '— ha';
 }
 
 // Definició de cada acció: com es calcula el cost/ha
@@ -3826,38 +4038,146 @@ function renderEPI() {
 //  EDICIÓ DE PARTS
 // ══════════════════════════════════════════════════
 function editarPartModal(id) {
-  const p = getParts().find(p => String(p.id) === String(id));
+  const p = getParts().find(function(x){ return String(x.id) === String(id); });
   if(!p) return;
-  document.getElementById('edit-id').value      = id;
-  document.getElementById('edit-fecha').value   = p.fecha||'';
-  document.getElementById('edit-parcela').value = p.parcela||'';
-  document.getElementById('edit-operario').value= p.operario||'';
-  document.getElementById('edit-tipo').value    = p.tipo||'';
-  document.getElementById('edit-c1').value      = p.c1||'';
-  document.getElementById('edit-c2').value      = p.c2||'';
-  document.getElementById('edit-c3').value      = p.c3||'';
-  document.getElementById('edit-c4').value      = p.c4||'';
-  document.getElementById('edit-c5').value      = p.c5||'';
-  document.getElementById('edit-c6').value      = p.c6||'';
-  document.getElementById('edit-c7').value      = p.c7||'';
-  document.getElementById('edit-obs').value     = p.obs||'';
+
+  // Camps comuns
+  document.getElementById('edit-id').value       = id;
+  document.getElementById('edit-tipo').value     = p.tipo||'';
+  document.getElementById('edit-fecha').value    = p.fecha||'';
+  document.getElementById('edit-parcela').value  = p.parcela||'';
+  document.getElementById('edit-operario').value = p.operario||'';
+  document.getElementById('edit-obs').value      = p.obs||'';
+
+  // Títol del modal
+  const titles = { fitosanitario:'🌿 Editar tractament fitosanitari',
+    labor:'🚜 Editar labor del sòl', riego:'💧 Editar reg', abonado:'🌱 Editar adob' };
+  const titleEl = document.getElementById('edit-modal-title');
+  if(titleEl) titleEl.textContent = titles[p.tipo] || '✏️ Editar part';
+
+  // Amaga totes les seccions
+  ['fit','labor','riego','abonado'].forEach(function(t) {
+    const el = document.getElementById('edit-sec-' + (t==='fit'?'fit':t));
+    if(el) el.style.display = 'none';
+  });
+
+  if(p.tipo === 'fitosanitario') {
+    document.getElementById('edit-sec-fit').style.display = 'block';
+    // Omple selector de productes
+    const sel = document.getElementById('edit-fit-prod');
+    sel.innerHTML = '<option value="">— Seleccionar —</option>';
+    getProductes().forEach(function(pr) {
+      const o = document.createElement('option');
+      o.value = pr.nom; o.textContent = pr.nom;
+      if(pr.nom === p.c1) o.selected = true;
+      sel.appendChild(o);
+    });
+    // Si el producte no és al catàleg, afegir-lo com opció
+    if(p.c1 && !getProductes().find(function(pr){ return pr.nom===p.c1; })) {
+      const o = document.createElement('option');
+      o.value = p.c1; o.textContent = p.c1; o.selected = true;
+      sel.appendChild(o);
+    }
+    document.getElementById('edit-fit-reg').value  = p.c2||'';
+    document.getElementById('edit-fit-dosi').value = p.c3||'';
+    document.getElementById('edit-fit-caldo').value= p.c4||'';
+    document.getElementById('edit-fit-sup').value  = p.c5||'';
+    document.getElementById('edit-fit-obj').value  = p.c6||'';
+    // Tipus tractament
+    const tipoSel = document.getElementById('edit-fit-tipo');
+    if(p.c7) { for(let i=0;i<tipoSel.options.length;i++) { if(tipoSel.options[i].text===p.c7) { tipoSel.selectedIndex=i; break; }}}
+    // Hores (format HH-HH de c8)
+    if(p.c8 && p.c8.includes('–')) {
+      const parts2 = p.c8.split('–');
+      document.getElementById('edit-fit-hi').value = parts2[0]||'';
+      document.getElementById('edit-fit-hf').value = parts2[1]||'';
+    }
+    // T, HR, Vent de c9 (format "T:X°C HR:Y% V:Z")
+    if(p.c9) {
+      const tM = p.c9.match(/T:([\d.]+)/);
+      const hM = p.c9.match(/HR:([\d.]+)/);
+      if(tM) document.getElementById('edit-fit-temp').value = tM[1];
+      if(hM) document.getElementById('edit-fit-hr').value   = hM[1];
+    }
+    document.getElementById('edit-fit-extra').value = p.extra||'';
+
+  } else if(p.tipo === 'labor') {
+    document.getElementById('edit-sec-labor').style.display = 'block';
+    const lSel = document.getElementById('edit-lab-tipo');
+    for(let i=0;i<lSel.options.length;i++) { if(lSel.options[i].text===p.c1) { lSel.selectedIndex=i; break; }}
+    document.getElementById('edit-lab-maq').value = p.c2||'';
+    if(p.c3 && p.c3.includes('–')) {
+      const pts = p.c3.split('–');
+      document.getElementById('edit-lab-hi').value = pts[0]||'';
+      document.getElementById('edit-lab-hf').value = pts[1]||'';
+    }
+  } else if(p.tipo === 'riego') {
+    document.getElementById('edit-sec-riego').style.display = 'block';
+    document.getElementById('edit-rie-cabal').value = p.c4||'';
+    if(p.c3 && p.c3.includes('–')) {
+      const pts = p.c3.split('–');
+      document.getElementById('edit-rie-hi').value = pts[0]||'';
+      document.getElementById('edit-rie-hf').value = pts[1]||'';
+    }
+  } else if(p.tipo === 'abonado') {
+    document.getElementById('edit-sec-abonado').style.display = 'block';
+    document.getElementById('edit-abo-prod').value = p.c2||'';
+    document.getElementById('edit-abo-dosi').value = p.c3||'';
+    document.getElementById('edit-abo-qty').value  = p.c4||'';
+    document.getElementById('edit-abo-sup').value  = p.c5||'';
+  }
+
   document.getElementById('editModal').style.display = 'block';
+  document.getElementById('editModal').scrollTop = 0;
 }
 
 function guardarEdicio() {
-  const id = document.getElementById('edit-id').value;
-  const g  = k => document.getElementById('edit-'+k)?.value||'';
+  const id   = document.getElementById('edit-id').value;
+  const tipo = document.getElementById('edit-tipo').value;
+  const g    = function(k){ return (document.getElementById('edit-'+k)?.value||'').trim(); };
   const parts = getParts();
-  const idx = parts.findIndex(p => String(p.id) === String(id));
+  const idx   = parts.findIndex(function(p){ return String(p.id) === String(id); });
   if(idx === -1) { showToast('⚠ Part no trobat', true); return; }
 
+  let c1='',c2='',c3='',c4='',c5='',c6='',c7='',c8='',c9='',extra='';
+
+  if(tipo === 'fitosanitario') {
+    c1 = g('fit-prod');
+    c2 = g('fit-reg');
+    c3 = g('fit-dosi');
+    c4 = g('fit-caldo');
+    c5 = g('fit-sup');
+    c6 = g('fit-obj');
+    c7 = document.getElementById('edit-fit-tipo')?.value||'';
+    const hi = g('fit-hi'); const hf = g('fit-hf');
+    c8 = hi && hf ? hi+'–'+hf : (hi||hf||'');
+    const t = g('fit-temp'); const hr = g('fit-hr');
+    const v = document.getElementById('edit-fit-vent')?.value||'Calma';
+    c9 = 'T:'+t+'°C HR:'+hr+'% V:'+v;
+    extra = g('fit-extra');
+  } else if(tipo === 'labor') {
+    c1 = document.getElementById('edit-lab-tipo')?.value||'';
+    c2 = g('lab-maq');
+    const hi = g('lab-hi'); const hf = g('lab-hf');
+    c3 = hi && hf ? hi+'–'+hf : (hi||hf||'');
+  } else if(tipo === 'riego') {
+    c1 = document.getElementById('edit-rie-tipo')?.value||'';
+    c2 = document.getElementById('edit-rie-origen')?.value||'';
+    const hi = g('rie-hi'); const hf = g('rie-hf');
+    c3 = hi && hf ? hi+'–'+hf : (hi||hf||'');
+    c4 = g('rie-cabal');
+  } else if(tipo === 'abonado') {
+    c1 = document.getElementById('edit-abo-tipo')?.value||'';
+    c2 = g('abo-prod');
+    c3 = g('abo-dosi');
+    c4 = g('abo-qty');
+    c5 = g('abo-sup');
+  }
+
   const updated = { ...parts[idx],
-    fecha:    g('fecha'),
-    parcela:  g('parcela'),
-    operario: g('operario'),
-    c1: g('c1'), c2: g('c2'), c3: g('c3'),
-    c4: g('c4'), c5: g('c5'), c6: g('c6'), c7: g('c7'),
-    obs: g('obs')
+    fecha: g('fecha'), parcela: parts[idx].parcela,
+    operario: g('operario'), obs: g('obs'),
+    c1, c2, c3, c4, c5, c6, c7, c8, c9, extra
   };
 
   parts[idx] = updated;
