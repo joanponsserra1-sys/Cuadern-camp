@@ -1463,7 +1463,7 @@ const PARCEL_DATA = [{"nom": "Cabernet Café", "sup": 0.5147, "municipi": "Santa
 // ══════════════════════════════════════════════════
 //  GOOGLE SHEETS SYNC
 // ══════════════════════════════════════════════════
-const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbycDm3WPYcdQY9ec1Gr-2D9BVE9TGDazuJ5JuY6L8gSFtMxZCG9IQr8KHCH048pzmI1/exec';
+const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzV2TbCenK9iTwImiwBYFwhrUZt6dQrYAYcA4FDb9nnrKDm6gDRdwDCjUiaWRwnDEOO/exec';
 
 function enviarASheets(data) {
   // Sempre inclou l'id original per poder sincronitzar
@@ -5075,7 +5075,7 @@ async function getSigpacCoord(nom) {
 
   // Fallback: Apps Script proxy
   try {
-    const SCRIPT = 'https://script.google.com/macros/s/AKfycbycDm3WPYcdQY9ec1Gr-2D9BVE9TGDazuJ5JuY6L8gSFtMxZCG9IQr8KHCH048pzmI1/exec';
+    const SCRIPT = 'https://script.google.com/macros/s/AKfycbzV2TbCenK9iTwImiwBYFwhrUZt6dQrYAYcA4FDb9nnrKDm6gDRdwDCjUiaWRwnDEOO/exec';
     const resp = await fetch(SCRIPT + '?tipus=sigpac&codi=' + encodeURIComponent(code));
     if(resp.ok) {
       const data = await resp.json();
