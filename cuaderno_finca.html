@@ -2779,33 +2779,52 @@ const ACCIONS_COST = [
                detail: `Gasoil: ${gasoilHa.toFixed(2)}€ · M.O.: ${maObraHa.toFixed(2)}€` };
     }
   },
+  // Poda: inclosa als Costos Fixos/ha (no es calcula per separat)
   { id:'poda', label:'Poda', icon:'✂️',
-    calcul: v => {
-      const costHora = v.salari / 160;
-      const base = 228.37 * (costHora / 12.5);
-      return { total: base, detail: "Ma d'obra poda (proporcional al salari)" };
-    }
+    calcul: v => ({ total: 0, detail: 'Inclosa als costos fixos/ha' })
   },
   { id:'fitosanitario', label:'Tractament', icon:'🌡️',
     calcul: (v, part) => {
       const costHora = v.salari / 160;
       const gasoilHa = 5.0 * v.gasoil;
       const maObraHa = 0.5 * costHora;
-      // Si el part té preu (c10) i dosi (c3), usar-los; sinó usar catàleg
+
       let producteHa = 0;
-      if(part && part.c10 && part.c3) {
-        producteHa = parseFloat(part.c10) * parseFloat(part.c3);
-      } else if(part && part.c1) {
-        const prod = getProductes().find(p => p.nom.toLowerCase().includes((part.c1||'').toLowerCase().split(' ')[0]));
-        if(prod) producteHa = prod.preu * prod.dosi;
-        else {
-          // Fallback: sofre per defecte
-          const sofre = getProductes().find(p => p.nom.toLowerCase().includes('sofre'));
-          if(sofre) producteHa = sofre.preu * sofre.dosi;
+      let prodDetail = '';
+
+      if(part) {
+        const costTotal = parseFloat(part.c10) || 0;  // cost total del producte (€)
+        const sup       = parseFloat(part.c5)  || 0;  // superfície tractada (ha)
+        const dosi      = parseFloat((part.c3||'').toString().replace(',','.').match(/[\d.]+/)?.[0]) || 0;
+
+        if(costTotal > 0) {
+          // c10 = cost producte €/ha directe
+          producteHa = costTotal;
+          prodDetail = 'Cost producte: ' + costTotal.toFixed(2) + '€/ha';
+        } else if(part.c1) {
+          // Opció B: buscar al catàleg pel nom del producte
+          const nomBusca = (part.c1||'').toLowerCase().trim();
+          const prod = getProductes().find(function(p) {
+            return p.nom.toLowerCase() === nomBusca ||
+                   p.nom.toLowerCase().includes(nomBusca.split(' ')[0]);
+          });
+          if(prod) {
+            if(dosi > 0) {
+              producteHa = prod.preu * dosi;
+              prodDetail = prod.nom + ': ' + prod.preu.toFixed(2) + '€/kg × ' + dosi.toFixed(3) + 'kg/ha';
+            } else {
+              producteHa = prod.preu * prod.dosi;
+              prodDetail = prod.nom + ' (dosi catàleg)';
+            }
+          }
         }
       }
-      return { total: gasoilHa + maObraHa + producteHa,
-               detail: `Gasoil: ${gasoilHa.toFixed(2)}€ · M.O.: ${maObraHa.toFixed(2)}€ · Producte: ${producteHa.toFixed(2)}€` };
+
+      return {
+        total: gasoilHa + maObraHa + producteHa,
+        detail: 'Gasoil: ' + gasoilHa.toFixed(2) + '€ · M.O.: ' + maObraHa.toFixed(2) + '€' +
+                (producteHa > 0 ? ' · ' + (prodDetail || 'Producte: ' + producteHa.toFixed(2) + '€') : ' · Producte: —')
+      };
     }
   },
   { id:'abonar',     label:'Abonar',     icon:'🌱',
@@ -3051,7 +3070,6 @@ function renderCostParceles() {
   // ── Define column groups ───────────────────────────────────────────────
   const FIXED_COLS = [
     { id:'llaurar',       label:'Llaurar',      ids:['llaurar','triturar','triturar_vergues'] },
-    { id:'poda',          label:'Poda',          ids:['poda'] },
     { id:'fitosanitario', label:'Tractaments',   ids:['fitosanitario'] },
     { id:'abonar',        label:'Abonar',        ids:['abonar'] },
     { id:'riego',         label:'Reg',           ids:['riego'] },
@@ -5025,31 +5043,51 @@ async function getSigpacCoord(nom) {
   if(sigpacCoordsCache[nom]) return sigpacCoordsCache[nom];
   const code = PARCEL_SIGPAC[nom];
   if(!code) return null;
-  try {
-    const url = 'https://sigpac.mapama.gob.es/fega/ServiciosViewer/query/recintos/' + code + '.geojson';
-    const resp = await fetch(url);
-    if(!resp.ok) return null;
-    const data = await resp.json();
-    if(data.features && data.features[0]) {
-      const geom = data.features[0].geometry;
-      // Calculate centroid from polygon
-      let lat = 0, lon = 0, n = 0;
-      function processCoords(coords) {
-        if(Array.isArray(coords[0])) {
-          coords.forEach(function(c) { processCoords(c); });
-        } else {
-          lon += coords[0]; lat += coords[1]; n++;
+
+  // Intentem l'API del SIGPAC directament (funciona des del navegador)
+  const urls = [
+    'https://sigpac.mapama.gob.es/fega/ServiciosViewer/query/recintos/' + code + '.geojson',
+    'https://sigpac.mapa.gob.es/fega/ServiciosViewer/query/recintos/' + code + '.geojson',
+  ];
+
+  for(const url of urls) {
+    try {
+      const resp = await fetch(url, { mode: 'cors' });
+      if(!resp.ok) continue;
+      const data = await resp.json();
+      if(data.features && data.features[0]) {
+        const geom = data.features[0].geometry;
+        let latSum = 0, lonSum = 0, n = 0;
+        function addCoords(c) {
+          if(Array.isArray(c[0])) { c.forEach(addCoords); }
+          else { lonSum += c[0]; latSum += c[1]; n++; }
+        }
+        addCoords(geom.coordinates);
+        if(n > 0) {
+          const coord = [latSum/n, lonSum/n];
+          sigpacCoordsCache[nom] = coord;
+          localStorage.setItem('sigpac_coords_cache', JSON.stringify(sigpacCoordsCache));
+          return coord;
         }
       }
-      processCoords(geom.coordinates);
-      if(n > 0) {
-        const coord = [lat/n, lon/n];
+    } catch(e) {}
+  }
+
+  // Fallback: Apps Script proxy
+  try {
+    const SCRIPT = 'https://script.google.com/macros/s/AKfycbycDm3WPYcdQY9ec1Gr-2D9BVE9TGDazuJ5JuY6L8gSFtMxZCG9IQr8KHCH048pzmI1/exec';
+    const resp = await fetch(SCRIPT + '?tipus=sigpac&codi=' + encodeURIComponent(code));
+    if(resp.ok) {
+      const data = await resp.json();
+      if(data.lat && data.lon) {
+        const coord = [data.lat, data.lon];
         sigpacCoordsCache[nom] = coord;
         localStorage.setItem('sigpac_coords_cache', JSON.stringify(sigpacCoordsCache));
         return coord;
       }
     }
   } catch(e) {}
+
   return null;
 }
 
@@ -5089,9 +5127,11 @@ async function renderMapa() {
   // Inicialitza mapa si no existeix
   if(!mapaInstance) {
     mapaInstance = L.map('mapa-container').setView([41.375, 1.755], 12);
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-      attribution: '© OpenStreetMap contributors',
-      maxZoom: 18
+    // Ortofoto PNOA (IGN España) — imatge aèria real
+    L.tileLayer('https://tms-pnoa-ma.idee.es/1.0.0/pnoa-ma/{z}/{x}/{y}.jpeg', {
+      attribution: '© PNOA IGN España',
+      maxZoom: 20,
+      tms: false
     }).addTo(mapaInstance);
   }
 
