@@ -536,6 +536,10 @@ footer{text-align:center;margin-top:1.5rem;font-family:monospace;font-size:.65re
   <button class="main-nav-btn" onclick="showPage('meteo')" id="nav-meteo"><span class="nav-icon">🌡️</span>Risc Meteo</button>
   <button class="main-nav-btn" onclick="showPage('estoc')" id="nav-estoc"><span class="nav-icon">📦</span>Estoc</button>
   <button class="main-nav-btn" onclick="showPage('mapa')" id="nav-mapa"><span class="nav-icon">🗺️</span>Mapa</button>
+  <button class="main-nav-btn" onclick="showPage('collita')" id="nav-collita"><span class="nav-icon">🍇</span>Collita</button>
+  <button class="main-nav-btn" onclick="showPage('fitxa')" id="nav-fitxa"><span class="nav-icon">📌</span>Fitxa</button>
+  <button class="main-nav-btn" onclick="showPage('ccpae')" id="nav-ccpae"><span class="nav-icon">📄</span>CCPAE</button>
+  <button class="main-nav-btn" onclick="showPage('comparativa')" id="nav-comparativa"><span class="nav-icon">📊</span>Comparativa</button>
 </div>
 <div style="background:var(--vine);padding:.35rem 1rem;display:flex;align-items:center;gap:.6rem;font-family:monospace;font-size:.7rem;color:rgba(245,239,224,.7);border-top:1px solid rgba(255,255,255,.1)">
   <span style="opacity:.7">📅 Campanya:</span>
@@ -661,6 +665,12 @@ footer{text-align:center;margin-top:1.5rem;font-family:monospace;font-size:.65re
           <div class="field"><label>Hora inici</label><input type="time" id="fit-hora-ini"></div>
           <div class="field"><label>Hora fi</label><input type="time" id="fit-hora-fin"></div>
           <div class="field"><label>Termini seguretat (dies)</label><input type="number" id="fit-plazo" placeholder="7" min="0"></div>
+        </div>
+        <div class="row row-2">
+          <div class="field"><label>Núm. registre producte <span style="color:var(--fog);font-size:.65rem">(CCPAE)</span></label><input type="text" id="fit-num-registre" placeholder="ES-…"></div>
+          <div class="field"><label>Eficàcia observada <span style="color:var(--fog);font-size:.65rem">(0=nul·la · 3=bona)</span></label>
+            <select id="fit-eficacia"><option value="">— No valorada —</option><option value="0">0 — Nul·la</option><option value="1">1 — Dolenta</option><option value="2">2 — Regular</option><option value="3">3 — Bona</option></select>
+          </div>
         </div>
         <div class="section-label" style="margin-top:.5rem">Condicions meteorològiques</div>
         <div class="row row-3">
@@ -1163,13 +1173,7 @@ footer{text-align:center;margin-top:1.5rem;font-family:monospace;font-size:.65re
         <span style="background:#9E9E9E;color:white;border-radius:50%;width:14px;height:14px;display:inline-block"></span> Sense dades
       </div>
     </div>
-    <div id="mapa-sigpac-status" style="font-family:monospace;font-size:.7rem;color:var(--fog);padding:.3rem 1rem;background:var(--parchment);border-top:1px solid #D8CEBA;display:flex;align-items:center;gap:.8rem;flex-wrap:wrap">
-      <span id="mapa-sigpac-txt">Coordenades aproximades per polígon SIGPAC</span>
-      <button onclick="carregarSIGPAC()" class="btn btn-vine" style="padding:.2rem .7rem;font-size:.68rem">
-        📡 Carregar posicions exactes SIGPAC
-      </button>
-    </div>
-    <div id="mapa-container" style="height:500px;border-radius:0 0 2px 2px;overflow:hidden"></div>
+    <div id="mapa-container" style="height:520px;border-radius:0 0 2px 2px;overflow:hidden"></div>
   </div>
 
   <div class="card">
@@ -1410,8 +1414,10 @@ footer{text-align:center;margin-top:1.5rem;font-family:monospace;font-size:.65re
       <div id="addCompraProdForm" style="display:none;background:var(--parchment);padding:.8rem;border-radius:2px;border:1px solid #D8CEBA;margin-bottom:.8rem">
         <div style="display:flex;gap:.6rem;flex-wrap:wrap;align-items:flex-end">
           <div class="field" style="margin-bottom:0;width:130px"><label>Data compra</label><input type="date" id="ep-data"></div>
-          <div class="field" style="margin-bottom:0;width:100px"><label>Quantitat</label><input type="number" id="ep-qty" placeholder="0" step="0.1" min="0"></div>
-          <div class="field" style="margin-bottom:0;width:100px"><label>Preu €/unitat</label><input type="number" id="ep-preu" placeholder="0.00" step="0.01" min="0"></div>
+          <div class="field" style="margin-bottom:0;width:90px"><label>Quantitat</label><input type="number" id="ep-qty" placeholder="0" step="0.1" min="0"></div>
+          <div class="field" style="margin-bottom:0;width:90px"><label>Preu €/unitat</label><input type="number" id="ep-preu" placeholder="0.00" step="0.01" min="0"></div>
+          <div class="field" style="margin-bottom:0;width:130px"><label>Proveïdor</label><input type="text" id="ep-proveidor" placeholder="Cevipe..."></div>
+          <div class="field" style="margin-bottom:0;width:120px"><label>Núm. albarà</label><input type="text" id="ep-albara" placeholder="VFR..."></div>
           <button class="btn btn-grape" onclick="addCompraProd()" style="margin-bottom:1rem">+ Afegir compra</button>
         </div>
       </div>
@@ -1422,6 +1428,179 @@ footer{text-align:center;margin-top:1.5rem;font-family:monospace;font-size:.65re
     </div>
   </div>
 
+</div>
+
+
+<!-- ══════════════════════════════════════════════ COLLITA ══ -->
+<div class="page" id="page-collita">
+  <div class="card" style="margin-bottom:1.2rem">
+    <div class="panel-header ph-grape">🍇 &nbsp; Registre de Collita per Parcel·la</div>
+    <div class="card-inner">
+      <div class="section-label">Afegir registre de verema</div>
+      <div style="display:flex;gap:.6rem;flex-wrap:wrap;align-items:flex-end;background:var(--parchment);padding:.8rem;border-radius:2px;border:1px solid #D8CEBA;margin-bottom:1rem">
+        <div class="field" style="margin-bottom:0;width:140px"><label>Data verema</label><input type="date" id="col-data"></div>
+        <div class="field" style="margin-bottom:0;flex:2;min-width:160px">
+          <label>Parcel·la</label>
+          <select id="col-parcela" onchange="colParcelaChange()">
+            <option value="">— Seleccionar —</option>
+          </select>
+        </div>
+        <div class="field" style="margin-bottom:0;width:110px"><label>kg recollits</label><input type="number" id="col-kg" placeholder="0" step="1" min="0" oninput="colCalcRendiment()"></div>
+        <div class="field" style="margin-bottom:0;width:90px"><label>Sup (ha)</label><input type="number" id="col-sup" placeholder="0.00" step="0.0001" readonly style="background:#F0F7F0;color:var(--ok);font-weight:600"></div>
+        <div class="field" style="margin-bottom:0;width:100px"><label>Rend. kg/ha</label><input type="number" id="col-rendiment" placeholder="0" readonly style="background:#F0F7F0;color:var(--ok);font-weight:600"></div>
+      </div>
+      <div style="display:flex;gap:.6rem;flex-wrap:wrap;align-items:flex-end;background:var(--parchment);padding:.8rem;border-radius:2px;border:1px solid #D8CEBA;margin-bottom:1rem">
+        <div class="field" style="margin-bottom:0;width:100px"><label>Grau Brix (°Bx)</label><input type="number" id="col-brix" placeholder="22.0" step="0.1" min="0" max="30"></div>
+        <div class="field" style="margin-bottom:0;width:100px"><label>Acidesa (g/l)</label><input type="number" id="col-acidesa" placeholder="5.5" step="0.1" min="0"></div>
+        <div class="field" style="margin-bottom:0;width:100px"><label>pH most</label><input type="number" id="col-ph" placeholder="3.3" step="0.01" min="0"></div>
+        <div class="field" style="margin-bottom:0;flex:1;min-width:120px"><label>Destí</label>
+          <select id="col-desti"><option>Cava Miquel Pons</option><option>Venda raïm</option><option>Autoconsum</option><option>Altre</option></select>
+        </div>
+        <div class="field" style="margin-bottom:0;flex:2;min-width:140px"><label>Observacions</label><input type="text" id="col-obs" placeholder="Notes de qualitat..."></div>
+        <button class="btn btn-grape" onclick="afegirCollita()" style="margin-bottom:1rem">+ Guardar verema</button>
+      </div>
+      <div id="collita-resum" style="margin-bottom:1rem"></div>
+    </div>
+  </div>
+  <div class="card">
+    <div class="panel-header ph-soil">📊 &nbsp; Historial de collites per campanya</div>
+    <div class="card-inner">
+      <div style="display:flex;gap:.6rem;flex-wrap:wrap;align-items:center;margin-bottom:.8rem">
+        <label style="font-size:.8rem">Campanya:</label>
+        <select id="col-filt-camp" onchange="renderCollita()" style="width:140px"></select>
+        <label style="font-size:.8rem">Varietat:</label>
+        <select id="col-filt-var" onchange="renderCollita()" style="width:140px"><option value="">Totes</option></select>
+      </div>
+      <div id="collita-taula"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════ FITXA ══ -->
+<div class="page" id="page-fitxa">
+  <div class="card" style="margin-bottom:1rem">
+    <div class="panel-header" style="background:#2A5472">📌 &nbsp; Fitxa de Parcel·la</div>
+    <div class="card-inner">
+      <div class="field" style="margin-bottom:.8rem">
+        <label>Seleccionar parcel·la</label>
+        <select id="fitxa-sel" onchange="renderFitxa()" style="font-size:1rem;font-weight:600">
+          <option value="">— Seleccionar —</option>
+        </select>
+      </div>
+    </div>
+  </div>
+  <div id="fitxa-contingut"></div>
+</div>
+
+<!-- ════════════════════════════════════════════════ CCPAE ══ -->
+<div class="page" id="page-ccpae">
+  <div class="card" style="margin-bottom:1rem">
+    <div class="panel-header" style="background:#1A4A2A">📄 &nbsp; Quadern CCPAE — Exportació Automàtica</div>
+    <div class="card-inner">
+      <p style="font-size:.84rem;color:var(--fog);margin-bottom:1rem;line-height:1.6">
+        Genera els fulls del Quadern d'Explotació Vegetal CCPAE a partir dels parts registrats a l'app.<br>
+        <strong>Fulls generats:</strong> Full 3 (Treballs de camp) · Full 4 (Adobats) · Full 6 (Tractaments fitosanitaris) · Full 10 (Compres de matèries primeres)
+      </p>
+      <div style="display:flex;gap:.6rem;flex-wrap:wrap;align-items:center;margin-bottom:.8rem">
+        <label style="font-size:.8rem">Campanya:</label>
+        <select id="ccpae-camp" style="width:140px" onchange="renderCCPAE()"></select>
+        <button class="btn btn-ok" onclick="exportarCCPAE()" style="padding:.5rem 1.2rem">⬇ Descarregar Excel CCPAE</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Full 3 -->
+  <div class="card" style="margin-bottom:1rem">
+    <div class="panel-header ph-soil">3 · Treballs de camp</div>
+    <div style="overflow-x:auto;padding:.5rem">
+      <table id="ccpae-t3" style="width:100%;font-size:.75rem;border-collapse:collapse">
+        <thead><tr style="background:var(--parchment)">
+          <th style="padding:.4rem .6rem;border:1px solid #ccc;text-align:left">Data</th>
+          <th style="padding:.4rem .6rem;border:1px solid #ccc;text-align:left">Núm. finca</th>
+          <th style="padding:.4rem .6rem;border:1px solid #ccc;text-align:left">Sup. (ha)</th>
+          <th style="padding:.4rem .6rem;border:1px solid #ccc;text-align:left">Cultiu</th>
+          <th style="padding:.4rem .6rem;border:1px solid #ccc;text-align:left">Treball</th>
+        </tr></thead>
+        <tbody id="ccpae-t3-body"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Full 4 -->
+  <div class="card" style="margin-bottom:1rem">
+    <div class="panel-header ph-leaf">4 · Adobats</div>
+    <div style="overflow-x:auto;padding:.5rem">
+      <table id="ccpae-t4" style="width:100%;font-size:.75rem;border-collapse:collapse">
+        <thead><tr style="background:var(--parchment)">
+          <th style="padding:.4rem .6rem;border:1px solid #ccc">Núm. finca</th>
+          <th style="padding:.4rem .6rem;border:1px solid #ccc">Sup. (ha)</th>
+          <th style="padding:.4rem .6rem;border:1px solid #ccc">Data</th>
+          <th style="padding:.4rem .6rem;border:1px solid #ccc">Producte</th>
+          <th style="padding:.4rem .6rem;border:1px solid #ccc">Quantitat (kg)</th>
+          <th style="padding:.4rem .6rem;border:1px solid #ccc">N aplicat (kg)</th>
+          <th style="padding:.4rem .6rem;border:1px solid #ccc">Dosi N/ha</th>
+          <th style="padding:.4rem .6rem;border:1px solid #ccc">Aplicador</th>
+        </tr></thead>
+        <tbody id="ccpae-t4-body"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Full 6 -->
+  <div class="card" style="margin-bottom:1rem">
+    <div class="panel-header ph-grape">6 · Tractaments fitosanitaris</div>
+    <div style="overflow-x:auto;padding:.5rem">
+      <table style="width:100%;font-size:.72rem;border-collapse:collapse">
+        <thead><tr style="background:var(--parchment)">
+          <th style="padding:.4rem .5rem;border:1px solid #ccc">Data</th>
+          <th style="padding:.4rem .5rem;border:1px solid #ccc">Núm. finca</th>
+          <th style="padding:.4rem .5rem;border:1px solid #ccc">Cultiu</th>
+          <th style="padding:.4rem .5rem;border:1px solid #ccc">Plaga</th>
+          <th style="padding:.4rem .5rem;border:1px solid #ccc">Sup. (ha)</th>
+          <th style="padding:.4rem .5rem;border:1px solid #ccc">Aplicador</th>
+          <th style="padding:.4rem .5rem;border:1px solid #ccc">Màquina</th>
+          <th style="padding:.4rem .5rem;border:1px solid #ccc">Producte</th>
+          <th style="padding:.4rem .5rem;border:1px solid #ccc">Núm. reg.</th>
+          <th style="padding:.4rem .5rem;border:1px solid #ccc">Dosi</th>
+          <th style="padding:.4rem .5rem;border:1px solid #ccc">Quantitat total</th>
+          <th style="padding:.4rem .5rem;border:1px solid #ccc">Eficàcia</th>
+        </tr></thead>
+        <tbody id="ccpae-t6-body"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Full 10 -->
+  <div class="card">
+    <div class="panel-header ph-harvest">10 · Compres de matèries primeres</div>
+    <div style="overflow-x:auto;padding:.5rem">
+      <table style="width:100%;font-size:.75rem;border-collapse:collapse">
+        <thead><tr style="background:var(--parchment)">
+          <th style="padding:.4rem .6rem;border:1px solid #ccc">Data</th>
+          <th style="padding:.4rem .6rem;border:1px solid #ccc">Producte</th>
+          <th style="padding:.4rem .6rem;border:1px solid #ccc">Qualificació</th>
+          <th style="padding:.4rem .6rem;border:1px solid #ccc">Quantitat</th>
+          <th style="padding:.4rem .6rem;border:1px solid #ccc">Proveïdor</th>
+          <th style="padding:.4rem .6rem;border:1px solid #ccc">Albarà</th>
+        </tr></thead>
+        <tbody id="ccpae-t10-body"></tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════ COMPARATIVA ══ -->
+<div class="page" id="page-comparativa">
+  <div class="card" style="margin-bottom:1rem">
+    <div class="panel-header" style="background:#3A2A5A">📊 &nbsp; Comparativa entre Campanyes</div>
+    <div class="card-inner">
+      <div style="display:flex;gap:.6rem;flex-wrap:wrap;align-items:center;margin-bottom:1rem">
+        <label style="font-size:.8rem">Campanyes a comparar:</label>
+        <div id="comp-camps-sel" style="display:flex;gap:.4rem;flex-wrap:wrap"></div>
+      </div>
+      <div id="comp-contingut"></div>
+    </div>
+  </div>
 </div>
 
 <!-- Modal compartir -->
@@ -1711,6 +1890,18 @@ let currentType = 'fitosanitario';
 // ══════════════════════════════════════════════════
 //  INIT
 // ══════════════════════════════════════════════════
+// ═══════════════════════════════════════════════════════════════
+// COLLITA 2024-25 — Importada dels extractes cooperativa
+// ═══════════════════════════════════════════════════════════════
+(function() {
+  const KEY = '2024-25_collites';
+  if(!localStorage.getItem(KEY)) {
+    const data = [{"id": 1000001, "data": "2025-08-13", "parcela": "Chardonnay les cabanyes", "pv": "AJ171", "varietat": "Chardonnay", "kg": 5580, "kg_teu": 5580.0, "pct_lliurador": 100, "parcer": "", "graus": 11.7, "kgraus": 65286, "gluco": 0.05, "pct_bon": 4.5, "do": "CAVA", "eco": "ECO", "superior": true, "desti": "cooperativa", "ingres": 3752.31, "sup": 0, "brix": 11.7, "obs": "DO:CAVA | ECO GS | Glucònic:0.05 | Bon:4.5%"}, {"id": 1000002, "data": "2025-08-18", "parcela": "Macabeu Pont Escudé", "pv": "IN905", "varietat": "Macabeu", "kg": 2360, "kg_teu": 2360.0, "pct_lliurador": 100, "parcer": "", "graus": 10.0, "kgraus": 23600, "gluco": 0.02, "pct_bon": 4.8, "do": "CAVA", "eco": "ECO", "superior": true, "desti": "cooperativa", "ingres": 1360.3, "sup": 0, "brix": 10.0, "obs": "DO:CAVA | ECO GS | Glucònic:0.02 | Bon:4.8%"}, {"id": 1000003, "data": "2025-08-18", "parcela": "Macabeu Pont Escudé", "pv": "IN905", "varietat": "Macabeu", "kg": 920, "kg_teu": 920.0, "pct_lliurador": 100, "parcer": "", "graus": 10.0, "kgraus": 9200, "gluco": 0.01, "pct_bon": 4.9, "do": "CAVA", "eco": "ECO", "superior": true, "desti": "cooperativa", "ingres": 530.79, "sup": 0, "brix": 10.0, "obs": "DO:CAVA | ECO GS | Glucònic:0.01 | Bon:4.9%"}, {"id": 1000004, "data": "2025-08-18", "parcela": "Macabeu Oria Vell", "pv": "AT639", "varietat": "Macabeu", "kg": 7320, "kg_teu": 7320.0, "pct_lliurador": 100, "parcer": "", "graus": 10.0, "kgraus": 73200, "gluco": 0.06, "pct_bon": 4.4, "do": "CAVA", "eco": "ECO", "superior": true, "desti": "cooperativa", "ingres": 4203.14, "sup": 0, "brix": 10.0, "obs": "DO:CAVA | ECO GS | Glucònic:0.06 | Bon:4.4%"}, {"id": 1000005, "data": "2025-08-19", "parcela": "Macabeu Pomers", "pv": "AW982", "varietat": "Macabeu", "kg": 5880, "kg_teu": 5880.0, "pct_lliurador": 100, "parcer": "", "graus": 10.0, "kgraus": 49070, "gluco": 0.05, "pct_bon": 4.5, "do": "PENEDES", "eco": "ECO", "superior": false, "desti": "cooperativa", "ingres": 2820.3, "sup": 0, "brix": 10.0, "obs": "DO:PENEDES | ECO | Glucònic:0.05 | Bon:4.5%"}, {"id": 1000006, "data": "2025-08-19", "parcela": "Macabeu Pont Escudé", "pv": "IN905", "varietat": "Macabeu", "kg": 973, "kg_teu": 973.0, "pct_lliurador": 100, "parcer": "", "graus": 10.0, "kgraus": 9730, "gluco": 0.05, "pct_bon": 4.5, "do": "PENEDES", "eco": "ECO", "superior": false, "desti": "cooperativa", "ingres": 559.23, "sup": 0, "brix": 10.0, "obs": "DO:PENEDES | ECO | Glucònic:0.05 | Bon:4.5%"}, {"id": 1000007, "data": "2025-08-19", "parcela": "Macabeu Pont Escudé", "pv": "IN905", "varietat": "Macabeu", "kg": 4500, "kg_teu": 4500.0, "pct_lliurador": 100, "parcer": "", "graus": 10.2, "kgraus": 45900, "gluco": 0.04, "pct_bon": 4.6, "do": "PENEDES", "eco": "ECO", "superior": false, "desti": "cooperativa", "ingres": 2640.63, "sup": 0, "brix": 10.2, "obs": "DO:PENEDES | ECO | Glucònic:0.04 | Bon:4.6%"}, {"id": 1000008, "data": "2025-08-20", "parcela": "Macabeu Oria Vell", "pv": "AT639", "varietat": "Macabeu", "kg": 565, "kg_teu": 565.0, "pct_lliurador": 100, "parcer": "", "graus": 10.0, "kgraus": 5650, "gluco": 0.03, "pct_bon": 4.7, "do": "CAVA", "eco": "ECO", "superior": true, "desti": "cooperativa", "ingres": 325.36, "sup": 0, "brix": 10.0, "obs": "DO:CAVA | ECO GS | Glucònic:0.03 | Bon:4.7%"}, {"id": 1000009, "data": "2025-08-20", "parcela": "Macabeu Pont Escudé", "pv": "IN905", "varietat": "Macabeu", "kg": 5175, "kg_teu": 5175.0, "pct_lliurador": 100, "parcer": "", "graus": 10.0, "kgraus": 51750, "gluco": 0.03, "pct_bon": 4.7, "do": "CAVA", "eco": "ECO", "superior": true, "desti": "cooperativa", "ingres": 2980.02, "sup": 0, "brix": 10.0, "obs": "DO:CAVA | ECO GS | Glucònic:0.03 | Bon:4.7%"}, {"id": 1000010, "data": "2025-08-20", "parcela": "Vinya Pol", "pv": "BB329", "varietat": "Macabeu", "kg": 3680, "kg_teu": 3680.0, "pct_lliurador": 100, "parcer": "", "graus": 11.2, "kgraus": 41216, "gluco": 0.07, "pct_bon": 4.3, "do": "CAVA", "eco": "ECO", "superior": true, "desti": "cooperativa", "ingres": 2364.36, "sup": 0, "brix": 11.2, "obs": "DO:CAVA | ECO GS | Glucònic:0.07 | Bon:4.3%"}, {"id": 1000011, "data": "2025-08-22", "parcela": "Macabeu Oria Vell", "pv": "AT639", "varietat": "Macabeu", "kg": 710, "kg_teu": 710.0, "pct_lliurador": 100, "parcer": "", "graus": 10.0, "kgraus": 7100, "gluco": 0.05, "pct_bon": 4.5, "do": "CAVA", "eco": "ECO", "superior": true, "desti": "cooperativa", "ingres": 408.07, "sup": 0, "brix": 10.0, "obs": "DO:CAVA | ECO GS | Glucònic:0.05 | Bon:4.5%"}, {"id": 1000012, "data": "2025-08-22", "parcela": "Macabeu Oria Vell", "pv": "AT639", "varietat": "Macabeu", "kg": 4220, "kg_teu": 4220.0, "pct_lliurador": 100, "parcer": "", "graus": 10.1, "kgraus": 21968, "gluco": 0.03, "pct_bon": 4.7, "do": "CAVA", "eco": "ECO", "superior": true, "desti": "cooperativa", "ingres": 1265.03, "sup": 0, "brix": 10.1, "obs": "DO:CAVA | ECO GS | Glucònic:0.03 | Bon:4.7%"}, {"id": 1000013, "data": "2025-08-22", "parcela": "Vinya Pol", "pv": "BB329", "varietat": "Macabeu", "kg": 4220, "kg_teu": 4220.0, "pct_lliurador": 100, "parcer": "", "graus": 10.1, "kgraus": 19443, "gluco": 0.03, "pct_bon": 4.7, "do": "CAVA", "eco": "ECO", "superior": true, "desti": "cooperativa", "ingres": 1119.63, "sup": 0, "brix": 10.1, "obs": "DO:CAVA | ECO GS | Glucònic:0.03 | Bon:4.7%"}, {"id": 1000014, "data": "2025-08-22", "parcela": "Vinya Pol", "pv": "BB329", "varietat": "Macabeu", "kg": 4220, "kg_teu": 4220.0, "pct_lliurador": 100, "parcer": "", "graus": 10.1, "kgraus": 19443, "gluco": 0.03, "pct_bon": 4.7, "do": "CAVA", "eco": "ECO", "superior": true, "desti": "cooperativa", "ingres": 1119.63, "sup": 0, "brix": 10.1, "obs": "DO:CAVA | ECO GS | Glucònic:0.03 | Bon:4.7%"}, {"id": 1000015, "data": "2025-08-22", "parcela": "Macabeu oria jove", "pv": "AT593", "varietat": "Macabeu", "kg": 8340, "kg_teu": 8340.0, "pct_lliurador": 100, "parcer": "", "graus": 10.0, "kgraus": 40030, "gluco": 0.04, "pct_bon": 4.6, "do": "PENEDES", "eco": "ECO", "superior": false, "desti": "cooperativa", "ingres": 2302.93, "sup": 0, "brix": 10.0, "obs": "DO:PENEDES | ECO | Glucònic:0.04 | Bon:4.6%"}, {"id": 1000016, "data": "2025-08-22", "parcela": "Oria Jove", "pv": "J1234", "varietat": "Macabeu", "kg": 8340, "kg_teu": 8340.0, "pct_lliurador": 100, "parcer": "", "graus": 10.0, "kgraus": 43370, "gluco": 0.04, "pct_bon": 4.6, "do": "PENEDES", "eco": "ECO", "superior": false, "desti": "cooperativa", "ingres": 2495.08, "sup": 0, "brix": 10.0, "obs": "DO:PENEDES | ECO | Glucònic:0.04 | Bon:4.6%"}, {"id": 1000017, "data": "2025-08-23", "parcela": "Merlot santa Fe", "pv": "A1847", "varietat": "Merlot", "kg": 6740, "kg_teu": 6740.0, "pct_lliurador": 100, "parcer": "", "graus": 10.0, "kgraus": 67400, "gluco": 0.0, "pct_bon": 5.0, "do": "PENEDES", "eco": "ECO", "superior": false, "desti": "cooperativa", "ingres": 3892.35, "sup": 0, "brix": 10.0, "obs": "DO:PENEDES | ECO | Glucònic:0.0 | Bon:5.0%"}, {"id": 1000018, "data": "2025-08-25", "parcela": "Macabeu Plana Escudé", "pv": "AW449", "varietat": "Macabeu", "kg": 1880, "kg_teu": 1880.0, "pct_lliurador": 100, "parcer": "", "graus": 10.3, "kgraus": 19364, "gluco": 0.12, "pct_bon": 3.8, "do": "CAVA", "eco": "ECO", "superior": true, "desti": "cooperativa", "ingres": 1105.49, "sup": 0, "brix": 10.3, "obs": "DO:CAVA | ECO GS | Glucònic:0.12 | Bon:3.8%"}, {"id": 1000019, "data": "2025-08-28", "parcela": "Mas Pardal", "pv": "JJ894", "varietat": "Xarel·lo", "kg": 11000, "kg_teu": 11000.0, "pct_lliurador": 100, "parcer": "", "graus": 11.1, "kgraus": 122100, "gluco": 0.08, "pct_bon": 4.2, "do": "CAVA", "eco": "ECO", "superior": true, "desti": "cooperativa", "ingres": 6997.55, "sup": 0, "brix": 11.1, "obs": "DO:CAVA | ECO GS | Glucònic:0.08 | Bon:4.2%"}, {"id": 1000020, "data": "2025-08-28", "parcela": "Vinya Hort", "pv": "IN269", "varietat": "Xarel·lo", "kg": 1440, "kg_teu": 1440.0, "pct_lliurador": 100, "parcer": "", "graus": 11.3, "kgraus": 16272, "gluco": 0.07, "pct_bon": 4.3, "do": "CAVA", "eco": "ECO", "superior": true, "desti": "cooperativa", "ingres": 933.44, "sup": 0, "brix": 11.3, "obs": "DO:CAVA | ECO GS | Glucònic:0.07 | Bon:4.3%"}, {"id": 1000021, "data": "2025-08-28", "parcela": "Mas Pardal", "pv": "J3894", "varietat": "Xarel·lo", "kg": 10040, "kg_teu": 10040.0, "pct_lliurador": 100, "parcer": "", "graus": 11.3, "kgraus": 97180, "gluco": 0.07, "pct_bon": 4.3, "do": "CAVA", "eco": "ECO", "superior": true, "desti": "cooperativa", "ingres": 5574.73, "sup": 0, "brix": 11.3, "obs": "DO:CAVA | ECO GS | Glucònic:0.07 | Bon:4.3%"}, {"id": 1000022, "data": "2025-08-28", "parcela": "Cal Caramet", "pv": "AB026", "varietat": "Xarel·lo", "kg": 9080, "kg_teu": 9080.0, "pct_lliurador": 100, "parcer": "", "graus": 11.6, "kgraus": 97440, "gluco": 0.08, "pct_bon": 4.3, "do": "CAVA", "eco": "ECO", "superior": true, "desti": "cooperativa", "ingres": 5589.65, "sup": 0, "brix": 11.6, "obs": "DO:CAVA | ECO GS | Glucònic:0.08 | Bon:4.3%"}, {"id": 1000023, "data": "2025-08-28", "parcela": "Cau del Torrent", "pv": "IN271", "varietat": "Xarel·lo", "kg": 680, "kg_teu": 680.0, "pct_lliurador": 100, "parcer": "", "graus": 11.6, "kgraus": 7888, "gluco": 0.08, "pct_bon": 4.2, "do": "CAVA", "eco": "ECO", "superior": true, "desti": "cooperativa", "ingres": 452.06, "sup": 0, "brix": 11.6, "obs": "DO:CAVA | ECO GS | Glucònic:0.08 | Bon:4.2%"}, {"id": 1000024, "data": "2025-08-28", "parcela": "Vinya Nova Mas Pardal", "pv": "BB873", "varietat": "Xarel·lo", "kg": 3080, "kg_teu": 3080.0, "pct_lliurador": 100, "parcer": "", "graus": 11.6, "kgraus": 35728, "gluco": 0.06, "pct_bon": 4.4, "do": "CAVA", "eco": "ECO", "superior": false, "desti": "cooperativa", "ingres": 1753.1, "sup": 0, "brix": 11.6, "obs": "DO:CAVA | ECO | Glucònic:0.06 | Bon:4.4%"}, {"id": 1000025, "data": "2025-08-28", "parcela": "Torrent de la Salada", "pv": "IA867", "varietat": "Xarel·lo", "kg": 1600, "kg_teu": 1600.0, "pct_lliurador": 100, "parcer": "", "graus": 10.6, "kgraus": 5978, "gluco": 0.24, "pct_bon": 2.6, "do": "CAVA", "eco": "ECO", "superior": false, "desti": "cooperativa", "ingres": 288.27, "sup": 0, "brix": 10.6, "obs": "DO:CAVA | ECO | Glucònic:0.24 | Bon:2.6%"}, {"id": 1000026, "data": "2025-08-30", "parcela": "Cau del Torrent", "pv": "IN271", "varietat": "Xarel·lo", "kg": 1600, "kg_teu": 1600.0, "pct_lliurador": 100, "parcer": "", "graus": 10.6, "kgraus": 10982, "gluco": 0.24, "pct_bon": 2.6, "do": "CAVA", "eco": "ECO", "superior": true, "desti": "cooperativa", "ingres": 619.71, "sup": 0, "brix": 10.6, "obs": "DO:CAVA | ECO GS | Glucònic:0.24 | Bon:2.6%"}, {"id": 1000027, "data": "2025-08-30", "parcela": "Torrent de la Salada", "pv": "IA867", "varietat": "Xarel·lo", "kg": 4420, "kg_teu": 4420.0, "pct_lliurador": 100, "parcer": "", "graus": 10.7, "kgraus": 47294, "gluco": 0.03, "pct_bon": 4.7, "do": "CAVA", "eco": "ECO", "superior": true, "desti": "cooperativa", "ingres": 2723.42, "sup": 0, "brix": 10.7, "obs": "DO:CAVA | ECO GS | Glucònic:0.03 | Bon:4.7%"}, {"id": 1000028, "data": "2025-09-02", "parcela": "Plana Mas Bertran", "pv": "AB003", "varietat": "Xarel·lo", "kg": 12403, "kg_teu": 12403.0, "pct_lliurador": 100, "parcer": "", "graus": 11.5, "kgraus": 142635, "gluco": 0.1, "pct_bon": 4.0, "do": "CAVA", "eco": "ECO", "superior": true, "desti": "cooperativa", "ingres": 8158.72, "sup": 0, "brix": 11.5, "obs": "DO:CAVA | ECO GS | Glucònic:0.1 | Bon:4.0%"}, {"id": 1000029, "data": "2025-09-04", "parcela": "Xarel·lo nou Escudé", "pv": "AW977", "varietat": "Xarel·lo", "kg": 11460, "kg_teu": 11460.0, "pct_lliurador": 100, "parcer": "", "graus": 11.6, "kgraus": 132936, "gluco": 0.1, "pct_bon": 4.0, "do": "CAVA", "eco": "ECO", "superior": false, "desti": "cooperativa", "ingres": 6497.91, "sup": 0, "brix": 11.6, "obs": "DO:CAVA | ECO | Glucònic:0.1 | Bon:4.0%"}, {"id": 1000030, "data": "2025-09-04", "parcela": "Xarel·lo nou Escudé", "pv": "AW975", "varietat": "Xarel·lo", "kg": 10320, "kg_teu": 10320.0, "pct_lliurador": 100, "parcer": "", "graus": 10.8, "kgraus": 70081, "gluco": 0.04, "pct_bon": 4.6, "do": "CAVA", "eco": "ECO", "superior": false, "desti": "cooperativa", "ingres": 3445.32, "sup": 0, "brix": 10.8, "obs": "DO:CAVA | ECO | Glucònic:0.04 | Bon:4.6%"}, {"id": 1000031, "data": "2025-09-04", "parcela": "Xarel·lo nou Escudé", "pv": "AW977", "varietat": "Xarel·lo", "kg": 320, "kg_teu": 320.0, "pct_lliurador": 100, "parcer": "", "graus": 10.8, "kgraus": 6512, "gluco": 0.04, "pct_bon": 4.6, "do": "CAVA", "eco": "ECO", "superior": false, "desti": "cooperativa", "ingres": 320.14, "sup": 0, "brix": 10.8, "obs": "DO:CAVA | ECO | Glucònic:0.04 | Bon:4.6%"}, {"id": 1000032, "data": "2025-09-04", "parcela": "Xarel·lo nou Escudé", "pv": "KD896", "varietat": "Xarel·lo", "kg": 10320, "kg_teu": 10320.0, "pct_lliurador": 100, "parcer": "", "graus": 10.8, "kgraus": 34862, "gluco": 0.04, "pct_bon": 4.2, "do": "CAVA", "eco": "ECO", "superior": false, "desti": "cooperativa", "ingres": 1707.33, "sup": 0, "brix": 10.8, "obs": "DO:CAVA | ECO | Glucònic:0.04 | Bon:4.2%"}, {"id": 1000033, "data": "2025-09-04", "parcela": "La Salada Masia", "pv": "AW505", "varietat": "Xarel·lo", "kg": 7520, "kg_teu": 7520.0, "pct_lliurador": 100, "parcer": "", "graus": 11.6, "kgraus": 85040, "gluco": 0.08, "pct_bon": 4.2, "do": "CAVA", "eco": "ECO", "superior": false, "desti": "cooperativa", "ingres": 4164.75, "sup": 0, "brix": 11.6, "obs": "DO:CAVA | ECO | Glucònic:0.08 | Bon:4.2%"}, {"id": 1000034, "data": "2025-09-04", "parcela": "Xarel·lo nou Escudé", "pv": "AW975", "varietat": "Xarel·lo", "kg": 7520, "kg_teu": 7520.0, "pct_lliurador": 100, "parcer": "", "graus": 11.6, "kgraus": 2192, "gluco": 0.08, "pct_bon": 4.2, "do": "CAVA", "eco": "ECO", "superior": false, "desti": "cooperativa", "ingres": 107.35, "sup": 0, "brix": 11.6, "obs": "DO:CAVA | ECO | Glucònic:0.08 | Bon:4.2%"}, {"id": 1000035, "data": "2025-09-04", "parcela": "Xarel·lo Pujols", "pv": "AG341", "varietat": "Xarel·lo", "kg": 3400, "kg_teu": 3400.0, "pct_lliurador": 100, "parcer": "", "graus": 11.2, "kgraus": 42112, "gluco": 0.1, "pct_bon": 4.0, "do": "CAVA", "eco": "ECO", "superior": false, "desti": "cooperativa", "ingres": 2058.43, "sup": 0, "brix": 11.2, "obs": "DO:CAVA | ECO | Glucònic:0.1 | Bon:4.0%"}, {"id": 1000036, "data": "2025-09-08", "parcela": "Xarel·lo Miquel Gran", "pv": "JE677", "varietat": "Xarel·lo", "kg": 7960, "kg_teu": 7960.0, "pct_lliurador": 100, "parcer": "", "graus": 11.3, "kgraus": 30397, "gluco": 0.01, "pct_bon": 4.9, "do": "CAVA", "eco": "ECO", "superior": true, "desti": "cooperativa", "ingres": 1753.75, "sup": 0, "brix": 11.3, "obs": "DO:CAVA | ECO GS | Glucònic:0.01 | Bon:4.9%"}, {"id": 1000037, "data": "2025-09-08", "parcela": "Xarel·lo Miquel Gran", "pv": "JE678", "varietat": "Xarel·lo", "kg": 7960, "kg_teu": 7960.0, "pct_lliurador": 100, "parcer": "", "graus": 11.3, "kgraus": 59551, "gluco": 0.01, "pct_bon": 4.9, "do": "CAVA", "eco": "ECO", "superior": true, "desti": "cooperativa", "ingres": 3435.79, "sup": 0, "brix": 11.3, "obs": "DO:CAVA | ECO GS | Glucònic:0.01 | Bon:4.9%"}, {"id": 1000038, "data": "2025-09-08", "parcela": "Sobrehort Dot Xarel·lo", "pv": "AV638", "varietat": "Xarel·lo", "kg": 10440, "kg_teu": 10440.0, "pct_lliurador": 100, "parcer": "", "graus": 11.1, "kgraus": 110778, "gluco": 0.05, "pct_bon": 4.5, "do": "CAVA", "eco": "ECO", "superior": true, "desti": "cooperativa", "ingres": 6366.97, "sup": 0, "brix": 11.1, "obs": "DO:CAVA | ECO GS | Glucònic:0.05 | Bon:4.5%"}, {"id": 1000039, "data": "2025-09-08", "parcela": "Vinya Hort", "pv": "IN269", "varietat": "Xarel·lo", "kg": 10440, "kg_teu": 10440.0, "pct_lliurador": 100, "parcer": "", "graus": 11.1, "kgraus": 5106, "gluco": 0.05, "pct_bon": 4.5, "do": "CAVA", "eco": "ECO", "superior": true, "desti": "cooperativa", "ingres": 293.47, "sup": 0, "brix": 11.1, "obs": "DO:CAVA | ECO GS | Glucònic:0.05 | Bon:4.5%"}, {"id": 1000040, "data": "2025-09-08", "parcela": "Xarel·lo Jove Vinya Llarga", "pv": "AT633", "varietat": "Xarel·lo", "kg": 10900, "kg_teu": 10900.0, "pct_lliurador": 100, "parcer": "", "graus": 9.0, "kgraus": 33930, "gluco": 0.03, "pct_bon": 4.7, "do": "CAVA", "eco": "ECO", "superior": true, "desti": "cooperativa", "ingres": 1953.86, "sup": 0, "brix": 9.0, "obs": "DO:CAVA | ECO GS | Glucònic:0.03 | Bon:4.7%"}, {"id": 1000041, "data": "2025-09-08", "parcela": "Xarel·lo Vinya Llarga", "pv": "AT636", "varietat": "Xarel·lo", "kg": 10900, "kg_teu": 10900.0, "pct_lliurador": 100, "parcer": "", "graus": 9.0, "kgraus": 45990, "gluco": 0.03, "pct_bon": 4.7, "do": "CAVA", "eco": "ECO", "superior": true, "desti": "cooperativa", "ingres": 2648.33, "sup": 0, "brix": 9.0, "obs": "DO:CAVA | ECO GS | Glucònic:0.03 | Bon:4.7%"}, {"id": 1000042, "data": "2025-09-08", "parcela": "Vinya Hort", "pv": "IN269", "varietat": "Xarel·lo", "kg": 10900, "kg_teu": 10900.0, "pct_lliurador": 100, "parcer": "", "graus": 9.0, "kgraus": 18180, "gluco": 0.03, "pct_bon": 4.7, "do": "CAVA", "eco": "ECO", "superior": true, "desti": "cooperativa", "ingres": 1046.9, "sup": 0, "brix": 9.0, "obs": "DO:CAVA | ECO GS | Glucònic:0.03 | Bon:4.7%"}, {"id": 1000043, "data": "2025-09-11", "parcela": "Xarel·lo Casan", "pv": "AT635", "varietat": "Xarel·lo", "kg": 9560, "kg_teu": 9560.0, "pct_lliurador": 100, "parcer": "", "graus": 10.5, "kgraus": 33180, "gluco": 0.03, "pct_bon": 4.7, "do": "CAVA", "eco": "ECO", "superior": true, "desti": "cooperativa", "ingres": 1910.67, "sup": 0, "brix": 10.5, "obs": "DO:CAVA | ECO GS | Glucònic:0.03 | Bon:4.7%"}, {"id": 1000044, "data": "2025-09-11", "parcela": "Xarel·lo Vinya Llarga", "pv": "AT636", "varietat": "Xarel·lo", "kg": 9560, "kg_teu": 9560.0, "pct_lliurador": 100, "parcer": "", "graus": 10.5, "kgraus": 16800, "gluco": 0.03, "pct_bon": 4.7, "do": "CAVA", "eco": "ECO", "superior": true, "desti": "cooperativa", "ingres": 967.43, "sup": 0, "brix": 10.5, "obs": "DO:CAVA | ECO GS | Glucònic:0.03 | Bon:4.7%"}, {"id": 1000045, "data": "2025-09-11", "parcela": "Xarel·lo Casan", "pv": "JI232", "varietat": "Xarel·lo", "kg": 9560, "kg_teu": 9560.0, "pct_lliurador": 100, "parcer": "", "graus": 10.5, "kgraus": 50400, "gluco": 0.03, "pct_bon": 4.7, "do": "CAVA", "eco": "ECO", "superior": true, "desti": "cooperativa", "ingres": 2902.28, "sup": 0, "brix": 10.5, "obs": "DO:CAVA | ECO GS | Glucònic:0.03 | Bon:4.7%"}, {"id": 1000046, "data": "2025-09-11", "parcela": "Xarel·lo Casan", "pv": "AT635", "varietat": "Xarel·lo", "kg": 5300, "kg_teu": 5300.0, "pct_lliurador": 100, "parcer": "", "graus": 10.5, "kgraus": 22050, "gluco": 0.03, "pct_bon": 4.7, "do": "CAVA", "eco": "ECO", "superior": true, "desti": "cooperativa", "ingres": 1269.75, "sup": 0, "brix": 10.5, "obs": "DO:CAVA | ECO GS | Glucònic:0.03 | Bon:4.7%"}, {"id": 1000047, "data": "2025-09-12", "parcela": "La Salada Masia", "pv": "AW505", "varietat": "Macabeu", "kg": 5300, "kg_teu": 5300.0, "pct_lliurador": 100, "parcer": "", "graus": 10.5, "kgraus": 33600, "gluco": 0.03, "pct_bon": 4.7, "do": "CAVA", "eco": "ECO", "superior": true, "desti": "cooperativa", "ingres": 1934.86, "sup": 0, "brix": 10.5, "obs": "DO:CAVA | ECO GS | Glucònic:0.03 | Bon:4.7%"}, {"id": 1000048, "data": "2025-09-12", "parcela": "La Salada Masia", "pv": "AW505", "varietat": "Macabeu", "kg": 10500, "kg_teu": 10500.0, "pct_lliurador": 100, "parcer": "", "graus": 12.1, "kgraus": 70543, "gluco": 0.02, "pct_bon": 4.8, "do": "CAVA", "eco": "ECO", "superior": true, "desti": "cooperativa", "ingres": 4066.1, "sup": 0, "brix": 12.1, "obs": "DO:CAVA | ECO GS | Glucònic:0.02 | Bon:4.8%"}, {"id": 1000049, "data": "2025-09-12", "parcela": "Torrent de la Salada", "pv": "IA867", "varietat": "Macabeu", "kg": 10500, "kg_teu": 10500.0, "pct_lliurador": 100, "parcer": "", "graus": 12.1, "kgraus": 56507, "gluco": 0.02, "pct_bon": 4.8, "do": "CAVA", "eco": "ECO", "superior": true, "desti": "cooperativa", "ingres": 3257.06, "sup": 0, "brix": 12.1, "obs": "DO:CAVA | ECO GS | Glucònic:0.02 | Bon:4.8%"}, {"id": 1000050, "data": "2025-09-12", "parcela": "Macabeu Lavern", "pv": "AV120", "varietat": "Macabeu", "kg": 7560, "kg_teu": 7560.0, "pct_lliurador": 100, "parcer": "", "graus": 11.2, "kgraus": 10752, "gluco": 0.05, "pct_bon": 4.5, "do": "CAVA", "eco": "ECO", "superior": true, "desti": "cooperativa", "ingres": 617.97, "sup": 0, "brix": 11.2, "obs": "DO:CAVA | ECO GS | Glucònic:0.05 | Bon:4.5%"}, {"id": 1000051, "data": "2025-09-12", "parcela": "Macabeu Lavern", "pv": "AV128", "varietat": "Macabeu", "kg": 7560, "kg_teu": 7560.0, "pct_lliurador": 100, "parcer": "", "graus": 11.2, "kgraus": 32480, "gluco": 0.05, "pct_bon": 4.5, "do": "CAVA", "eco": "ECO", "superior": true, "desti": "cooperativa", "ingres": 1866.79, "sup": 0, "brix": 11.2, "obs": "DO:CAVA | ECO GS | Glucònic:0.05 | Bon:4.5%"}, {"id": 1000052, "data": "2025-09-12", "parcela": "Macabeu Plana Escudé", "pv": "AW449", "varietat": "Macabeu", "kg": 7560, "kg_teu": 7560.0, "pct_lliurador": 100, "parcer": "", "graus": 11.2, "kgraus": 28896, "gluco": 0.05, "pct_bon": 4.5, "do": "CAVA", "eco": "ECO", "superior": true, "desti": "cooperativa", "ingres": 1660.8, "sup": 0, "brix": 11.2, "obs": "DO:CAVA | ECO GS | Glucònic:0.05 | Bon:4.5%"}, {"id": 1000053, "data": "2025-09-12", "parcela": "Macabeu Plana Escudé", "pv": "AW465", "varietat": "Macabeu", "kg": 7560, "kg_teu": 7560.0, "pct_lliurador": 100, "parcer": "", "graus": 11.2, "kgraus": 12544, "gluco": 0.05, "pct_bon": 4.5, "do": "CAVA", "eco": "ECO", "superior": true, "desti": "cooperativa", "ingres": 720.97, "sup": 0, "brix": 11.2, "obs": "DO:CAVA | ECO GS | Glucònic:0.05 | Bon:4.5%"}, {"id": 1000054, "data": "2025-09-12", "parcela": "Torrent de la Salada", "pv": "IA867", "varietat": "Xarel·lo", "kg": 8040, "kg_teu": 8040.0, "pct_lliurador": 100, "parcer": "", "graus": 10.5, "kgraus": 84420, "gluco": 0.06, "pct_bon": 4.4, "do": "CAVA", "eco": "ECO", "superior": true, "desti": "cooperativa", "ingres": 4847.4, "sup": 0, "brix": 10.5, "obs": "DO:CAVA | ECO GS | Glucònic:0.06 | Bon:4.4%"}, {"id": 1000055, "data": "2025-09-12", "parcela": "Macabeu Jove Mas Masagué", "pv": "JE676", "varietat": "Macabeu", "kg": 2480, "kg_teu": 2480.0, "pct_lliurador": 100, "parcer": "", "graus": 10.9, "kgraus": 27032, "gluco": 0.26, "pct_bon": 2.4, "do": "CAVA", "eco": "ECO", "superior": true, "desti": "cooperativa", "ingres": 1522.44, "sup": 0, "brix": 10.9, "obs": "DO:CAVA | ECO GS | Glucònic:0.26 | Bon:2.4%"}, {"id": 1000056, "data": "2025-09-13", "parcela": "Xarel·lo Reempeltat casan", "pv": "AT641", "varietat": "Xarel·lo", "kg": 7780, "kg_teu": 7780.0, "pct_lliurador": 100, "parcer": "", "graus": 11.5, "kgraus": 88665, "gluco": 0.03, "pct_bon": 4.7, "do": "CAVA", "eco": "ECO", "superior": true, "desti": "cooperativa", "ingres": 5105.77, "sup": 0, "brix": 11.5, "obs": "DO:CAVA | ECO GS | Glucònic:0.03 | Bon:4.7%"}, {"id": 1000057, "data": "2025-09-13", "parcela": "Xarel·lo Les costes", "pv": "AT674", "varietat": "Xarel·lo", "kg": 7780, "kg_teu": 7780.0, "pct_lliurador": 100, "parcer": "", "graus": 11.5, "kgraus": 805, "gluco": 0.03, "pct_bon": 4.7, "do": "CAVA", "eco": "ECO", "superior": true, "desti": "cooperativa", "ingres": 46.36, "sup": 0, "brix": 11.5, "obs": "DO:CAVA | ECO GS | Glucònic:0.03 | Bon:4.7%"}, {"id": 1000058, "data": "2025-09-13", "parcela": "L'Oliverà", "pv": "KA617", "varietat": "Xarel·lo Vermell", "kg": 8640, "kg_teu": 8640.0, "pct_lliurador": 100, "parcer": "", "graus": 12.1, "kgraus": 104544, "gluco": 0.03, "pct_bon": 4.7, "do": "PENEDES", "eco": "ECO", "superior": false, "desti": "cooperativa", "ingres": 6020.17, "sup": 0, "brix": 12.1, "obs": "DO:PENEDES | ECO | Glucònic:0.03 | Bon:4.7%"}, {"id": 1000059, "data": "2025-09-13", "parcela": "Vinya Nova Mas Pardal", "pv": "BB873", "varietat": "Xarel·lo Vermell", "kg": 290, "kg_teu": 290.0, "pct_lliurador": 100, "parcer": "", "graus": 12.1, "kgraus": 3016, "gluco": 0.08, "pct_bon": 4.2, "do": "PENEDES", "eco": "ECO", "superior": false, "desti": "cooperativa", "ingres": 172.85, "sup": 0, "brix": 12.1, "obs": "DO:PENEDES | ECO | Glucònic:0.08 | Bon:4.2%"}, {"id": 1000060, "data": "2025-09-13", "parcela": "L'Oliverà", "pv": "KC746", "varietat": "Xarel·lo Vermell", "kg": 8370, "kg_teu": 8370.0, "pct_lliurador": 100, "parcer": "", "graus": 10.8, "kgraus": 49248, "gluco": 0.06, "pct_bon": 4.2, "do": "PENEDES", "eco": "ECO", "superior": false, "desti": "cooperativa", "ingres": 2822.4, "sup": 0, "brix": 10.8, "obs": "DO:PENEDES | ECO | Glucònic:0.06 | Bon:4.2%"}, {"id": 1000061, "data": "2025-09-13", "parcela": "L'Oliverà", "pv": "KA617", "varietat": "Xarel·lo Vermell", "kg": 3050, "kg_teu": 3050.0, "pct_lliurador": 100, "parcer": "", "graus": 10.8, "kgraus": 32940, "gluco": 0.06, "pct_bon": 4.2, "do": "PENEDES", "eco": "ECO", "superior": false, "desti": "cooperativa", "ingres": 1887.79, "sup": 0, "brix": 10.8, "obs": "DO:PENEDES | ECO | Glucònic:0.06 | Bon:4.2%"}, {"id": 1000062, "data": "2025-09-13", "parcela": "Xarel·lo Les costes", "pv": "AT674", "varietat": "Xarel·lo", "kg": 695, "kg_teu": 695.0, "pct_lliurador": 100, "parcer": "", "graus": 10.8, "kgraus": 7993, "gluco": 0.08, "pct_bon": 4.2, "do": "PENEDES", "eco": "ECO", "superior": false, "desti": "cooperativa", "ingres": 458.08, "sup": 0, "brix": 10.8, "obs": "DO:PENEDES | ECO | Glucònic:0.08 | Bon:4.2%"}, {"id": 1000063, "data": "2025-09-15", "parcela": "Vinya Nova Mas Pardal", "pv": "BB873", "varietat": "Macabeu", "kg": 2560, "kg_teu": 2560.0, "pct_lliurador": 100, "parcer": "", "graus": 11.5, "kgraus": 21448, "gluco": 0.08, "pct_bon": 4.2, "do": "CAVA", "eco": "ECO", "superior": false, "desti": "cooperativa", "ingres": 1050.39, "sup": 0, "brix": 11.5, "obs": "DO:CAVA | ECO | Glucònic:0.08 | Bon:4.2%"}, {"id": 1000064, "data": "2025-09-15", "parcela": "Xarel·lo Pujols", "pv": "AG341", "varietat": "Xarel·lo", "kg": 1350, "kg_teu": 1350.0, "pct_lliurador": 100, "parcer": "", "graus": 11.9, "kgraus": 7795, "gluco": 0.16, "pct_bon": 3.4, "do": "CAVA", "eco": "ECO", "superior": false, "desti": "cooperativa", "ingres": 378.82, "sup": 0, "brix": 11.9, "obs": "DO:CAVA | ECO | Glucònic:0.16 | Bon:3.4%"}, {"id": 1000065, "data": "2025-09-15", "parcela": "Xarel·lo Vinya Llarga", "pv": "JF678", "varietat": "Xarel·lo", "kg": 1350, "kg_teu": 1350.0, "pct_lliurador": 100, "parcer": "", "graus": 11.9, "kgraus": 8271, "gluco": 0.16, "pct_bon": 3.4, "do": "CAVA", "eco": "ECO", "superior": false, "desti": "cooperativa", "ingres": 401.95, "sup": 0, "brix": 11.9, "obs": "DO:CAVA | ECO | Glucònic:0.16 | Bon:3.4%"}, {"id": 1000066, "data": "2025-09-15", "parcela": "Oria Jove", "pv": "J1234", "varietat": "Macabeu", "kg": 1350, "kg_teu": 1350.0, "pct_lliurador": 100, "parcer": "", "graus": 11.9, "kgraus": 37962, "gluco": 0.16, "pct_bon": 3.4, "do": "CAVA", "eco": "ECO", "superior": false, "desti": "cooperativa", "ingres": 1844.88, "sup": 0, "brix": 11.9, "obs": "DO:CAVA | ECO | Glucònic:0.16 | Bon:3.4%"}, {"id": 1000067, "data": "2025-09-15", "parcela": "Vinya Torres", "pv": "BB323", "varietat": "Macabeu", "kg": 5870, "kg_teu": 5870.0, "pct_lliurador": 100, "parcer": "", "graus": 11.9, "kgraus": 31892, "gluco": 0.16, "pct_bon": 3.4, "do": "CAVA", "eco": "ECO", "superior": false, "desti": "cooperativa", "ingres": 1549.89, "sup": 0, "brix": 11.9, "obs": "DO:CAVA | ECO | Glucònic:0.16 | Bon:3.4%"}, {"id": 1000068, "data": "2025-09-15", "parcela": "Vinya Torres", "pv": "BB323", "varietat": "Macabeu", "kg": 785, "kg_teu": 785.0, "pct_lliurador": 100, "parcer": "", "graus": 11.9, "kgraus": 9342, "gluco": 0.16, "pct_bon": 3.4, "do": "CAVA", "eco": "ECO", "superior": false, "desti": "cooperativa", "ingres": 454.0, "sup": 0, "brix": 11.9, "obs": "DO:CAVA | ECO | Glucònic:0.16 | Bon:3.4%"}, {"id": 1000069, "data": "2025-09-15", "parcela": "Xarel·lo Miquel Gran", "pv": "JE678", "varietat": "Xarel·lo", "kg": 1485, "kg_teu": 1485.0, "pct_lliurador": 100, "parcer": "", "graus": 11.9, "kgraus": 17672, "gluco": 0.16, "pct_bon": 3.4, "do": "CAVA", "eco": "ECO", "superior": true, "desti": "cooperativa", "ingres": 1005.01, "sup": 0, "brix": 11.9, "obs": "DO:CAVA | ECO GS | Glucònic:0.16 | Bon:3.4%"}, {"id": 1000070, "data": "2025-09-18", "parcela": "Parellada Pujols", "pv": "IN111", "varietat": "Parellada", "kg": 8300, "kg_teu": 8300.0, "pct_lliurador": 100, "parcer": "", "graus": 10.0, "kgraus": 5800, "gluco": 0.5, "pct_bon": 0.0, "do": "CAVA", "eco": "ECO", "superior": true, "desti": "cooperativa", "ingres": 319.0, "sup": 0, "brix": 10.0, "obs": "DO:CAVA | ECO GS | Glucònic:0.5 | Bon:0.0%"}, {"id": 1000071, "data": "2025-09-18", "parcela": "Parellada Pujols", "pv": "IN111", "varietat": "Parellada", "kg": 4040, "kg_teu": 4040.0, "pct_lliurador": 100, "parcer": "", "graus": 10.0, "kgraus": 40400, "gluco": 0.5, "pct_bon": 0.0, "do": "CAVA", "eco": "ECO", "superior": true, "desti": "cooperativa", "ingres": 2222.0, "sup": 0, "brix": 10.0, "obs": "DO:CAVA | ECO GS | Glucònic:0.5 | Bon:0.0%"}, {"id": 1000072, "data": "2025-09-19", "parcela": "Macabeu Jove Mas Masagué", "pv": "JF676", "varietat": "Macabeu", "kg": 1680, "kg_teu": 1680.0, "pct_lliurador": 100, "parcer": "", "graus": 10.0, "kgraus": 16800, "gluco": 0.1, "pct_bon": 4.0, "do": "CAVA", "eco": "ECO", "superior": false, "desti": "cooperativa", "ingres": 821.18, "sup": 0, "brix": 10.0, "obs": "DO:CAVA | ECO | Glucònic:0.1 | Bon:4.0%"}, {"id": 1000073, "data": "2025-09-19", "parcela": "Subirat parent santa fe", "pv": "LC865", "varietat": "Subirat Parent", "kg": 2050, "kg_teu": 1537.5, "pct_lliurador": 75, "parcer": "Casanovas Orellana", "graus": 10.0, "kgraus": 20500, "gluco": 0.1, "pct_bon": 4.0, "do": "CAVA", "eco": "ECO", "superior": false, "desti": "cooperativa", "ingres": 751.53, "sup": 0, "brix": 10.0, "obs": "DO:CAVA | ECO | Glucònic:0.1 | Bon:4.0% | Parcer:Casanovas Orellana"}, {"id": 1000074, "data": "2025-09-19", "parcela": "Subirat parent santa fe", "pv": "LC819", "varietat": "Subirat Parent", "kg": 1762, "kg_teu": 1321.5, "pct_lliurador": 75, "parcer": "Casanovas Orellana", "graus": 10.0, "kgraus": 17620, "gluco": 0.1, "pct_bon": 4.0, "do": "CAVA", "eco": "ECO", "superior": false, "desti": "cooperativa", "ingres": 645.95, "sup": 0, "brix": 10.0, "obs": "DO:CAVA | ECO | Glucònic:0.1 | Bon:4.0% | Parcer:Casanovas Orellana"}, {"id": 1000075, "data": "2025-09-19", "parcela": "Subirat parent santa fe", "pv": "LC819", "varietat": "Subirat Parent", "kg": 1594, "kg_teu": 1195.5, "pct_lliurador": 75, "parcer": "Casanovas Orellana", "graus": 10.0, "kgraus": 15940, "gluco": 0.1, "pct_bon": 4.0, "do": "CAVA", "eco": "ECO", "superior": false, "desti": "cooperativa", "ingres": 584.36, "sup": 0, "brix": 10.0, "obs": "DO:CAVA | ECO | Glucònic:0.1 | Bon:4.0% | Parcer:Casanovas Orellana"}, {"id": 1000076, "data": "2025-09-19", "parcela": "Subirat parent santa fe", "pv": "LC865", "varietat": "Subirat Parent", "kg": 783, "kg_teu": 587.2, "pct_lliurador": 75, "parcer": "Casanovas Orellana", "graus": 10.0, "kgraus": 3830, "gluco": 0.1, "pct_bon": 4.0, "do": "CAVA", "eco": "ECO", "superior": false, "desti": "cooperativa", "ingres": 140.41, "sup": 0, "brix": 10.0, "obs": "DO:CAVA | ECO | Glucònic:0.1 | Bon:4.0% | Parcer:Casanovas Orellana"}, {"id": 1000077, "data": "2025-09-19", "parcela": "Subirat parent santa fe", "pv": "LC865", "varietat": "Subirat Parent", "kg": 783, "kg_teu": 587.2, "pct_lliurador": 75, "parcer": "Casanovas Orellana", "graus": 10.0, "kgraus": 4000, "gluco": 0.1, "pct_bon": 4.0, "do": "CAVA", "eco": "ECO", "superior": false, "desti": "cooperativa", "ingres": 146.64, "sup": 0, "brix": 10.0, "obs": "DO:CAVA | ECO | Glucònic:0.1 | Bon:4.0% | Parcer:Casanovas Orellana"}, {"id": 1000078, "data": "2025-09-19", "parcela": "Subirat parent santa fe", "pv": "LC819", "varietat": "Subirat Parent", "kg": 1900, "kg_teu": 1425.0, "pct_lliurador": 75, "parcer": "Casanovas Orellana", "graus": 10.0, "kgraus": 19000, "gluco": 0.1, "pct_bon": 4.0, "do": "CAVA", "eco": "ECO", "superior": false, "desti": "cooperativa", "ingres": 696.54, "sup": 0, "brix": 10.0, "obs": "DO:CAVA | ECO | Glucònic:0.1 | Bon:4.0% | Parcer:Casanovas Orellana"}, {"id": 1000079, "data": "2025-09-19", "parcela": "Montargull Xarel·lo Esquerre", "pv": "AW458", "varietat": "Xarel·lo", "kg": 1900, "kg_teu": 1425.0, "pct_lliurador": 75, "parcer": "Casanovas Orellana", "graus": 10.0, "kgraus": 9500, "gluco": 0.1, "pct_bon": 4.0, "do": "CAVA", "eco": "ECO", "superior": false, "desti": "cooperativa", "ingres": 348.27, "sup": 0, "brix": 10.0, "obs": "DO:CAVA | ECO | Glucònic:0.1 | Bon:4.0% | Parcer:Casanovas Orellana"}, {"id": 1000080, "data": "2025-09-19", "parcela": "Montargull Xarel·lo dreta abaix", "pv": "AW472", "varietat": "Xarel·lo", "kg": 991, "kg_teu": 743.2, "pct_lliurador": 75, "parcer": "Casanovas Orellana", "graus": 10.0, "kgraus": 9910, "gluco": 0.1, "pct_bon": 4.0, "do": "CAVA", "eco": "ECO", "superior": false, "desti": "cooperativa", "ingres": 363.3, "sup": 0, "brix": 10.0, "obs": "DO:CAVA | ECO | Glucònic:0.1 | Bon:4.0% | Parcer:Casanovas Orellana"}, {"id": 1000081, "data": "2025-09-19", "parcela": "Montargull Xarel·lo Esquerre", "pv": "AW458", "varietat": "Xarel·lo", "kg": 991, "kg_teu": 743.2, "pct_lliurador": 75, "parcer": "Casanovas Orellana", "graus": 10.0, "kgraus": 9910, "gluco": 0.1, "pct_bon": 4.0, "do": "CAVA", "eco": "ECO", "superior": false, "desti": "cooperativa", "ingres": 363.3, "sup": 0, "brix": 10.0, "obs": "DO:CAVA | ECO | Glucònic:0.1 | Bon:4.0% | Parcer:Casanovas Orellana"}, {"id": 1000082, "data": "2025-09-19", "parcela": "Montargull Xarel·lo dreta abaix", "pv": "AW472", "varietat": "Xarel·lo", "kg": 1760, "kg_teu": 1320.0, "pct_lliurador": 75, "parcer": "Casanovas Orellana", "graus": 10.0, "kgraus": 17600, "gluco": 0.1, "pct_bon": 4.0, "do": "CAVA", "eco": "ECO", "superior": false, "desti": "cooperativa", "ingres": 645.22, "sup": 0, "brix": 10.0, "obs": "DO:CAVA | ECO | Glucònic:0.1 | Bon:4.0% | Parcer:Casanovas Orellana"}, {"id": 1000083, "data": "2025-09-19", "parcela": "Montargull Xarel·lo Esquerre", "pv": "AW458", "varietat": "Xarel·lo", "kg": 1669, "kg_teu": 1251.8, "pct_lliurador": 75, "parcer": "Casanovas Orellana", "graus": 10.0, "kgraus": 16690, "gluco": 0.1, "pct_bon": 4.0, "do": "CAVA", "eco": "ECO", "superior": false, "desti": "cooperativa", "ingres": 611.86, "sup": 0, "brix": 10.0, "obs": "DO:CAVA | ECO | Glucònic:0.1 | Bon:4.0% | Parcer:Casanovas Orellana"}, {"id": 1000084, "data": "2025-09-19", "parcela": "Montargull Xarel·lo dreta abaix", "pv": "AW472", "varietat": "Xarel·lo", "kg": 2491, "kg_teu": 1868.2, "pct_lliurador": 75, "parcer": "Casanovas Orellana", "graus": 10.0, "kgraus": 24910, "gluco": 0.1, "pct_bon": 4.0, "do": "CAVA", "eco": "ECO", "superior": false, "desti": "cooperativa", "ingres": 913.2, "sup": 0, "brix": 10.0, "obs": "DO:CAVA | ECO | Glucònic:0.1 | Bon:4.0% | Parcer:Casanovas Orellana"}, {"id": 1000085, "data": "2025-09-19", "parcela": "Montargull Xarel·lo Esquerre", "pv": "AW458", "varietat": "Xarel·lo", "kg": 1002, "kg_teu": 751.5, "pct_lliurador": 75, "parcer": "Casanovas Orellana", "graus": 10.0, "kgraus": 10020, "gluco": 0.1, "pct_bon": 4.0, "do": "CAVA", "eco": "ECO", "superior": false, "desti": "cooperativa", "ingres": 367.33, "sup": 0, "brix": 10.0, "obs": "DO:CAVA | ECO | Glucònic:0.1 | Bon:4.0% | Parcer:Casanovas Orellana"}, {"id": 1000086, "data": "2025-09-19", "parcela": "Montargull Xarel·lo Esquerre", "pv": "AW458", "varietat": "Xarel·lo", "kg": 1746, "kg_teu": 1309.5, "pct_lliurador": 75, "parcer": "Casanovas Orellana", "graus": 10.0, "kgraus": 17460, "gluco": 0.1, "pct_bon": 4.0, "do": "CAVA", "eco": "ECO", "superior": false, "desti": "cooperativa", "ingres": 640.08, "sup": 0, "brix": 10.0, "obs": "DO:CAVA | ECO | Glucònic:0.1 | Bon:4.0% | Parcer:Casanovas Orellana"}, {"id": 1000087, "data": "2025-09-19", "parcela": "Macabeu Plana Escudé", "pv": "AW447", "varietat": "Macabeu", "kg": 2833, "kg_teu": 2124.8, "pct_lliurador": 75, "parcer": "Casanovas Orellana", "graus": 10.0, "kgraus": 14330, "gluco": 0.1, "pct_bon": 4.0, "do": "CAVA", "eco": "ECO", "superior": false, "desti": "cooperativa", "ingres": 525.34, "sup": 0, "brix": 10.0, "obs": "DO:CAVA | ECO | Glucònic:0.1 | Bon:4.0% | Parcer:Casanovas Orellana"}, {"id": 1000088, "data": "2025-09-19", "parcela": "Macabeu Plana Escudé", "pv": "AW465", "varietat": "Macabeu", "kg": 2833, "kg_teu": 2124.8, "pct_lliurador": 75, "parcer": "Casanovas Orellana", "graus": 10.0, "kgraus": 14000, "gluco": 0.1, "pct_bon": 4.0, "do": "CAVA", "eco": "ECO", "superior": false, "desti": "cooperativa", "ingres": 513.24, "sup": 0, "brix": 10.0, "obs": "DO:CAVA | ECO | Glucònic:0.1 | Bon:4.0% | Parcer:Casanovas Orellana"}, {"id": 1000089, "data": "2025-09-19", "parcela": "Macabeu Plana Escudé", "pv": "AW447", "varietat": "Macabeu", "kg": 1327, "kg_teu": 995.2, "pct_lliurador": 75, "parcer": "Casanovas Orellana", "graus": 10.0, "kgraus": 13270, "gluco": 0.1, "pct_bon": 4.0, "do": "CAVA", "eco": "ECO", "superior": false, "desti": "cooperativa", "ingres": 486.48, "sup": 0, "brix": 10.0, "obs": "DO:CAVA | ECO | Glucònic:0.1 | Bon:4.0% | Parcer:Casanovas Orellana"}, {"id": 1000090, "data": "2025-09-19", "parcela": "Macabeu Plana Escudé", "pv": "AW465", "varietat": "Macabeu", "kg": 1915, "kg_teu": 1436.2, "pct_lliurador": 75, "parcer": "Casanovas Orellana", "graus": 10.0, "kgraus": 19150, "gluco": 0.1, "pct_bon": 4.0, "do": "CAVA", "eco": "ECO", "superior": false, "desti": "cooperativa", "ingres": 702.04, "sup": 0, "brix": 10.0, "obs": "DO:CAVA | ECO | Glucònic:0.1 | Bon:4.0% | Parcer:Casanovas Orellana"}, {"id": 1000091, "data": "2025-09-19", "parcela": "Macabeu Plana Escudé", "pv": "AW447", "varietat": "Macabeu", "kg": 3300, "kg_teu": 2475.0, "pct_lliurador": 75, "parcer": "Casanovas Orellana", "graus": 10.0, "kgraus": 33000, "gluco": 0.1, "pct_bon": 4.0, "do": "CAVA", "eco": "ECO", "superior": false, "desti": "cooperativa", "ingres": 1209.78, "sup": 0, "brix": 10.0, "obs": "DO:CAVA | ECO | Glucònic:0.1 | Bon:4.0% | Parcer:Casanovas Orellana"}, {"id": 1000092, "data": "2025-09-19", "parcela": "L'Oliverà", "pv": "KC746", "varietat": "Xarel·lo", "kg": 1529, "kg_teu": 1146.8, "pct_lliurador": 75, "parcer": "Casanovas Orellana", "graus": 10.0, "kgraus": 15290, "gluco": 0.1, "pct_bon": 4.0, "do": "CAVA", "eco": "ECO", "superior": false, "desti": "cooperativa", "ingres": 560.53, "sup": 0, "brix": 10.0, "obs": "DO:CAVA | ECO | Glucònic:0.1 | Bon:4.0% | Parcer:Casanovas Orellana"}, {"id": 1000093, "data": "2025-09-19", "parcela": "L'Oliverà", "pv": "KC746", "varietat": "Xarel·lo", "kg": 2375, "kg_teu": 1781.2, "pct_lliurador": 75, "parcer": "Casanovas Orellana", "graus": 10.0, "kgraus": 23750, "gluco": 0.0, "pct_bon": 4.0, "do": "PENEDES", "eco": "ECO", "superior": false, "desti": "cooperativa", "ingres": 1018.88, "sup": 0, "brix": 10.0, "obs": "DO:PENEDES | ECO | Glucònic:0.0 | Bon:4.0% | Parcer:Casanovas Orellana"}, {"id": 1000094, "data": "2025-09-19", "parcela": "L'Oliverà", "pv": "KC746", "varietat": "Xarel·lo", "kg": 1263, "kg_teu": 947.2, "pct_lliurador": 75, "parcer": "Casanovas Orellana", "graus": 10.0, "kgraus": 12630, "gluco": 0.1, "pct_bon": 4.0, "do": "CAVA", "eco": "ECO", "superior": false, "desti": "cooperativa", "ingres": 463.02, "sup": 0, "brix": 10.0, "obs": "DO:CAVA | ECO | Glucònic:0.1 | Bon:4.0% | Parcer:Casanovas Orellana"}, {"id": 1000095, "data": "2025-09-19", "parcela": "Merlot santa Fe", "pv": "A1847", "varietat": "Merlot", "kg": 410, "kg_teu": 410.0, "pct_lliurador": 100, "parcer": "", "graus": 10.0, "kgraus": 4100, "gluco": 0.0, "pct_bon": 5.0, "do": "PENEDES", "eco": "ECO", "superior": false, "desti": "cooperativa", "ingres": 236.78, "sup": 0, "brix": 10.0, "obs": "DO:PENEDES | ECO | Glucònic:0.0 | Bon:5.0%"}, {"id": 1000096, "data": "2025-09-19", "parcela": "Macabeu Nou Escudé E", "pv": "KA572", "varietat": "Xarel·lo", "kg": 2400, "kg_teu": 2400.0, "pct_lliurador": 100, "parcer": "", "graus": 10.0, "kgraus": 24000, "gluco": 0.1, "pct_bon": 4.0, "do": "CAVA", "eco": "ECO", "superior": false, "desti": "torelló", "ingres": 2208.0, "sup": 0, "brix": 10.0, "obs": "DO:CAVA | ECO | Glucònic:0.1 | Bon:4.0%"}, {"id": 1000097, "data": "2025-09-19", "parcela": "Macabeu Nou Escudé E", "pv": "KA572", "varietat": "Xarel·lo", "kg": 1940, "kg_teu": 1940.0, "pct_lliurador": 100, "parcer": "", "graus": 10.0, "kgraus": 19400, "gluco": 0.1, "pct_bon": 4.0, "do": "CAVA", "eco": "ECO", "superior": false, "desti": "torelló", "ingres": 1784.8, "sup": 0, "brix": 10.0, "obs": "DO:CAVA | ECO | Glucònic:0.1 | Bon:4.0%"}, {"id": 1000098, "data": "2025-09-19", "parcela": "Trepat Cal Escudé", "pv": "AW463", "varietat": "Xarel·lo", "kg": 2060, "kg_teu": 2060.0, "pct_lliurador": 100, "parcer": "", "graus": 10.0, "kgraus": 20600, "gluco": 0.1, "pct_bon": 4.0, "do": "CAVA", "eco": "ECO", "superior": false, "desti": "torelló", "ingres": 1895.2, "sup": 0, "brix": 10.0, "obs": "DO:CAVA | ECO | Glucònic:0.1 | Bon:4.0%"}, {"id": 1000099, "data": "2025-09-19", "parcela": "L'Oliverà", "pv": "KA617", "varietat": "Xarel·lo", "kg": 602, "kg_teu": 602.0, "pct_lliurador": 100, "parcer": "", "graus": 10.0, "kgraus": 6020, "gluco": 0.1, "pct_bon": 4.0, "do": "PENEDES", "eco": "ECO", "superior": false, "desti": "torelló", "ingres": 553.84, "sup": 0, "brix": 10.0, "obs": "DO:PENEDES | ECO | Glucònic:0.1 | Bon:4.0%"}, {"id": 1000100, "data": "2025-09-19", "parcela": "Xarel·lo Les costes", "pv": "AT674", "varietat": "Xarel·lo", "kg": 963, "kg_teu": 963.0, "pct_lliurador": 100, "parcer": "", "graus": 10.0, "kgraus": 9630, "gluco": 0.1, "pct_bon": 4.0, "do": "CAVA", "eco": "ECO", "superior": false, "desti": "miquel pons", "ingres": 847.44, "sup": 0, "brix": 10.0, "obs": "DO:CAVA | ECO | Glucònic:0.1 | Bon:4.0%"}, {"id": 1000101, "data": "2025-09-24", "parcela": "Xarel·lo Les costes", "pv": "AT674", "varietat": "Xarel·lo", "kg": 3200, "kg_teu": 3200.0, "pct_lliurador": 100, "parcer": "", "graus": 10.0, "kgraus": 32000, "gluco": 0.0, "pct_bon": 0.0, "do": "CAVA", "eco": "ECO", "superior": true, "desti": "miquel pons", "ingres": 2816.0, "sup": 0, "brix": 10.0, "obs": "DO:CAVA | ECO GS | Glucònic:0.0 | Bon:0.0%"}, {"id": 1000102, "data": "2025-08-12", "parcela": "Chardonnay Bas", "pv": "AI899", "varietat": "Chardonnay", "kg": 3380, "kg_teu": 2535.0, "pct_lliurador": 75, "parcer": "Bas Santacana", "graus": 11.5, "kgraus": 29153, "gluco": 0.05, "pct_bon": 4.5, "do": "CAVA", "eco": "ECO", "superior": true, "desti": "cooperativa", "ingres": 1256.68, "sup": 0, "brix": 11.5, "obs": "DO:CAVA | ECO GS | Glucònic:0.05 | Bon:4.5% | Parcer:Bas Santacana"}, {"id": 1000103, "data": "2025-08-21", "parcela": "Macabeu Bas Ave", "pv": "AB087", "varietat": "Macabeu", "kg": 7560, "kg_teu": 5670.0, "pct_lliurador": 75, "parcer": "Bas Santacana", "graus": 10.0, "kgraus": 56700, "gluco": 0.34, "pct_bon": 1.6, "do": "CAVA", "eco": "ECO", "superior": true, "desti": "cooperativa", "ingres": 2376.3, "sup": 0, "brix": 10.0, "obs": "DO:CAVA | ECO GS | Glucònic:0.34 | Bon:1.6% | Parcer:Bas Santacana"}, {"id": 1000104, "data": "2025-08-23", "parcela": "Macabeu Bas Ave", "pv": "AB087", "varietat": "Macabeu", "kg": 2820, "kg_teu": 2115.0, "pct_lliurador": 75, "parcer": "Bas Santacana", "graus": 10.6, "kgraus": 22419, "gluco": 0.17, "pct_bon": 3.3, "do": "CAVA", "eco": "ECO", "superior": true, "desti": "cooperativa", "ingres": 955.3, "sup": 0, "brix": 10.6, "obs": "DO:CAVA | ECO GS | Glucònic:0.17 | Bon:3.3% | Parcer:Bas Santacana"}, {"id": 1000105, "data": "2025-09-19", "parcela": "Muscat Rectoria", "pv": "AI896", "varietat": "Moscatell Alexandria", "kg": 1290, "kg_teu": 967.5, "pct_lliurador": 75, "parcer": "Parroquia Sant Cristofor", "graus": 10.0, "kgraus": 4838, "gluco": 0.1, "pct_bon": 4.0, "do": "PENEDES", "eco": "ECO", "superior": false, "desti": "cooperativa", "ingres": 207.55, "sup": 0, "brix": 10.0, "obs": "DO:PENEDES | ECO | Glucònic:0.1 | Bon:4.0% | Parcer:Parroquia Sant Cristofor"}, {"id": 1000106, "data": "2025-09-19", "parcela": "Muscat Rectoria", "pv": "AI895", "varietat": "Moscatell Alexandria", "kg": 1290, "kg_teu": 967.5, "pct_lliurador": 75, "parcer": "Parroquia Sant Cristofor", "graus": 10.0, "kgraus": 4838, "gluco": 0.1, "pct_bon": 4.0, "do": "PENEDES", "eco": "ECO", "superior": false, "desti": "cooperativa", "ingres": 207.55, "sup": 0, "brix": 10.0, "obs": "DO:PENEDES | ECO | Glucònic:0.1 | Bon:4.0% | Parcer:Parroquia Sant Cristofor"}, {"id": 1000107, "data": "2025-09-19", "parcela": "Muscat Rectoria", "pv": "AI896", "varietat": "Moscatell Alexandria", "kg": 1571, "kg_teu": 1178.2, "pct_lliurador": 75, "parcer": "Parroquia Sant Cristofor", "graus": 10.0, "kgraus": 11783, "gluco": 0.1, "pct_bon": 4.0, "do": "PENEDES", "eco": "ECO", "superior": false, "desti": "cooperativa", "ingres": 505.49, "sup": 0, "brix": 10.0, "obs": "DO:PENEDES | ECO | Glucònic:0.1 | Bon:4.0% | Parcer:Parroquia Sant Cristofor"}, {"id": 1000108, "data": "2025-09-19", "parcela": "Muscat Rectoria", "pv": "AI895", "varietat": "Moscatell Alexandria", "kg": 1899, "kg_teu": 1424.2, "pct_lliurador": 75, "parcer": "Parroquia Sant Cristofor", "graus": 10.0, "kgraus": 14242, "gluco": 0.1, "pct_bon": 4.0, "do": "PENEDES", "eco": "ECO", "superior": false, "desti": "cooperativa", "ingres": 610.98, "sup": 0, "brix": 10.0, "obs": "DO:PENEDES | ECO | Glucònic:0.1 | Bon:4.0% | Parcer:Parroquia Sant Cristofor"}, {"id": 1000109, "data": "2025-09-19", "parcela": "Muscat Rectoria", "pv": "AI895", "varietat": "Moscatell Alexandria", "kg": 1611, "kg_teu": 1208.2, "pct_lliurador": 75, "parcer": "Parroquia Sant Cristofor", "graus": 10.0, "kgraus": 12083, "gluco": 0.1, "pct_bon": 4.0, "do": "PENEDES", "eco": "ECO", "superior": false, "desti": "cooperativa", "ingres": 518.36, "sup": 0, "brix": 10.0, "obs": "DO:PENEDES | ECO | Glucònic:0.1 | Bon:4.0% | Parcer:Parroquia Sant Cristofor"}, {"id": 1000110, "data": "2025-09-19", "parcela": "Muscat Rectoria", "pv": "AI895", "varietat": "Moscatell Alexandria", "kg": 1830, "kg_teu": 1372.5, "pct_lliurador": 75, "parcer": "Parroquia Sant Cristofor", "graus": 10.0, "kgraus": 13725, "gluco": 0.1, "pct_bon": 4.0, "do": "PENEDES", "eco": "ECO", "superior": false, "desti": "cooperativa", "ingres": 588.8, "sup": 0, "brix": 10.0, "obs": "DO:PENEDES | ECO | Glucònic:0.1 | Bon:4.0% | Parcer:Parroquia Sant Cristofor"}, {"id": 1000111, "data": "2025-09-19", "parcela": "Muscat Rectoria", "pv": "AI894", "varietat": "Moscatell Alexandria", "kg": 1095, "kg_teu": 821.2, "pct_lliurador": 75, "parcer": "Parroquia Sant Cristofor", "graus": 10.0, "kgraus": 3750, "gluco": 0.1, "pct_bon": 4.0, "do": "PENEDES", "eco": "ECO", "superior": false, "desti": "cooperativa", "ingres": 160.88, "sup": 0, "brix": 10.0, "obs": "DO:PENEDES | ECO | Glucònic:0.1 | Bon:4.0% | Parcer:Parroquia Sant Cristofor"}, {"id": 1000112, "data": "2025-09-19", "parcela": "Muscat Rectoria", "pv": "AI895", "varietat": "Moscatell Alexandria", "kg": 1095, "kg_teu": 821.2, "pct_lliurador": 75, "parcer": "Parroquia Sant Cristofor", "graus": 10.0, "kgraus": 4463, "gluco": 0.1, "pct_bon": 4.0, "do": "PENEDES", "eco": "ECO", "superior": false, "desti": "cooperativa", "ingres": 191.46, "sup": 0, "brix": 10.0, "obs": "DO:PENEDES | ECO | Glucònic:0.1 | Bon:4.0% | Parcer:Parroquia Sant Cristofor"}, {"id": 1000113, "data": "2025-08-27", "parcela": "Macabeu Lavern", "pv": "AV119", "varietat": "Macabeu", "kg": 10800, "kg_teu": 8100.0, "pct_lliurador": 75, "parcer": "Escoda Roca", "graus": 11.5, "kgraus": 69000, "gluco": 0.01, "pct_bon": 4.9, "do": "CAVA", "eco": "ECO", "superior": true, "desti": "cooperativa", "ingres": 2985.72, "sup": 0, "brix": 11.5, "obs": "DO:CAVA | ECO GS | Glucònic:0.01 | Bon:4.9% | Parcer:Escoda Roca"}, {"id": 1000114, "data": "2025-08-27", "parcela": "Macabeu Lavern", "pv": "AV143", "varietat": "Macabeu", "kg": 10800, "kg_teu": 8100.0, "pct_lliurador": 75, "parcer": "Escoda Roca", "graus": 11.5, "kgraus": 24150, "gluco": 0.01, "pct_bon": 4.9, "do": "CAVA", "eco": "ECO", "superior": true, "desti": "cooperativa", "ingres": 1045.0, "sup": 0, "brix": 11.5, "obs": "DO:CAVA | ECO GS | Glucònic:0.01 | Bon:4.9% | Parcer:Escoda Roca"}, {"id": 1000115, "data": "2025-08-27", "parcela": "Macabeu Lavern", "pv": "AV143", "varietat": "Macabeu", "kg": 6970, "kg_teu": 5227.5, "pct_lliurador": 75, "parcer": "Escoda Roca", "graus": 11.5, "kgraus": 9056, "gluco": 0.04, "pct_bon": 4.6, "do": "CAVA", "eco": "ECO", "superior": true, "desti": "cooperativa", "ingres": 390.74, "sup": 0, "brix": 11.5, "obs": "DO:CAVA | ECO GS | Glucònic:0.04 | Bon:4.6% | Parcer:Escoda Roca"}, {"id": 1000116, "data": "2025-08-27", "parcela": "Macabeu Lavern", "pv": "AV149", "varietat": "Macabeu", "kg": 6970, "kg_teu": 5227.5, "pct_lliurador": 75, "parcer": "Escoda Roca", "graus": 11.5, "kgraus": 51060, "gluco": 0.04, "pct_bon": 4.6, "do": "CAVA", "eco": "ECO", "superior": true, "desti": "cooperativa", "ingres": 2203.11, "sup": 0, "brix": 11.5, "obs": "DO:CAVA | ECO GS | Glucònic:0.04 | Bon:4.6% | Parcer:Escoda Roca"}, {"id": 1000117, "data": "2025-08-27", "parcela": "Macabeu Lavern", "pv": "AV143", "varietat": "Macabeu", "kg": 1270, "kg_teu": 952.5, "pct_lliurador": 75, "parcer": "Escoda Roca", "graus": 11.5, "kgraus": 5477, "gluco": 0.04, "pct_bon": 4.6, "do": "CAVA", "eco": "ECO", "superior": true, "desti": "cooperativa", "ingres": 236.32, "sup": 0, "brix": 11.5, "obs": "DO:CAVA | ECO GS | Glucònic:0.04 | Bon:4.6% | Parcer:Escoda Roca"}, {"id": 1000118, "data": "2025-08-27", "parcela": "Macabeu Lavern", "pv": "AV149", "varietat": "Macabeu", "kg": 1270, "kg_teu": 952.5, "pct_lliurador": 75, "parcer": "Escoda Roca", "graus": 11.5, "kgraus": 5477, "gluco": 0.04, "pct_bon": 4.6, "do": "CAVA", "eco": "ECO", "superior": true, "desti": "cooperativa", "ingres": 236.32, "sup": 0, "brix": 11.5, "obs": "DO:CAVA | ECO GS | Glucònic:0.04 | Bon:4.6% | Parcer:Escoda Roca"}, {"id": 1000119, "data": "2025-09-15", "parcela": "Escoda Autopista", "pv": "BB859", "varietat": "Xarel·lo", "kg": 1300, "kg_teu": 975.0, "pct_lliurador": 75, "parcer": "Garcia Llopart", "graus": 11.9, "kgraus": 11603, "gluco": 0.16, "pct_bon": 3.4, "do": "CAVA", "eco": "ECO", "superior": false, "desti": "cooperativa", "ingres": 422.91, "sup": 0, "brix": 11.9, "obs": "DO:CAVA | ECO | Glucònic:0.16 | Bon:3.4% | Parcer:Garcia Llopart"}, {"id": 1000120, "data": "2025-09-13", "parcela": "La Salada Masia", "pv": "AW505", "varietat": "Xarel·lo", "kg": 530, "kg_teu": 397.5, "pct_lliurador": 75, "parcer": "Parroquia Sant Cristofor", "graus": 10.4, "kgraus": 4134, "gluco": 0.08, "pct_bon": 4.2, "do": "CAVA", "eco": "ECO", "superior": false, "desti": "cooperativa", "ingres": 151.84, "sup": 0, "brix": 10.4, "obs": "DO:CAVA | ECO | Glucònic:0.08 | Bon:4.2% | Parcer:Parroquia Sant Cristofor"}, {"id": 1000121, "data": "2025-09-17", "parcela": "Muscat Rectoria", "pv": "AI895", "varietat": "Moscatell Alexandria", "kg": 4720, "kg_teu": 3540.0, "pct_lliurador": 75, "parcer": "Parroquia Sant Cristofor", "graus": 11.4, "kgraus": 17613, "gluco": 0.05, "pct_bon": 4.5, "do": "PENEDES", "eco": "ECO", "superior": false, "desti": "cooperativa", "ingres": 759.23, "sup": 0, "brix": 11.4, "obs": "DO:PENEDES | ECO | Glucònic:0.05 | Bon:4.5% | Parcer:Parroquia Sant Cristofor"}, {"id": 1000122, "data": "2025-09-17", "parcela": "Muscat Rectoria", "pv": "AI903", "varietat": "Moscatell Alexandria", "kg": 4720, "kg_teu": 3540.0, "pct_lliurador": 75, "parcer": "Parroquia Sant Cristofor", "graus": 11.4, "kgraus": 22743, "gluco": 0.05, "pct_bon": 4.5, "do": "PENEDES", "eco": "ECO", "superior": false, "desti": "cooperativa", "ingres": 980.37, "sup": 0, "brix": 11.4, "obs": "DO:PENEDES | ECO | Glucònic:0.05 | Bon:4.5% | Parcer:Parroquia Sant Cristofor"}, {"id": 1000123, "data": "2025-09-17", "parcela": "Muscat Rectoria", "pv": "AI896", "varietat": "Moscatell Alexandria", "kg": 1330, "kg_teu": 997.5, "pct_lliurador": 75, "parcer": "Parroquia Sant Cristofor", "graus": 10.0, "kgraus": 9975, "gluco": 0.1, "pct_bon": 4.0, "do": "PENEDES", "eco": "ECO", "superior": false, "desti": "cooperativa", "ingres": 427.93, "sup": 0, "brix": 10.0, "obs": "DO:PENEDES | ECO | Glucònic:0.1 | Bon:4.0% | Parcer:Parroquia Sant Cristofor"}, {"id": 1000124, "data": "2025-09-19", "parcela": "Muscat Rectoria", "pv": "AI895", "varietat": "Moscatell Alexandria", "kg": 407, "kg_teu": 305.2, "pct_lliurador": 75, "parcer": "Parroquia Sant Cristofor", "graus": 10.0, "kgraus": 3053, "gluco": 0.1, "pct_bon": 4.0, "do": "PENEDES", "eco": "ECO", "superior": false, "desti": "cooperativa", "ingres": 130.97, "sup": 0, "brix": 10.0, "obs": "DO:PENEDES | ECO | Glucònic:0.1 | Bon:4.0% | Parcer:Parroquia Sant Cristofor"}, {"id": 1000125, "data": "2025-09-19", "parcela": "Muscat Rectoria", "pv": "AI896", "varietat": "Moscatell Alexandria", "kg": 1571, "kg_teu": 1178.2, "pct_lliurador": 75, "parcer": "Parroquia Sant Cristofor", "graus": 10.0, "kgraus": 11783, "gluco": 0.1, "pct_bon": 4.0, "do": "PENEDES", "eco": "ECO", "superior": false, "desti": "cooperativa", "ingres": 505.49, "sup": 0, "brix": 10.0, "obs": "DO:PENEDES | ECO | Glucònic:0.1 | Bon:4.0% | Parcer:Parroquia Sant Cristofor"}, {"id": 1000126, "data": "2025-09-19", "parcela": "Muscat Rectoria", "pv": "AI895", "varietat": "Moscatell Alexandria", "kg": 1899, "kg_teu": 1424.2, "pct_lliurador": 75, "parcer": "Parroquia Sant Cristofor", "graus": 10.0, "kgraus": 14242, "gluco": 0.1, "pct_bon": 4.0, "do": "PENEDES", "eco": "ECO", "superior": false, "desti": "cooperativa", "ingres": 610.98, "sup": 0, "brix": 10.0, "obs": "DO:PENEDES | ECO | Glucònic:0.1 | Bon:4.0% | Parcer:Parroquia Sant Cristofor"}, {"id": 1000127, "data": "2025-09-19", "parcela": "Muscat Rectoria", "pv": "AI895", "varietat": "Moscatell Alexandria", "kg": 1611, "kg_teu": 1208.2, "pct_lliurador": 75, "parcer": "Parroquia Sant Cristofor", "graus": 10.0, "kgraus": 12083, "gluco": 0.1, "pct_bon": 4.0, "do": "PENEDES", "eco": "ECO", "superior": false, "desti": "cooperativa", "ingres": 518.36, "sup": 0, "brix": 10.0, "obs": "DO:PENEDES | ECO | Glucònic:0.1 | Bon:4.0% | Parcer:Parroquia Sant Cristofor"}, {"id": 1000128, "data": "2025-09-19", "parcela": "Muscat Rectoria", "pv": "AI895", "varietat": "Moscatell Alexandria", "kg": 1830, "kg_teu": 1372.5, "pct_lliurador": 75, "parcer": "Parroquia Sant Cristofor", "graus": 10.0, "kgraus": 13725, "gluco": 0.1, "pct_bon": 4.0, "do": "PENEDES", "eco": "ECO", "superior": false, "desti": "cooperativa", "ingres": 588.8, "sup": 0, "brix": 10.0, "obs": "DO:PENEDES | ECO | Glucònic:0.1 | Bon:4.0% | Parcer:Parroquia Sant Cristofor"}, {"id": 1000129, "data": "2025-09-19", "parcela": "Muscat Rectoria", "pv": "AI894", "varietat": "Moscatell Alexandria", "kg": 1095, "kg_teu": 821.2, "pct_lliurador": 75, "parcer": "Parroquia Sant Cristofor", "graus": 10.0, "kgraus": 3750, "gluco": 0.1, "pct_bon": 4.0, "do": "PENEDES", "eco": "ECO", "superior": false, "desti": "cooperativa", "ingres": 160.88, "sup": 0, "brix": 10.0, "obs": "DO:PENEDES | ECO | Glucònic:0.1 | Bon:4.0% | Parcer:Parroquia Sant Cristofor"}, {"id": 1000130, "data": "2025-09-19", "parcela": "Muscat Rectoria", "pv": "AI895", "varietat": "Moscatell Alexandria", "kg": 1095, "kg_teu": 821.2, "pct_lliurador": 75, "parcer": "Parroquia Sant Cristofor", "graus": 10.0, "kgraus": 4463, "gluco": 0.1, "pct_bon": 4.0, "do": "PENEDES", "eco": "ECO", "superior": false, "desti": "cooperativa", "ingres": 191.46, "sup": 0, "brix": 10.0, "obs": "DO:PENEDES | ECO | Glucònic:0.1 | Bon:4.0% | Parcer:Parroquia Sant Cristofor"}, {"id": 1000131, "data": "2025-08-25", "parcela": "Macabeu Josep Maria", "pv": "AT594", "varietat": "Macabeu", "kg": 6560, "kg_teu": 4920.0, "pct_lliurador": 75, "parcer": "Pons Font Josep", "graus": 10.9, "kgraus": 53628, "gluco": 0.03, "pct_bon": 4.7, "do": "CAVA", "eco": "ECO", "superior": false, "desti": "cooperativa", "ingres": 1979.24, "sup": 0, "brix": 10.9, "obs": "DO:CAVA | ECO | Glucònic:0.03 | Bon:4.7% | Parcer:Pons Font Josep"}, {"id": 1000132, "data": "2025-08-22", "parcela": "Macabeu Miquel", "pv": "IB172", "varietat": "Macabeu", "kg": 9260, "kg_teu": 6945.0, "pct_lliurador": 75, "parcer": "Raventons Cardona", "graus": 10.3, "kgraus": 45547, "gluco": 0.04, "pct_bon": 4.6, "do": "CAVA", "eco": "ECO", "superior": true, "desti": "cooperativa", "ingres": 1965.24, "sup": 0, "brix": 10.3, "obs": "DO:CAVA | ECO GS | Glucònic:0.04 | Bon:4.6% | Parcer:Raventons Cardona"}, {"id": 1000133, "data": "2025-08-22", "parcela": "Macabeu Miquel", "pv": "J1233", "varietat": "Macabeu", "kg": 9260, "kg_teu": 6945.0, "pct_lliurador": 75, "parcer": "Raventons Cardona", "graus": 10.3, "kgraus": 25987, "gluco": 0.04, "pct_bon": 4.6, "do": "CAVA", "eco": "ECO", "superior": true, "desti": "cooperativa", "ingres": 1121.27, "sup": 0, "brix": 10.3, "obs": "DO:CAVA | ECO GS | Glucònic:0.04 | Bon:4.6% | Parcer:Raventons Cardona"}, {"id": 1000134, "data": "2025-08-22", "parcela": "Macabeu Miquel", "pv": "J1235", "varietat": "Macabeu", "kg": 9180, "kg_teu": 6885.0, "pct_lliurador": 75, "parcer": "Raventons Cardona", "graus": 10.9, "kgraus": 75047, "gluco": 0.04, "pct_bon": 4.6, "do": "CAVA", "eco": "ECO", "superior": true, "desti": "cooperativa", "ingres": 3238.09, "sup": 0, "brix": 10.9, "obs": "DO:CAVA | ECO GS | Glucònic:0.04 | Bon:4.6% | Parcer:Raventons Cardona"}, {"id": 1000135, "data": "2025-08-25", "parcela": "Macabeu Miquel", "pv": "IB172", "varietat": "Macabeu", "kg": 340, "kg_teu": 255.0, "pct_lliurador": 75, "parcer": "Raventons Cardona", "graus": 10.3, "kgraus": 2627, "gluco": 0.12, "pct_bon": 3.8, "do": "CAVA", "eco": "ECO", "superior": true, "desti": "cooperativa", "ingres": 112.48, "sup": 0, "brix": 10.3, "obs": "DO:CAVA | ECO GS | Glucònic:0.12 | Bon:3.8% | Parcer:Raventons Cardona"}, {"id": 1000136, "data": "2025-09-15", "parcela": "La Masia", "pv": "AD318", "varietat": "Xarel·lo", "kg": 10140, "kg_teu": 8720.4, "pct_lliurador": 86, "parcer": "Pere Pons Font", "graus": 10.0, "kgraus": 87204, "gluco": 0.19, "pct_bon": 3.1, "do": "CAVA", "eco": "ECO", "superior": true, "desti": "cooperativa", "ingres": 4252.62, "sup": 0, "brix": 10.0, "obs": "DO:CAVA | ECO GS | Glucònic:0.19 | Bon:3.1% | Parcer:Pere Pons Font"}, {"id": 1000137, "data": "2025-09-15", "parcela": "La Masia", "pv": "IX548", "varietat": "Xarel·lo", "kg": 10320, "kg_teu": 8875.2, "pct_lliurador": 86, "parcer": "Pere Pons Font", "graus": 12.1, "kgraus": 76172, "gluco": 0.14, "pct_bon": 3.6, "do": "CAVA", "eco": "ECO", "superior": true, "desti": "cooperativa", "ingres": 3732.64, "sup": 0, "brix": 12.1, "obs": "DO:CAVA | ECO GS | Glucònic:0.14 | Bon:3.6% | Parcer:Pere Pons Font"}, {"id": 1000138, "data": "2025-09-15", "parcela": "La Masia", "pv": "AD318", "varietat": "Xarel·lo", "kg": 10320, "kg_teu": 8875.2, "pct_lliurador": 86, "parcer": "Pere Pons Font", "graus": 12.1, "kgraus": 31218, "gluco": 0.14, "pct_bon": 3.6, "do": "CAVA", "eco": "ECO", "superior": true, "desti": "cooperativa", "ingres": 1529.77, "sup": 0, "brix": 12.1, "obs": "DO:CAVA | ECO GS | Glucònic:0.14 | Bon:3.6% | Parcer:Pere Pons Font"}, {"id": 1000139, "data": "2025-09-15", "parcela": "La Masia", "pv": "IX548", "varietat": "Xarel·lo", "kg": 8305, "kg_teu": 7142.3, "pct_lliurador": 86, "parcer": "Pere Pons Font", "graus": 11.5, "kgraus": 21857, "gluco": 0.08, "pct_bon": 4.2, "do": "CAVA", "eco": "ECO", "superior": true, "desti": "cooperativa", "ingres": 1077.26, "sup": 0, "brix": 11.5, "obs": "DO:CAVA | ECO GS | Glucònic:0.08 | Bon:4.2% | Parcer:Pere Pons Font"}, {"id": 1000140, "data": "2025-09-15", "parcela": "La Masia", "pv": "AD318", "varietat": "Xarel·lo", "kg": 8305, "kg_teu": 7142.3, "pct_lliurador": 86, "parcer": "Pere Pons Font", "graus": 11.5, "kgraus": 60279, "gluco": 0.08, "pct_bon": 4.2, "do": "CAVA", "eco": "ECO", "superior": true, "desti": "cooperativa", "ingres": 2970.95, "sup": 0, "brix": 11.5, "obs": "DO:CAVA | ECO GS | Glucònic:0.08 | Bon:4.2% | Parcer:Pere Pons Font"}, {"id": 1000141, "data": "2025-08-18", "parcela": "Molí de Vent", "pv": "JV107", "varietat": "Macabeu", "kg": 10020, "kg_teu": 8016.0, "pct_lliurador": 80, "parcer": "Mila Esteve", "graus": 10.0, "kgraus": 75150, "gluco": 0.04, "pct_bon": 4.6, "do": "CAVA", "eco": "ECO", "superior": false, "desti": "cooperativa", "ingres": 3458.7, "sup": 0, "brix": 10.0, "obs": "DO:CAVA | ECO | Glucònic:0.04 | Bon:4.6% | Parcer:Mila Esteve"}, {"id": 1000142, "data": "2025-08-21", "parcela": "Vinya Torres", "pv": "BB323", "varietat": "Macabeu", "kg": 5380, "kg_teu": 4304.0, "pct_lliurador": 80, "parcer": "Pons Font JM", "graus": 10.6, "kgraus": 45622, "gluco": 0.09, "pct_bon": 4.1, "do": "CAVA", "eco": "ECO", "superior": false, "desti": "cooperativa", "ingres": 1785.72, "sup": 0, "brix": 10.6, "obs": "DO:CAVA | ECO | Glucònic:0.09 | Bon:4.1% | Parcer:Pons Font JM"}, {"id": 1000143, "data": "2025-09-19", "parcela": "Malvasia Santa Fe", "pv": "AT640", "varietat": "Malvasia Sitges", "kg": 1258, "kg_teu": 943.5, "pct_lliurador": 75, "parcer": "Casanovas Orellana", "graus": 10.0, "kgraus": 9435, "gluco": 0.1, "pct_bon": 4.0, "do": "PENEDES", "eco": "ECO", "superior": false, "desti": "miquel pons", "ingres": 830.28, "sup": 0, "brix": 10.0, "obs": "DO:PENEDES | ECO | Glucònic:0.1 | Bon:4.0% | Parcer:Casanovas Orellana"}, {"id": 1000144, "data": "2025-09-19", "parcela": "Xarel·lo Truco", "pv": "AJ031", "varietat": "Xarel·lo", "kg": 4030, "kg_teu": 3022.5, "pct_lliurador": 75, "parcer": "Raventos Escofet", "graus": 11.2, "kgraus": 33852, "gluco": 0.12, "pct_bon": 3.8, "do": "PENEDES", "eco": "ECO", "superior": false, "desti": "cooperativa", "ingres": 1449.46, "sup": 0, "brix": 11.2, "obs": "DO:PENEDES | ECO | Glucònic:0.12 | Bon:3.8% | Parcer:Raventos Escofet"}, {"id": 1000145, "data": "2025-09-19", "parcela": "Cabernet Truco", "pv": "AJ029", "varietat": "Cabernet Sauvignon", "kg": 1513, "kg_teu": 1134.8, "pct_lliurador": 75, "parcer": "Via Valls", "graus": 10.0, "kgraus": 11348, "gluco": 0.0, "pct_bon": 5.0, "do": "PENEDES", "eco": "ECO", "superior": false, "desti": "cooperativa", "ingres": 491.51, "sup": 0, "brix": 10.0, "obs": "DO:PENEDES | ECO | Glucònic:0.0 | Bon:5.0% | Parcer:Via Valls"}, {"id": 1000146, "data": "2025-09-19", "parcela": "Cabernet Truco", "pv": "AJ029", "varietat": "Cabernet Sauvignon", "kg": 948, "kg_teu": 711.0, "pct_lliurador": 75, "parcer": "Raventos Escofet", "graus": 10.0, "kgraus": 7110, "gluco": 0.0, "pct_bon": 5.0, "do": "PENEDES", "eco": "ECO", "superior": false, "desti": "cooperativa", "ingres": 307.95, "sup": 0, "brix": 10.0, "obs": "DO:PENEDES | ECO | Glucònic:0.0 | Bon:5.0% | Parcer:Raventos Escofet"}, {"id": 1000147, "data": "2025-08-27", "parcela": "Macabeu Lavern", "pv": "AV119", "varietat": "Macabeu", "kg": 10800, "kg_teu": 8100.0, "pct_lliurador": 75, "parcer": "Raventons Cardona", "graus": 11.5, "kgraus": 69000, "gluco": 0.01, "pct_bon": 4.9, "do": "CAVA", "eco": "ECO", "superior": true, "desti": "cooperativa", "ingres": 2985.72, "sup": 0, "brix": 11.5, "obs": "DO:CAVA | ECO GS | Glucònic:0.01 | Bon:4.9% | Parcer:Raventons Cardona"}, {"id": 1000148, "data": "2025-08-27", "parcela": "Macabeu Lavern", "pv": "AV143", "varietat": "Macabeu", "kg": 6970, "kg_teu": 5227.5, "pct_lliurador": 75, "parcer": "Raventons Cardona", "graus": 11.5, "kgraus": 9056, "gluco": 0.04, "pct_bon": 4.6, "do": "CAVA", "eco": "ECO", "superior": true, "desti": "cooperativa", "ingres": 390.74, "sup": 0, "brix": 11.5, "obs": "DO:CAVA | ECO GS | Glucònic:0.04 | Bon:4.6% | Parcer:Raventons Cardona"}, {"id": 1000149, "data": "2025-08-27", "parcela": "Macabeu Lavern", "pv": "AV143", "varietat": "Macabeu", "kg": 6970, "kg_teu": 5227.5, "pct_lliurador": 75, "parcer": "Raventons Cardona", "graus": 11.5, "kgraus": 51060, "gluco": 0.04, "pct_bon": 4.6, "do": "CAVA", "eco": "ECO", "superior": true, "desti": "cooperativa", "ingres": 2203.11, "sup": 0, "brix": 11.5, "obs": "DO:CAVA | ECO GS | Glucònic:0.04 | Bon:4.6% | Parcer:Raventons Cardona"}, {"id": 1000150, "data": "2025-08-27", "parcela": "Macabeu Lavern", "pv": "AV149", "varietat": "Macabeu", "kg": 1270, "kg_teu": 952.5, "pct_lliurador": 75, "parcer": "Raventons Cardona", "graus": 11.5, "kgraus": 5477, "gluco": 0.04, "pct_bon": 4.6, "do": "CAVA", "eco": "ECO", "superior": true, "desti": "cooperativa", "ingres": 236.32, "sup": 0, "brix": 11.5, "obs": "DO:CAVA | ECO GS | Glucònic:0.04 | Bon:4.6% | Parcer:Raventons Cardona"}, {"id": 1000151, "data": "2025-08-27", "parcela": "Macabeu Lavern", "pv": "AV143", "varietat": "Macabeu", "kg": 1270, "kg_teu": 952.5, "pct_lliurador": 75, "parcer": "Raventons Cardona", "graus": 11.5, "kgraus": 5477, "gluco": 0.04, "pct_bon": 4.6, "do": "CAVA", "eco": "ECO", "superior": true, "desti": "cooperativa", "ingres": 236.32, "sup": 0, "brix": 11.5, "obs": "DO:CAVA | ECO GS | Glucònic:0.04 | Bon:4.6% | Parcer:Raventons Cardona"}, {"id": 1000152, "data": "2025-09-10", "parcela": "Lavern Xarel·lo Vinya Mig", "pv": "AV154", "varietat": "Xarel·lo", "kg": 10760, "kg_teu": 8070.0, "pct_lliurador": 75, "parcer": "Raventons Cardona", "graus": 11.4, "kgraus": 91998, "gluco": 0.03, "pct_bon": 4.7, "do": "CAVA", "eco": "ECO", "superior": true, "desti": "cooperativa", "ingres": 3973.28, "sup": 0, "brix": 11.4, "obs": "DO:CAVA | ECO GS | Glucònic:0.03 | Bon:4.7% | Parcer:Raventons Cardona"}, {"id": 1000153, "data": "2025-09-10", "parcela": "Xarel·lo Carretera", "pv": "AV123", "varietat": "Xarel·lo", "kg": 10200, "kg_teu": 7650.0, "pct_lliurador": 75, "parcer": "Raventons Cardona", "graus": 10.9, "kgraus": 12344, "gluco": 0.02, "pct_bon": 4.8, "do": "CAVA", "eco": "ECO", "superior": true, "desti": "cooperativa", "ingres": 533.63, "sup": 0, "brix": 10.9, "obs": "DO:CAVA | ECO GS | Glucònic:0.02 | Bon:4.8% | Parcer:Raventons Cardona"}, {"id": 1000154, "data": "2025-09-10", "parcela": "Lavern Xarel·lo Carretera", "pv": "AV153", "varietat": "Xarel·lo", "kg": 10200, "kg_teu": 7650.0, "pct_lliurador": 75, "parcer": "Raventons Cardona", "graus": 10.9, "kgraus": 71041, "gluco": 0.02, "pct_bon": 4.8, "do": "CAVA", "eco": "ECO", "superior": true, "desti": "cooperativa", "ingres": 3071.1, "sup": 0, "brix": 10.9, "obs": "DO:CAVA | ECO GS | Glucònic:0.02 | Bon:4.8% | Parcer:Raventons Cardona"}, {"id": 1000155, "data": "2025-09-10", "parcela": "Lavern Xarel·lo Vinya Mig", "pv": "AV154", "varietat": "Xarel·lo", "kg": 8060, "kg_teu": 6045.0, "pct_lliurador": 75, "parcer": "Raventons Cardona", "graus": 10.9, "kgraus": 62264, "gluco": 0.02, "pct_bon": 4.8, "do": "CAVA", "eco": "ECO", "superior": true, "desti": "cooperativa", "ingres": 2691.67, "sup": 0, "brix": 10.9, "obs": "DO:CAVA | ECO GS | Glucònic:0.02 | Bon:4.8% | Parcer:Raventons Cardona"}, {"id": 1000156, "data": "2025-09-10", "parcela": "Xarel·lo Carretera", "pv": "AV123", "varietat": "Xarel·lo", "kg": 9060, "kg_teu": 6795.0, "pct_lliurador": 75, "parcer": "Raventons Cardona", "graus": 10.9, "kgraus": 51246, "gluco": 0.03, "pct_bon": 4.7, "do": "CAVA", "eco": "ECO", "superior": true, "desti": "cooperativa", "ingres": 2213.25, "sup": 0, "brix": 10.9, "obs": "DO:CAVA | ECO GS | Glucònic:0.03 | Bon:4.7% | Parcer:Raventons Cardona"}, {"id": 1000157, "data": "2025-09-10", "parcela": "Xarel·lo Carretera", "pv": "AV123", "varietat": "Xarel·lo", "kg": 9060, "kg_teu": 6795.0, "pct_lliurador": 75, "parcer": "Raventons Cardona", "graus": 10.4, "kgraus": 0, "gluco": 0.15, "pct_bon": 3.5, "do": "CAVA", "eco": "ECO", "superior": true, "desti": "cooperativa", "ingres": 0.0, "sup": 0, "brix": 10.4, "obs": "DO:CAVA | ECO GS | Glucònic:0.15 | Bon:3.5% | Parcer:Raventons Cardona"}, {"id": 1000158, "data": "2025-09-10", "parcela": "Vinya Petita Lavern", "pv": "IN287", "varietat": "Xarel·lo", "kg": 5700, "kg_teu": 4275.0, "pct_lliurador": 75, "parcer": "Raventons Cardona", "graus": 11.1, "kgraus": 47453, "gluco": 0.04, "pct_bon": 4.6, "do": "CAVA", "eco": "ECO", "superior": true, "desti": "cooperativa", "ingres": 2047.48, "sup": 0, "brix": 11.1, "obs": "DO:CAVA | ECO GS | Glucònic:0.04 | Bon:4.6% | Parcer:Raventons Cardona"}, {"id": 1000159, "data": "2025-09-19", "parcela": "Xarel·lo Truco", "pv": "AJ031", "varietat": "Xarel·lo", "kg": 4380, "kg_teu": 3285.0, "pct_lliurador": 75, "parcer": "Raventos Escofet", "graus": 11.1, "kgraus": 36464, "gluco": 0.04, "pct_bon": 4.6, "do": "CAVA", "eco": "ECO", "superior": true, "desti": "cooperativa", "ingres": 1573.33, "sup": 0, "brix": 11.1, "obs": "DO:CAVA | ECO GS | Glucònic:0.04 | Bon:4.6% | Parcer:Raventos Escofet"}, {"id": 1000160, "data": "2025-08-12", "parcela": "Chardonnay Lavern", "pv": "IE545", "varietat": "Chardonnay", "kg": 11400, "kg_teu": 8550.0, "pct_lliurador": 75, "parcer": "Raventos Cardona", "graus": 10.0, "kgraus": 5964, "gluco": 0.0, "pct_bon": 5.0, "do": "PENEDES", "eco": "ECO", "superior": false, "desti": "cooperativa", "ingres": 258.32, "sup": 0, "brix": 10.0, "obs": "DO:PENEDES | ECO | Glucònic:0.0 | Bon:5.0% | Parcer:Raventos Cardona"}, {"id": 1000161, "data": "2025-09-19", "parcela": "Cabernet Café", "pv": "AT695", "varietat": "Cabernet Sauvignon", "kg": 406, "kg_teu": 304.5, "pct_lliurador": 75, "parcer": "Totosaus Raventons", "graus": 10.0, "kgraus": 3045, "gluco": 0.0, "pct_bon": 5.0, "do": "PENEDES", "eco": "ECO", "superior": false, "desti": "cooperativa", "ingres": 131.89, "sup": 0, "brix": 10.0, "obs": "DO:PENEDES | ECO | Glucònic:0.0 | Bon:5.0% | Parcer:Totosaus Raventons"}, {"id": 1000162, "data": "2025-09-21", "parcela": "Tofol Xic", "pv": "BB318", "varietat": "Macabeu", "kg": 6660, "kg_teu": 4995.0, "pct_lliurador": 75, "parcer": "Totosaus Raventons", "graus": 10.0, "kgraus": 49950, "gluco": 0.05, "pct_bon": 4.5, "do": "CAVA", "eco": "ECO", "superior": true, "desti": "cooperativa", "ingres": 2153.16, "sup": 0, "brix": 10.0, "obs": "DO:CAVA | ECO GS | Glucònic:0.05 | Bon:4.5% | Parcer:Totosaus Raventons"}, {"id": 1000163, "data": "2025-08-13", "parcela": "Chardonnay Lavern", "pv": "IB545", "varietat": "Chardonnay", "kg": 8200, "kg_teu": 8200.0, "pct_lliurador": 100, "parcer": "", "graus": 12.0, "kgraus": 98400, "gluco": 0.03, "pct_bon": 4.7, "do": "CAVA", "eco": "ECO", "superior": true, "desti": "cooperativa", "ingres": 5666.36, "sup": 0, "brix": 12.0, "obs": "DO:CAVA | ECO GS | Glucònic:0.03 | Bon:4.7%"}, {"id": 1000164, "data": "2025-08-13", "parcela": "Chardonnay Lavern", "pv": "AW402", "varietat": "Chardonnay", "kg": 7260, "kg_teu": 7260.0, "pct_lliurador": 100, "parcer": "", "graus": 12.5, "kgraus": 21513, "gluco": 0.05, "pct_bon": 4.5, "do": "CAVA", "eco": "ECO", "superior": true, "desti": "cooperativa", "ingres": 1236.46, "sup": 0, "brix": 12.5, "obs": "DO:CAVA | ECO GS | Glucònic:0.05 | Bon:4.5%"}, {"id": 1000165, "data": "2025-08-13", "parcela": "Chardonnay Lavern", "pv": "IB545", "varietat": "Chardonnay", "kg": 7260, "kg_teu": 7260.0, "pct_lliurador": 100, "parcer": "", "graus": 12.5, "kgraus": 69238, "gluco": 0.05, "pct_bon": 4.5, "do": "CAVA", "eco": "ECO", "superior": true, "desti": "cooperativa", "ingres": 3979.45, "sup": 0, "brix": 12.5, "obs": "DO:CAVA | ECO GS | Glucònic:0.05 | Bon:4.5%"}, {"id": 1000166, "data": "2025-08-13", "parcela": "Chardonnay Lavern", "pv": "AW402", "varietat": "Chardonnay", "kg": 4220, "kg_teu": 4220.0, "pct_lliurador": 100, "parcer": "", "graus": 12.1, "kgraus": 51062, "gluco": 0.06, "pct_bon": 4.4, "do": "CAVA", "eco": "ECO", "superior": true, "desti": "cooperativa", "ingres": 2931.98, "sup": 0, "brix": 12.1, "obs": "DO:CAVA | ECO GS | Glucònic:0.06 | Bon:4.4%"}, {"id": 1000167, "data": "2025-08-13", "parcela": "Chardonnay Lavern", "pv": "AW402", "varietat": "Chardonnay", "kg": 5240, "kg_teu": 5240.0, "pct_lliurador": 100, "parcer": "", "graus": 12.0, "kgraus": 30600, "gluco": 0.04, "pct_bon": 4.6, "do": "PENEDES", "eco": "ECO", "superior": false, "desti": "cooperativa", "ingres": 1760.42, "sup": 0, "brix": 12.0, "obs": "DO:PENEDES | ECO | Glucònic:0.04 | Bon:4.6%"}, {"id": 1000168, "data": "2025-08-18", "parcela": "Macabeu Mas Mesague", "pv": "AT634", "varietat": "Macabeu", "kg": 3060, "kg_teu": 3060.0, "pct_lliurador": 100, "parcer": "", "graus": 10.0, "kgraus": 30600, "gluco": 0.05, "pct_bon": 4.5, "do": "CAVA", "eco": "ECO", "superior": true, "desti": "cooperativa", "ingres": 1758.73, "sup": 0, "brix": 10.0, "obs": "DO:CAVA | ECO GS | Glucònic:0.05 | Bon:4.5%"}, {"id": 1000169, "data": "2025-09-02", "parcela": "Macabeu Mas Mesague", "pv": "AT634", "varietat": "Macabeu", "kg": 9650, "kg_teu": 9650.0, "pct_lliurador": 100, "parcer": "", "graus": 10.0, "kgraus": 96500, "gluco": 0.05, "pct_bon": 4.5, "do": "CAVA", "eco": "ECO", "superior": true, "desti": "cooperativa", "ingres": 5546.34, "sup": 0, "brix": 10.0, "obs": "DO:CAVA | ECO GS | Glucònic:0.05 | Bon:4.5%"}, {"id": 1000170, "data": "2025-09-02", "parcela": "Modesta Xarel·lo", "pv": "AB020", "varietat": "Xarel·lo", "kg": 5420, "kg_teu": 5420.0, "pct_lliurador": 100, "parcer": "", "graus": 10.8, "kgraus": 58536, "gluco": 0.1, "pct_bon": 4.0, "do": "PENEDES", "eco": "ECO", "superior": false, "desti": "cooperativa", "ingres": 3348.26, "sup": 0, "brix": 10.8, "obs": "DO:PENEDES | ECO | Glucònic:0.1 | Bon:4.0%"}, {"id": 1000171, "data": "2025-09-02", "parcela": "Plana Mas Bertran Masia", "pv": "AB016", "varietat": "Xarel·lo", "kg": 10017, "kg_teu": 10017.0, "pct_lliurador": 100, "parcer": "", "graus": 10.9, "kgraus": 109185, "gluco": 0.1, "pct_bon": 4.0, "do": "PENEDES", "eco": "ECO", "superior": false, "desti": "cooperativa", "ingres": 6245.38, "sup": 0, "brix": 10.9, "obs": "DO:PENEDES | ECO | Glucònic:0.1 | Bon:4.0%"}, {"id": 1000172, "data": "2025-09-15", "parcela": "Modesta Xarel·lo", "pv": "AB020", "varietat": "Xarel·lo", "kg": 5725, "kg_teu": 5725.0, "pct_lliurador": 100, "parcer": "", "graus": 10.5, "kgraus": 60113, "gluco": 0.07, "pct_bon": 4.3, "do": "CAVA", "eco": "ECO", "superior": false, "desti": "cooperativa", "ingres": 2946.8, "sup": 0, "brix": 10.5, "obs": "DO:CAVA | ECO | Glucònic:0.07 | Bon:4.3%"}, {"id": 1000173, "data": "2025-09-15", "parcela": "Vinya llarga avinyonet", "pv": "JA331", "varietat": "Xarel·lo", "kg": 2490, "kg_teu": 2490.0, "pct_lliurador": 100, "parcer": "", "graus": 10.5, "kgraus": 13073, "gluco": 0.07, "pct_bon": 4.3, "do": "CAVA", "eco": "ECO", "superior": false, "desti": "cooperativa", "ingres": 640.85, "sup": 0, "brix": 10.5, "obs": "DO:CAVA | ECO | Glucònic:0.07 | Bon:4.3%"}, {"id": 1000174, "data": "2025-09-15", "parcela": "Modesta Xarel·lo", "pv": "AB020", "varietat": "Xarel·lo", "kg": 2490, "kg_teu": 2490.0, "pct_lliurador": 100, "parcer": "", "graus": 10.5, "kgraus": 13073, "gluco": 0.07, "pct_bon": 4.3, "do": "CAVA", "eco": "ECO", "superior": false, "desti": "cooperativa", "ingres": 640.85, "sup": 0, "brix": 10.5, "obs": "DO:CAVA | ECO | Glucònic:0.07 | Bon:4.3%"}, {"id": 1000175, "data": "2025-09-15", "parcela": "Vinya llarga avinyonet", "pv": "JA331", "varietat": "Xarel·lo", "kg": 1700, "kg_teu": 1700.0, "pct_lliurador": 100, "parcer": "", "graus": 10.5, "kgraus": 8925, "gluco": 0.07, "pct_bon": 4.3, "do": "CAVA", "eco": "ECO", "superior": false, "desti": "cooperativa", "ingres": 437.51, "sup": 0, "brix": 10.5, "obs": "DO:CAVA | ECO | Glucònic:0.07 | Bon:4.3%"}, {"id": 1000176, "data": "2025-09-15", "parcela": "Plana Mas Bertran Masia", "pv": "AB016", "varietat": "Xarel·lo", "kg": 965, "kg_teu": 965.0, "pct_lliurador": 100, "parcer": "", "graus": 10.7, "kgraus": 2675, "gluco": 0.07, "pct_bon": 4.3, "do": "CAVA", "eco": "ECO", "superior": false, "desti": "cooperativa", "ingres": 131.13, "sup": 0, "brix": 10.7, "obs": "DO:CAVA | ECO | Glucònic:0.07 | Bon:4.3%"}, {"id": 1000177, "data": "2025-09-15", "parcela": "Modesta Xarel·lo", "pv": "AB020", "varietat": "Xarel·lo", "kg": 965, "kg_teu": 965.0, "pct_lliurador": 100, "parcer": "", "graus": 10.7, "kgraus": 2675, "gluco": 0.07, "pct_bon": 4.3, "do": "CAVA", "eco": "ECO", "superior": false, "desti": "cooperativa", "ingres": 131.13, "sup": 0, "brix": 10.7, "obs": "DO:CAVA | ECO | Glucònic:0.07 | Bon:4.3%"}, {"id": 1000178, "data": "2025-09-15", "parcela": "Plana Mas Bertran Masia", "pv": "AB016", "varietat": "Xarel·lo", "kg": 965, "kg_teu": 965.0, "pct_lliurador": 100, "parcer": "", "graus": 10.7, "kgraus": 2675, "gluco": 0.07, "pct_bon": 4.3, "do": "CAVA", "eco": "ECO", "superior": false, "desti": "cooperativa", "ingres": 131.13, "sup": 0, "brix": 10.7, "obs": "DO:CAVA | ECO | Glucònic:0.07 | Bon:4.3%"}, {"id": 1000179, "data": "2025-09-19", "parcela": "Modesta Malvasia", "pv": "AB021", "varietat": "Malvasia Sitges", "kg": 2349, "kg_teu": 2349.0, "pct_lliurador": 100, "parcer": "", "graus": 10.0, "kgraus": 23490, "gluco": 0.1, "pct_bon": 4.0, "do": "PENEDES", "eco": "ECO", "superior": false, "desti": "miquel pons", "ingres": 2067.12, "sup": 0, "brix": 10.0, "obs": "DO:PENEDES | ECO | Glucònic:0.1 | Bon:4.0%"}, {"id": 1000180, "data": "2025-09-19", "parcela": "Modesta Malvasia", "pv": "AB021", "varietat": "Malvasia Sitges", "kg": 480, "kg_teu": 480.0, "pct_lliurador": 100, "parcer": "", "graus": 10.0, "kgraus": 4800, "gluco": 0.1, "pct_bon": 4.0, "do": "PENEDES", "eco": "ECO", "superior": false, "desti": "miquel pons", "ingres": 422.4, "sup": 0, "brix": 10.0, "obs": "DO:PENEDES | ECO | Glucònic:0.1 | Bon:4.0%"}, {"id": 1000181, "data": "2025-09-02", "parcela": "Modesta Xarel·lo", "pv": "AB020", "varietat": "Xarel·lo", "kg": 10760, "kg_teu": 8070.0, "pct_lliurador": 75, "parcer": "Casanovas Orellana Manel", "graus": 10.5, "kgraus": 84735, "gluco": 0.1, "pct_bon": 4.0, "do": "CAVA", "eco": "ECO", "superior": false, "desti": "cooperativa", "ingres": 3106.39, "sup": 0, "brix": 10.5, "obs": "DO:CAVA | ECO | Glucònic:0.1 | Bon:4.0% | Parcer:Casanovas Orellana Manel"}, {"id": 1000182, "data": "2025-08-30", "parcela": "Escoda Poligon", "pv": "AA937", "varietat": "Xarel·lo", "kg": 5900, "kg_teu": 4425.0, "pct_lliurador": 75, "parcer": "Casanovas Orellana Manel", "graus": 10.8, "kgraus": 29160, "gluco": 0.03, "pct_bon": 4.7, "do": "CAVA", "eco": "ECO", "superior": false, "desti": "cooperativa", "ingres": 1076.2, "sup": 0, "brix": 10.8, "obs": "DO:CAVA | ECO | Glucònic:0.03 | Bon:4.7% | Parcer:Casanovas Orellana Manel"}, {"id": 1000183, "data": "2025-08-30", "parcela": "Escoda Poligon", "pv": "AA938", "varietat": "Xarel·lo", "kg": 5900, "kg_teu": 4425.0, "pct_lliurador": 75, "parcer": "Casanovas Orellana Manel", "graus": 10.8, "kgraus": 18630, "gluco": 0.03, "pct_bon": 4.7, "do": "CAVA", "eco": "ECO", "superior": false, "desti": "cooperativa", "ingres": 687.57, "sup": 0, "brix": 10.8, "obs": "DO:CAVA | ECO | Glucònic:0.03 | Bon:4.7% | Parcer:Casanovas Orellana Manel"}, {"id": 1000184, "data": "2025-09-19", "parcela": "Malvasia Santa Fe", "pv": "AT640", "varietat": "Malvasia Sitges", "kg": 1258, "kg_teu": 943.5, "pct_lliurador": 75, "parcer": "Casanovas Orellana Miquel", "graus": 10.0, "kgraus": 9435, "gluco": 0.1, "pct_bon": 4.0, "do": "PENEDES", "eco": "ECO", "superior": false, "desti": "miquel pons", "ingres": 830.28, "sup": 0, "brix": 10.0, "obs": "DO:PENEDES | ECO | Glucònic:0.1 | Bon:4.0% | Parcer:Casanovas Orellana Miquel"}, {"id": 1000185, "data": "2025-09-10", "parcela": "Xarel·lo Miquel Gran", "pv": "AV113", "varietat": "Xarel·lo", "kg": 5040, "kg_teu": 3780.0, "pct_lliurador": 75, "parcer": "Pons Font Miquel", "graus": 11.6, "kgraus": 35148, "gluco": 0.03, "pct_bon": 4.7, "do": "CAVA", "eco": "ECO", "superior": false, "desti": "cooperativa", "ingres": 1297.2, "sup": 0, "brix": 11.6, "obs": "DO:CAVA | ECO | Glucònic:0.03 | Bon:4.7% | Parcer:Pons Font Miquel"}, {"id": 1000186, "data": "2025-09-10", "parcela": "Xarel·lo Miquel Petita", "pv": "AV118", "varietat": "Xarel·lo", "kg": 5040, "kg_teu": 3780.0, "pct_lliurador": 75, "parcer": "Pons Font Miquel", "graus": 11.6, "kgraus": 8700, "gluco": 0.03, "pct_bon": 4.7, "do": "CAVA", "eco": "ECO", "superior": false, "desti": "cooperativa", "ingres": 321.09, "sup": 0, "brix": 11.6, "obs": "DO:CAVA | ECO | Glucònic:0.03 | Bon:4.7% | Parcer:Pons Font Miquel"}, {"id": 1000187, "data": "2025-08-08", "parcela": "Carme i Roser Raventós", "pv": "AA965", "varietat": "Xarel·lo", "kg": 10500, "kg_teu": 7875.0, "pct_lliurador": 75, "parcer": "Carme i Roser Raventós", "graus": 11.0, "kgraus": 7260, "gluco": 0.07, "pct_bon": 4.3, "do": "CAVA", "eco": "ECO", "superior": false, "desti": "cooperativa", "ingres": 312.35, "sup": 0, "brix": 11.0, "obs": "DO:CAVA | ECO | Glucònic:0.07 | Bon:4.3% | Parcer:Raventos Escofet Carmen"}, {"id": 1000188, "data": "2025-08-08", "parcela": "Carme i Roser Raventós", "pv": "AA964", "varietat": "Xarel·lo", "kg": 10500, "kg_teu": 7875.0, "pct_lliurador": 75, "parcer": "Carme i Roser Raventós", "graus": 11.0, "kgraus": 79365, "gluco": 0.07, "pct_bon": 4.3, "do": "CAVA", "eco": "ECO", "superior": false, "desti": "cooperativa", "ingres": 3414.58, "sup": 0, "brix": 11.0, "obs": "DO:CAVA | ECO | Glucònic:0.07 | Bon:4.3% | Parcer:Raventos Escofet Carmen"}, {"id": 1000189, "data": "2025-08-09", "parcela": "Josep Raventós", "pv": "AA949", "varietat": "Xarel·lo", "kg": 9440, "kg_teu": 7080.0, "pct_lliurador": 75, "parcer": "Josep Raventós", "graus": 11.0, "kgraus": 7260, "gluco": 0.07, "pct_bon": 4.3, "do": "CAVA", "eco": "ECO", "superior": false, "desti": "cooperativa", "ingres": 312.35, "sup": 0, "brix": 11.0, "obs": "DO:CAVA | ECO | Glucònic:0.07 | Bon:4.3% | Parcer:Raventos Escofet Josep"}, {"id": 1000190, "data": "2025-08-09", "parcela": "Carme i Roser Raventós", "pv": "AA965", "varietat": "Xarel·lo", "kg": 9440, "kg_teu": 7080.0, "pct_lliurador": 75, "parcer": "Carme i Roser Raventós", "graus": 11.4, "kgraus": 80712, "gluco": 0.07, "pct_bon": 4.3, "do": "CAVA", "eco": "ECO", "superior": false, "desti": "cooperativa", "ingres": 3472.53, "sup": 0, "brix": 11.4, "obs": "DO:CAVA | ECO | Glucònic:0.07 | Bon:4.3% | Parcer:Raventos Escofet Josep"}];
+    localStorage.setItem(KEY, JSON.stringify(data));
+    console.log('Collita 2024-25 importada:', data.length, 'registres');
+  }
+})();
+
 document.addEventListener('DOMContentLoaded', function() {
   document.getElementById('fecha').valueAsDate = new Date();
   // Assegura que sempre hi ha una campanya activa
@@ -1762,6 +1953,10 @@ document.addEventListener('DOMContentLoaded', function() {
 //  NAV
 // ══════════════════════════════════════════════════
 function showPage(name) {
+  if(name === 'collita')    { renderCollita(); }
+  if(name === 'fitxa')      { renderFitxaSelector(); }
+  if(name === 'ccpae')      { initCCPAE(); renderCCPAE(); }
+  if(name === 'comparativa'){ renderComparativa(); }
   document.querySelectorAll('.page').forEach(p=>p.classList.remove('visible'));
   document.querySelectorAll('.main-nav-btn').forEach(b=>b.classList.remove('active'));
   document.getElementById('page-'+name).classList.add('visible');
@@ -2012,7 +2207,8 @@ function collectData() {
     fitosanitario: ()=>({ c1:g('fit-producto'), c2:g('fit-registro'), c3:g('fit-dosis'),
       c4:g('fit-caldo'), c5:g('fit-superficie'), c6:g('fit-objetivo'), c7:g('fit-tipo'), qtyTotal:g('fit-qty-total'),
       c8:g('fit-hora-ini')+'–'+g('fit-hora-fin'), c9:'T:'+g('fit-temp')+'°C HR:'+g('fit-hr')+'% V:'+g('fit-viento')+' PS:'+g('fit-plazo')+'d',
-      c10: g('fit-preu'), costTotal: g('fit-cost-total-input'), costHa: g('fit-cost-ha-auto') }),
+      c10: g('fit-preu'), costTotal: g('fit-cost-total-input'), costHa: g('fit-cost-ha-auto'),
+      numRegistre: g('fit-num-registre'), eficacia: g('fit-eficacia') }),
     labor:   ()=>({ c1:g('lab-tipo'), c2:g('lab-maquina'), c3:g('lab-hora-ini')+'–'+g('lab-hora-fin'), c4:g('lab-superficie'), c5:g('lab-fenologia'), costTotal: g('lab-cost-total'), costHa: g('lab-cost-ha') }),
     riego:   ()=>({ c1:g('rie-tipo'), c2:g('rie-origen'), c3:g('rie-hora-ini')+'–'+g('rie-hora-fin'), c4:g('rie-caudal'), c5:g('rie-volumen'), c6:g('rie-superficie'), c7:g('rie-motivo') }),
     abonado: ()=>({ c1:g('abo-tipo'), c2:g('abo-producto'), c3:g('abo-dosis'), c4:g('abo-cantidad'), c5:g('abo-superficie'), c6:g('abo-forma'), c7:'N:'+g('abo-n')+' P:'+g('abo-p')+' K:'+g('abo-k') }),
@@ -4549,12 +4745,16 @@ function addCompraProd() {
   const preu = parseFloat(document.getElementById('ep-preu')?.value) || 0;
   if(!nom || !data || qty <= 0 || preu <= 0) { showToast('⚠ Omple tots els camps', true); return; }
 
+  const proveidor = document.getElementById('ep-proveidor')?.value?.trim() || '';
+  const albara    = document.getElementById('ep-albara')?.value?.trim() || '';
   const estoc = getEstocProds();
   if(!estoc[nom]) estoc[nom] = [];
-  estoc[nom].push({ data, qty, preu });
+  estoc[nom].push({ data, qty, preu, proveidor, albara });
   saveEstocProds(estoc);
   document.getElementById('ep-qty').value  = '';
   document.getElementById('ep-preu').value = '';
+  if(document.getElementById('ep-proveidor')) document.getElementById('ep-proveidor').value = '';
+  if(document.getElementById('ep-albara'))    document.getElementById('ep-albara').value    = '';
 
   const compres = estoc[nom];
   const pmp     = calcPMP(compres);
@@ -5325,6 +5525,715 @@ function showToast(msg,error=false,success=false){
   setTimeout(()=>el.classList.add('show'),10);
   setTimeout(()=>el.classList.remove('show'),3000);
 }
+
+// ═══════════════════════════════════════════════════════════════
+// MAPEIG PV → NÚMERO FINCA CCPAE (del full 2 del quadern)
+// ═══════════════════════════════════════════════════════════════
+const PV_TO_FINCA = {
+  'AV638':1,'AA935':2,'AI721':3,'AI847':4,'AI847b':5,'AI899':6,'AI899b':7,'AJ029':8,'AJ038':9,'AV638b':10,
+  'IN111':11,'AT593':12,'AT635':13,'AT639':14,'AT641':15,'AT695':16,'AT719':17,'JI233':18,
+  'AV153':19,'AV123':20,'AV154':21,'AV154b':22,'IN271':23,'IN287':24,
+  'BB318':25,'BB329':26,'BB354':27,'BB832':28,'BB859':29,'BB859b':30,'IN288':31,
+  'IA867':32,'AV119':33,'AV128':34,'AV120':35,'AV149':36,'AV143':37,
+  'JA932':38,'AT633':39,'JF676':40,'AT636':41,'IN269':42,
+};
+
+// Mapeig nom parcel·la → número finca CCPAE
+function getNomFincaCCPAE(nomParcela) {
+  const p = PARCEL_DATA.find(function(x) { return x.nom === nomParcela; });
+  if(!p) return nomParcela;
+  const pvs = (p.codis||'').split('/').map(function(s){ return s.trim(); });
+  for(let i = 0; i < pvs.length; i++) {
+    if(PV_TO_FINCA[pvs[i]]) return PV_TO_FINCA[pvs[i]];
+  }
+  return nomParcela;
+}
+
+// Superfície total d'un grup de parcel·les
+function getSupParceles(nomsList) {
+  return nomsList.reduce(function(sum, nom) {
+    const p = PARCEL_DATA.find(function(x){ return x.nom === nom; });
+    return sum + (p ? p.sup : 0);
+  }, 0);
+}
+
+// ═══════════════════════════════════════════════════════════════
+// COLLITA — localStorage key: campanya_collites
+// ═══════════════════════════════════════════════════════════════
+function getCollites(camp) {
+  const k = (camp || getCampanyaActual()) + '_collites';
+  try { return JSON.parse(localStorage.getItem(k) || '[]'); } catch(e) { return []; }
+}
+function saveCollites(arr, camp) {
+  const k = (camp || getCampanyaActual()) + '_collites';
+  localStorage.setItem(k, JSON.stringify(arr));
+}
+
+function colParcelaChange() {
+  const sel = document.getElementById('col-parcela')?.value;
+  const p = PARCEL_DATA.find(function(x){ return x.nom === sel; });
+  if(p) {
+    document.getElementById('col-sup').value = p.sup.toFixed(4);
+    const kg = parseFloat(document.getElementById('col-kg')?.value) || 0;
+    if(kg > 0) document.getElementById('col-rendiment').value = Math.round(kg / p.sup);
+  }
+}
+
+function colCalcRendiment() {
+  const kg = parseFloat(document.getElementById('col-kg')?.value) || 0;
+  const sup = parseFloat(document.getElementById('col-sup')?.value) || 0;
+  if(sup > 0) document.getElementById('col-rendiment').value = Math.round(kg / sup);
+}
+
+function afegirCollita() {
+  const data    = document.getElementById('col-data')?.value;
+  const parcela = document.getElementById('col-parcela')?.value;
+  const kg      = parseFloat(document.getElementById('col-kg')?.value) || 0;
+  const sup     = parseFloat(document.getElementById('col-sup')?.value) || 0;
+  const brix    = parseFloat(document.getElementById('col-brix')?.value) || 0;
+  const acidesa = parseFloat(document.getElementById('col-acidesa')?.value) || 0;
+  const ph      = parseFloat(document.getElementById('col-ph')?.value) || 0;
+  const desti   = document.getElementById('col-desti')?.value || '';
+  const obs     = document.getElementById('col-obs')?.value || '';
+
+  if(!data) { showToast('⚠ Indica la data de verema', true); return; }
+  if(!parcela) { showToast('⚠ Selecciona la parcel·la', true); return; }
+  if(kg <= 0) { showToast('⚠ Indica els kg recollits', true); return; }
+
+  const collites = getCollites();
+  collites.push({ id: Date.now(), data, parcela, kg, sup, rendiment: sup > 0 ? Math.round(kg/sup) : 0,
+                  brix, acidesa, ph, desti, obs });
+  saveCollites(collites);
+
+  // Reset form
+  ['col-data','col-parcela','col-kg','col-sup','col-rendiment','col-brix','col-acidesa','col-ph','col-obs']
+    .forEach(function(id) { const el = document.getElementById(id); if(el) el.value = ''; });
+
+  showToast('✅ Verema registrada!');
+  renderCollita();
+}
+
+function renderCollita() {
+  // Omplir selectors de parcel·la i campanya
+  const selP = document.getElementById('col-parcela');
+  if(selP && selP.options.length <= 1) {
+    PARCEL_DATA.filter(function(p){ return p.sup > 0; }).forEach(function(p) {
+      const o = document.createElement('option');
+      o.value = p.nom; o.textContent = p.nom + ' (' + p.sup.toFixed(2) + 'ha · ' + p.varietat + ')';
+      selP.appendChild(o);
+    });
+  }
+
+  const selC = document.getElementById('col-filt-camp');
+  if(selC) {
+    const camps = getCampanyes();
+    selC.innerHTML = '';
+    camps.forEach(function(c) { const o = document.createElement('option'); o.value = c; o.textContent = c; selC.appendChild(o); });
+    if(!selC.value) selC.value = getCampanyaActual();
+  }
+
+  const campSel = document.getElementById('col-filt-camp')?.value || getCampanyaActual();
+  const varFilt = document.getElementById('col-filt-var')?.value || '';
+  const collites = getCollites(campSel);
+
+  // Omplir selector varietats
+  const selV = document.getElementById('col-filt-var');
+  if(selV && selV.options.length <= 1) {
+    const vars = [...new Set(PARCEL_DATA.map(function(p){ return p.varietat; }))].sort();
+    vars.forEach(function(v) { const o = document.createElement('option'); o.value = v; o.textContent = v; selV.appendChild(o); });
+  }
+
+  const filtrades = varFilt
+    ? collites.filter(function(c) {
+        const p = PARCEL_DATA.find(function(x){ return x.nom === c.parcela; });
+        return p && p.varietat === varFilt;
+      })
+    : collites;
+
+  // Resum total
+  const totalKg = filtrades.reduce(function(s, c){ return s + c.kg; }, 0);
+  const totalSup = filtrades.reduce(function(s, c){ return s + c.sup; }, 0);
+  const rendMig = totalSup > 0 ? Math.round(totalKg / totalSup) : 0;
+
+  const resumEl = document.getElementById('collita-resum');
+  if(resumEl) {
+    resumEl.innerHTML = '<div style="display:flex;gap:.8rem;flex-wrap:wrap;margin-bottom:.5rem">' +
+      '<div style="background:var(--parchment);padding:.6rem 1rem;border-radius:2px;border:1px solid #D8CEBA;text-align:center">' +
+        '<div style="font-size:1.4rem;font-weight:700;font-family:monospace">' + totalKg.toLocaleString('ca') + ' kg</div>' +
+        '<div style="font-size:.7rem;color:var(--fog)">Total collita</div></div>' +
+      '<div style="background:var(--parchment);padding:.6rem 1rem;border-radius:2px;border:1px solid #D8CEBA;text-align:center">' +
+        '<div style="font-size:1.4rem;font-weight:700;font-family:monospace">' + totalSup.toFixed(2) + ' ha</div>' +
+        '<div style="font-size:.7rem;color:var(--fog)">Superfície veremada</div></div>' +
+      '<div style="background:var(--parchment);padding:.6rem 1rem;border-radius:2px;border:1px solid #D8CEBA;text-align:center">' +
+        '<div style="font-size:1.4rem;font-weight:700;font-family:monospace">' + rendMig + ' kg/ha</div>' +
+        '<div style="font-size:.7rem;color:var(--fog)">Rendiment mitjà</div></div>' +
+      '</div>';
+  }
+
+  const taulaEl = document.getElementById('collita-taula');
+  if(!taulaEl) return;
+  if(filtrades.length === 0) { taulaEl.innerHTML = '<p style="color:var(--fog);font-size:.84rem;padding:.5rem 0">Cap registre de collita per a aquesta campanya.</p>'; return; }
+
+  let rows = filtrades.slice().sort(function(a, b){ return a.data.localeCompare(b.data); })
+    .map(function(c) {
+      const p = PARCEL_DATA.find(function(x){ return x.nom === c.parcela; });
+      return '<tr>' +
+        '<td style="padding:.4rem .6rem;border-bottom:1px solid #E8DCC8">' + c.data + '</td>' +
+        '<td style="padding:.4rem .6rem;border-bottom:1px solid #E8DCC8;font-weight:600">' + c.parcela + '</td>' +
+        '<td style="padding:.4rem .6rem;border-bottom:1px solid #E8DCC8">' + (p ? p.varietat : '—') + '</td>' +
+        '<td style="padding:.4rem .6rem;border-bottom:1px solid #E8DCC8;text-align:right;font-family:monospace">' + c.kg.toLocaleString('ca') + '</td>' +
+        '<td style="padding:.4rem .6rem;border-bottom:1px solid #E8DCC8;text-align:right;font-family:monospace">' + c.sup.toFixed(2) + '</td>' +
+        '<td style="padding:.4rem .6rem;border-bottom:1px solid #E8DCC8;text-align:right;font-family:monospace">' + c.rendiment + '</td>' +
+        '<td style="padding:.4rem .6rem;border-bottom:1px solid #E8DCC8;text-align:center">' + (c.brix > 0 ? c.brix + '°' : '—') + '</td>' +
+        '<td style="padding:.4rem .6rem;border-bottom:1px solid #E8DCC8;text-align:center">' + (c.acidesa > 0 ? c.acidesa : '—') + '</td>' +
+        '<td style="padding:.4rem .6rem;border-bottom:1px solid #E8DCC8">' + c.desti + '</td>' +
+        '<td style="padding:.4rem .6rem;border-bottom:1px solid #E8DCC8;color:var(--fog);font-size:.72rem">' + (c.obs||'') + '</td>' +
+        '<td style="padding:.4rem .6rem;border-bottom:1px solid #E8DCC8">' +
+          '<button onclick="eliminarCollita(' + c.id + ')" style="background:none;border:none;color:#8A1A1A;cursor:pointer;font-size:.8rem">🗑</button></td>' +
+        '</tr>';
+    }).join('');
+
+  taulaEl.innerHTML = '<table style="width:100%;font-size:.78rem;border-collapse:collapse">' +
+    '<thead><tr style="background:var(--parchment)">' +
+    '<th style="padding:.4rem .6rem;text-align:left;font-size:.7rem">Data</th>' +
+    '<th style="padding:.4rem .6rem;text-align:left;font-size:.7rem">Parcel·la</th>' +
+    '<th style="padding:.4rem .6rem;text-align:left;font-size:.7rem">Varietat</th>' +
+    '<th style="padding:.4rem .6rem;text-align:right;font-size:.7rem">kg</th>' +
+    '<th style="padding:.4rem .6rem;text-align:right;font-size:.7rem">ha</th>' +
+    '<th style="padding:.4rem .6rem;text-align:right;font-size:.7rem">kg/ha</th>' +
+    '<th style="padding:.4rem .6rem;text-align:center;font-size:.7rem">°Brix</th>' +
+    '<th style="padding:.4rem .6rem;text-align:center;font-size:.7rem">Acid.</th>' +
+    '<th style="padding:.4rem .6rem;text-align:left;font-size:.7rem">Destí</th>' +
+    '<th style="padding:.4rem .6rem;text-align:left;font-size:.7rem">Obs.</th>' +
+    '<th style="padding:.4rem .6rem;font-size:.7rem"></th>' +
+    '</tr></thead><tbody>' + rows + '</tbody></table>';
+}
+
+function eliminarCollita(id) {
+  if(!confirm('Eliminar aquest registre de collita?')) return;
+  const camp = document.getElementById('col-filt-camp')?.value || getCampanyaActual();
+  const collites = getCollites(camp).filter(function(c){ return c.id !== id; });
+  saveCollites(collites, camp);
+  renderCollita();
+}
+
+// ═══════════════════════════════════════════════════════════════
+// FITXA DE PARCEL·LA
+// ═══════════════════════════════════════════════════════════════
+function renderFitxaSelector() {
+  const sel = document.getElementById('fitxa-sel');
+  if(!sel || sel.options.length > 1) return;
+  PARCEL_DATA.forEach(function(p) {
+    const o = document.createElement('option');
+    o.value = p.nom;
+    o.textContent = p.nom + ' — ' + p.varietat + ' · ' + p.sup.toFixed(2) + 'ha · ' + p.municipi;
+    sel.appendChild(o);
+  });
+}
+
+function renderFitxa() {
+  const nom = document.getElementById('fitxa-sel')?.value;
+  const el = document.getElementById('fitxa-contingut');
+  if(!el) return;
+  if(!nom) { el.innerHTML = ''; return; }
+
+  const p = PARCEL_DATA.find(function(x){ return x.nom === nom; });
+  if(!p) { el.innerHTML = ''; return; }
+
+  const parts = getParts().filter(function(pt){
+    return (pt.parcela||'').split(' / ').map(function(s){ return s.trim(); }).indexOf(nom) !== -1;
+  });
+
+  const camps = getCampanyes();
+
+  // Historial tractaments
+  const fits = parts.filter(function(pt){ return pt.tipo === 'fitosanitario'; })
+    .sort(function(a, b){ return b.fecha.localeCompare(a.fecha); });
+
+  // Collites per campanya
+  const collitesPerCamp = {};
+  camps.forEach(function(c) {
+    const col = getCollites(c).filter(function(x){ return x.parcela === nom; });
+    if(col.length > 0) collitesPerCamp[c] = col;
+  });
+
+  // Costos per campanya (sumats)
+  const v = getCostVars();
+  const costPerCamp = {};
+  camps.forEach(function(camp) {
+    const partsC = JSON.parse(localStorage.getItem(camp + '_parts') || '[]')
+      .filter(function(pt) {
+        return (pt.parcela||'').split(' / ').map(function(s){ return s.trim(); }).indexOf(nom) !== -1;
+      });
+    let total = 0;
+    partsC.forEach(function(pt) {
+      let acc = TIPO_TO_ACCIO[pt.tipo];
+      if(pt.tipo === 'labor' && pt.c1) acc = LABOR_TO_ACCIO[pt.c1] || null;
+      if(acc) total += getAccioCalcul(acc, v, pt) * p.sup;
+    });
+    const costosFix = (parseFloat(v.costFixHa) || 0) * p.sup;
+    if(total + costosFix > 0) costPerCamp[camp] = { variable: total, fix: costosFix };
+  });
+
+  let html = '<div class="card" style="margin-bottom:1rem">' +
+    '<div class="panel-header" style="background:#2A5472">📌 ' + nom + '</div>' +
+    '<div class="card-inner">' +
+    '<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:.8rem;margin-bottom:1rem">' +
+    kv('Municipi', p.municipi) + kv('Varietat', p.varietat) + kv('Superfície', p.sup.toFixed(4) + ' ha') +
+    kv('Número finca CCPAE', getNomFincaCCPAE(nom)) + kv('Codi PV', p.codis || '—') + kv('Sistema', 'Secà · Ecològic') +
+    '</div></div></div>';
+
+  // Collites
+  if(Object.keys(collitesPerCamp).length > 0) {
+    html += '<div class="card" style="margin-bottom:1rem"><div class="panel-header ph-grape">🍇 Collites registrades</div><div class="card-inner">';
+    html += '<table style="width:100%;font-size:.8rem;border-collapse:collapse"><thead><tr style="background:var(--parchment)">' +
+      '<th style="padding:.35rem .6rem;text-align:left">Campanya</th><th style="padding:.35rem .6rem;text-align:right">kg</th>' +
+      '<th style="padding:.35rem .6rem;text-align:right">kg/ha</th><th style="padding:.35rem .6rem;text-align:center">°Brix</th>' +
+      '<th style="padding:.35rem .6rem;text-align:center">Acidesa</th></tr></thead><tbody>';
+    Object.keys(collitesPerCamp).sort().reverse().forEach(function(c) {
+      const cols = collitesPerCamp[c];
+      const totalKg = cols.reduce(function(s,x){ return s+x.kg; }, 0);
+      const rendMig = p.sup > 0 ? Math.round(totalKg / p.sup) : 0;
+      const brixMig = cols.filter(function(x){return x.brix>0;}).length > 0
+        ? (cols.reduce(function(s,x){return s+x.brix;},0)/cols.filter(function(x){return x.brix>0;}).length).toFixed(1) : '—';
+      const acidMig = cols.filter(function(x){return x.acidesa>0;}).length > 0
+        ? (cols.reduce(function(s,x){return s+x.acidesa;},0)/cols.filter(function(x){return x.acidesa>0;}).length).toFixed(1) : '—';
+      html += '<tr><td style="padding:.35rem .6rem;border-bottom:1px solid #E8DCC8">' + c + '</td>' +
+        '<td style="padding:.35rem .6rem;border-bottom:1px solid #E8DCC8;text-align:right;font-family:monospace">' + totalKg.toLocaleString('ca') + '</td>' +
+        '<td style="padding:.35rem .6rem;border-bottom:1px solid #E8DCC8;text-align:right;font-family:monospace">' + rendMig + '</td>' +
+        '<td style="padding:.35rem .6rem;border-bottom:1px solid #E8DCC8;text-align:center">' + brixMig + '</td>' +
+        '<td style="padding:.35rem .6rem;border-bottom:1px solid #E8DCC8;text-align:center">' + acidMig + '</td></tr>';
+    });
+    html += '</tbody></table></div></div>';
+  }
+
+  // Costos per campanya
+  if(Object.keys(costPerCamp).length > 0) {
+    html += '<div class="card" style="margin-bottom:1rem"><div class="panel-header ph-soil">💶 Costos per campanya</div><div class="card-inner">';
+    html += '<table style="width:100%;font-size:.8rem;border-collapse:collapse"><thead><tr style="background:var(--parchment)">' +
+      '<th style="padding:.35rem .6rem;text-align:left">Campanya</th>' +
+      '<th style="padding:.35rem .6rem;text-align:right">Cost variable (€)</th>' +
+      '<th style="padding:.35rem .6rem;text-align:right">Cost fix (€)</th>' +
+      '<th style="padding:.35rem .6rem;text-align:right">Total (€)</th>' +
+      '<th style="padding:.35rem .6rem;text-align:right">€/ha</th></tr></thead><tbody>';
+    Object.keys(costPerCamp).sort().reverse().forEach(function(c) {
+      const d = costPerCamp[c];
+      const total = d.variable + d.fix;
+      html += '<tr><td style="padding:.35rem .6rem;border-bottom:1px solid #E8DCC8">' + c + '</td>' +
+        '<td style="padding:.35rem .6rem;border-bottom:1px solid #E8DCC8;text-align:right;font-family:monospace">' + d.variable.toFixed(0) + '</td>' +
+        '<td style="padding:.35rem .6rem;border-bottom:1px solid #E8DCC8;text-align:right;font-family:monospace">' + d.fix.toFixed(0) + '</td>' +
+        '<td style="padding:.35rem .6rem;border-bottom:1px solid #E8DCC8;text-align:right;font-family:monospace;font-weight:600">' + total.toFixed(0) + '</td>' +
+        '<td style="padding:.35rem .6rem;border-bottom:1px solid #E8DCC8;text-align:right;font-family:monospace">' + (p.sup > 0 ? (total/p.sup).toFixed(0) : '—') + '</td></tr>';
+    });
+    html += '</tbody></table></div></div>';
+  }
+
+  // Historial tractaments
+  html += '<div class="card"><div class="panel-header ph-grape">🌡️ Historial fitosanitari</div><div class="card-inner">';
+  if(fits.length === 0) {
+    html += '<p style="color:var(--fog);font-size:.84rem">Cap tractament registrat.</p>';
+  } else {
+    html += '<table style="width:100%;font-size:.78rem;border-collapse:collapse"><thead><tr style="background:var(--parchment)">' +
+      '<th style="padding:.35rem .6rem;text-align:left">Data</th><th style="padding:.35rem .6rem;text-align:left">Producte</th>' +
+      '<th style="padding:.35rem .6rem;text-align:left">Plaga</th><th style="padding:.35rem .6rem;text-align:left">Dosi</th>' +
+      '<th style="padding:.35rem .6rem;text-align:center">Eficàcia</th></tr></thead><tbody>';
+    fits.forEach(function(pt) {
+      const efTxt = ['—','1-Dolenta','2-Regular','3-Bona'][parseInt(pt.eficacia)||0] || '—';
+      html += '<tr><td style="padding:.35rem .6rem;border-bottom:1px solid #E8DCC8">' + (pt.fecha||'') + '</td>' +
+        '<td style="padding:.35rem .6rem;border-bottom:1px solid #E8DCC8">' + (pt.c1||'') + '</td>' +
+        '<td style="padding:.35rem .6rem;border-bottom:1px solid #E8DCC8">' + (pt.c6||'') + '</td>' +
+        '<td style="padding:.35rem .6rem;border-bottom:1px solid #E8DCC8;font-family:monospace">' + (pt.c3||'') + ' ' + (pt.c3?'kg/ha':'') + '</td>' +
+        '<td style="padding:.35rem .6rem;border-bottom:1px solid #E8DCC8;text-align:center">' + (pt.eficacia ? efTxt : '—') + '</td></tr>';
+    });
+    html += '</tbody></table>';
+  }
+  html += '</div></div>';
+
+  el.innerHTML = html;
+}
+
+function kv(label, val) {
+  return '<div style="background:var(--parchment);padding:.5rem .8rem;border-radius:2px;border:1px solid #D8CEBA">' +
+    '<div style="font-size:.65rem;color:var(--fog);text-transform:uppercase;letter-spacing:.06em;margin-bottom:.2rem">' + label + '</div>' +
+    '<div style="font-weight:600;font-size:.88rem">' + val + '</div></div>';
+}
+
+// ═══════════════════════════════════════════════════════════════
+// CCPAE — Generació quadern
+// ═══════════════════════════════════════════════════════════════
+function initCCPAE() {
+  const selC = document.getElementById('ccpae-camp');
+  if(!selC || selC.options.length > 0) return;
+  getCampanyes().forEach(function(c) {
+    const o = document.createElement('option');
+    o.value = c; o.textContent = c; selC.appendChild(o);
+  });
+  selC.value = getCampanyaActual();
+}
+
+function renderCCPAE() {
+  const camp = document.getElementById('ccpae-camp')?.value || getCampanyaActual();
+  const allParts = JSON.parse(localStorage.getItem(camp + '_parts') || '[]');
+
+  // ── Full 3: Treballs de camp (parts labor) ──────────────────
+  const t3 = document.getElementById('ccpae-t3-body');
+  if(t3) {
+    const labors = allParts.filter(function(p){ return p.tipo === 'labor'; })
+      .sort(function(a, b){ return a.fecha.localeCompare(b.fecha); });
+
+    t3.innerHTML = labors.map(function(p) {
+      const parceles = (p.parcela||'').split(' / ').map(function(s){ return s.trim(); }).filter(Boolean);
+      const sup = getSupParceles(parceles);
+      const finques = parceles.length === PARCEL_DATA.length ? 'Totes'
+        : [...new Set(parceles.map(getNomFincaCCPAE))].join(', ');
+      return '<tr>' +
+        '<td style="padding:.4rem .6rem;border:1px solid #ddd">' + (p.fecha||'') + '</td>' +
+        '<td style="padding:.4rem .6rem;border:1px solid #ddd">' + finques + '</td>' +
+        '<td style="padding:.4rem .6rem;border:1px solid #ddd;text-align:right;font-family:monospace">' + sup.toFixed(2) + '</td>' +
+        '<td style="padding:.4rem .6rem;border:1px solid #ddd">Vinya</td>' +
+        '<td style="padding:.4rem .6rem;border:1px solid #ddd">' + (p.c1||'') + (p.c2 ? ' (' + p.c2 + ')' : '') + '</td>' +
+        '</tr>';
+    }).join('') || '<tr><td colspan="5" style="padding:.6rem;color:var(--fog);text-align:center">Cap labor registrada</td></tr>';
+  }
+
+  // ── Full 4: Adobats ─────────────────────────────────────────
+  const t4 = document.getElementById('ccpae-t4-body');
+  if(t4) {
+    const abons = allParts.filter(function(p){ return p.tipo === 'abonado'; })
+      .sort(function(a, b){ return a.fecha.localeCompare(b.fecha); });
+
+    t4.innerHTML = abons.map(function(p) {
+      const parceles = (p.parcela||'').split(' / ').map(function(s){ return s.trim(); }).filter(Boolean);
+      const sup = getSupParceles(parceles);
+      const finques = parceles.length === PARCEL_DATA.length ? 'Totes'
+        : [...new Set(parceles.map(getNomFincaCCPAE))].join(', ');
+      const qty = parseFloat(p.c4) || 0;
+      const nPct = parseFloat((p.c7||'').match(/N:([\d.]+)/)?.[1]) || 0;
+      const nKg = qty > 0 && nPct > 0 ? (qty * nPct / 100).toFixed(0) : '—';
+      const nHa = sup > 0 && nKg !== '—' ? (parseFloat(nKg) / sup).toFixed(1) : '—';
+      return '<tr>' +
+        '<td style="padding:.4rem .6rem;border:1px solid #ddd">' + finques + '</td>' +
+        '<td style="padding:.4rem .6rem;border:1px solid #ddd;text-align:right;font-family:monospace">' + sup.toFixed(2) + '</td>' +
+        '<td style="padding:.4rem .6rem;border:1px solid #ddd">' + (p.fecha||'') + '</td>' +
+        '<td style="padding:.4rem .6rem;border:1px solid #ddd">' + (p.c2||'') + '</td>' +
+        '<td style="padding:.4rem .6rem;border:1px solid #ddd;text-align:right;font-family:monospace">' + (qty > 0 ? qty : '—') + '</td>' +
+        '<td style="padding:.4rem .6rem;border:1px solid #ddd;text-align:right;font-family:monospace">' + nKg + '</td>' +
+        '<td style="padding:.4rem .6rem;border:1px solid #ddd;text-align:right;font-family:monospace">' + nHa + '</td>' +
+        '<td style="padding:.4rem .6rem;border:1px solid #ddd">' + (p.operario||'Joan Pons Serra') + '</td>' +
+        '</tr>';
+    }).join('') || '<tr><td colspan="8" style="padding:.6rem;color:var(--fog);text-align:center">Cap adobat registrat</td></tr>';
+  }
+
+  // ── Full 6: Tractaments fitosanitaris ───────────────────────
+  const t6 = document.getElementById('ccpae-t6-body');
+  if(t6) {
+    const fits = allParts.filter(function(p){ return p.tipo === 'fitosanitario'; })
+      .sort(function(a, b){ return a.fecha.localeCompare(b.fecha); });
+
+    // Expandir: una fila per parcel·la tractada
+    const rows = [];
+    fits.forEach(function(p) {
+      const parceles = (p.parcela||'').split(' / ').map(function(s){ return s.trim(); }).filter(Boolean);
+      // Agrupar per número de finca per evitar repeticions
+      const finquesMap = {};
+      parceles.forEach(function(nom) {
+        const finca = getNomFincaCCPAE(nom);
+        const pInfo = PARCEL_DATA.find(function(x){ return x.nom === nom; });
+        if(!finquesMap[finca]) finquesMap[finca] = { finca, sup: 0 };
+        finquesMap[finca].sup += pInfo ? pInfo.sup : 0;
+      });
+      Object.values(finquesMap).forEach(function(f) {
+        rows.push({ p, finca: f.finca, sup: f.sup });
+      });
+    });
+
+    const efTxt = ['0-Nul·la','1-Dolenta','2-Regular','3-Bona'];
+    t6.innerHTML = rows.map(function(r) {
+      const p = r.p;
+      const qtyTotal = r.sup > 0 && p.c3 ? (parseFloat(p.c3) * r.sup).toFixed(2) : (p.qtyTotal || '—');
+      return '<tr>' +
+        '<td style="padding:.35rem .5rem;border:1px solid #ddd">' + (p.fecha||'') + '</td>' +
+        '<td style="padding:.35rem .5rem;border:1px solid #ddd;text-align:center">' + r.finca + '</td>' +
+        '<td style="padding:.35rem .5rem;border:1px solid #ddd">Vinya</td>' +
+        '<td style="padding:.35rem .5rem;border:1px solid #ddd">' + (p.c6||'') + '</td>' +
+        '<td style="padding:.35rem .5rem;border:1px solid #ddd;text-align:right;font-family:monospace">' + r.sup.toFixed(2) + '</td>' +
+        '<td style="padding:.35rem .5rem;border:1px solid #ddd;text-align:center">A-1</td>' +
+        '<td style="padding:.35rem .5rem;border:1px solid #ddd;text-align:center">D-1</td>' +
+        '<td style="padding:.35rem .5rem;border:1px solid #ddd">' + (p.c1||'') + '</td>' +
+        '<td style="padding:.35rem .5rem;border:1px solid #ddd;font-family:monospace;font-size:.7rem">' + (p.numRegistre||p.c2||'') + '</td>' +
+        '<td style="padding:.35rem .5rem;border:1px solid #ddd;text-align:right;font-family:monospace">' + (p.c3||'') + '</td>' +
+        '<td style="padding:.35rem .5rem;border:1px solid #ddd;text-align:right;font-family:monospace">' + qtyTotal + '</td>' +
+        '<td style="padding:.35rem .5rem;border:1px solid #ddd;text-align:center">' + (p.eficacia !== undefined && p.eficacia !== '' ? efTxt[parseInt(p.eficacia)]||'—' : '—') + '</td>' +
+        '</tr>';
+    }).join('') || '<tr><td colspan="12" style="padding:.6rem;color:var(--fog);text-align:center">Cap tractament registrat</td></tr>';
+  }
+
+  // ── Full 10: Compres ────────────────────────────────────────
+  const t10 = document.getElementById('ccpae-t10-body');
+  if(t10) {
+    const compres = [];
+    // Compres gasoil
+    const gasoilCompres = JSON.parse(localStorage.getItem('estoc_gasoil') || '[]');
+    gasoilCompres.forEach(function(c) {
+      compres.push({ data: c.data, producte: 'Gasoil', qualificacio: 'CVL', qty: c.litres + ' L', proveidor: '—', albara: '—' });
+    });
+    // Compres fitosanitaris (de l'estoc PMP)
+    const prodsEstoc = JSON.parse(localStorage.getItem('estoc_prods') || '[]');
+    prodsEstoc.forEach(function(prod) {
+      (prod.compres || []).forEach(function(c) {
+        compres.push({
+          data: c.data,
+          producte: prod.nom,
+          qualificacio: 'ECO',
+          qty: c.qty + ' ' + (prod.unitat || 'kg'),
+          proveidor: c.proveidor || 'Cevipe',
+          albara: c.albara || '—'
+        });
+      });
+    });
+    compres.sort(function(a, b){ return (a.data||'').localeCompare(b.data||''); });
+
+    t10.innerHTML = compres.map(function(c) {
+      return '<tr>' +
+        '<td style="padding:.4rem .6rem;border:1px solid #ddd">' + (c.data||'') + '</td>' +
+        '<td style="padding:.4rem .6rem;border:1px solid #ddd">' + c.producte + '</td>' +
+        '<td style="padding:.4rem .6rem;border:1px solid #ddd;text-align:center">' + c.qualificacio + '</td>' +
+        '<td style="padding:.4rem .6rem;border:1px solid #ddd;text-align:right;font-family:monospace">' + c.qty + '</td>' +
+        '<td style="padding:.4rem .6rem;border:1px solid #ddd">' + c.proveidor + '</td>' +
+        '<td style="padding:.4rem .6rem;border:1px solid #ddd;font-family:monospace;font-size:.72rem">' + c.albara + '</td>' +
+        '</tr>';
+    }).join('') || '<tr><td colspan="6" style="padding:.6rem;color:var(--fog);text-align:center">Cap compra registrada. Afegeix compres a la pestanya Estoc.</td></tr>';
+  }
+}
+
+function exportarCCPAE() {
+  const camp = document.getElementById('ccpae-camp')?.value || getCampanyaActual();
+  // Generar CSV simple per a cada full
+  let csvContent = 'data:text/csv;charset=utf-8,';
+
+  csvContent += 'FULL 3 - TREBALLS DE CAMP\n';
+  csvContent += 'Data,Num Finca,Sup (ha),Cultiu,Treball\n';
+  const allParts = JSON.parse(localStorage.getItem(camp + '_parts') || '[]');
+  allParts.filter(function(p){ return p.tipo==='labor'; })
+    .sort(function(a,b){ return a.fecha.localeCompare(b.fecha); })
+    .forEach(function(p) {
+      const parceles = (p.parcela||'').split(' / ').map(function(s){ return s.trim(); });
+      const sup = getSupParceles(parceles);
+      const finques = parceles.length === PARCEL_DATA.length ? 'Totes'
+        : [...new Set(parceles.map(getNomFincaCCPAE))].join('+');
+      csvContent += '"' + (p.fecha||'') + '","' + finques + '",' + sup.toFixed(2) + ',Vinya,"' + (p.c1||'') + '"\n';
+    });
+
+  csvContent += '\nFULL 6 - TRACTAMENTS FITOSANITARIS\n';
+  csvContent += 'Data,Num Finca,Cultiu,Plaga,Sup (ha),Aplicador,Maquina,Producte,Num Registre,Dosi,Qty Total,Eficacia\n';
+  const efTxt = ['0-Nul\'la','1-Dolenta','2-Regular','3-Bona'];
+  allParts.filter(function(p){ return p.tipo==='fitosanitario'; })
+    .sort(function(a,b){ return a.fecha.localeCompare(b.fecha); })
+    .forEach(function(p) {
+      const parceles = (p.parcela||'').split(' / ').map(function(s){ return s.trim(); });
+      const sup = getSupParceles(parceles);
+      const finques = parceles.length === PARCEL_DATA.length ? 'Totes'
+        : [...new Set(parceles.map(getNomFincaCCPAE))].join('+');
+      const qtyT = sup > 0 && p.c3 ? (parseFloat(p.c3)*sup).toFixed(2) : (p.qtyTotal||'');
+      const ef = p.eficacia !== undefined && p.eficacia !== '' ? efTxt[parseInt(p.eficacia)]||'' : '';
+      csvContent += '"' + (p.fecha||'') + '","' + finques + '",Vinya,"' + (p.c6||'') + '",' + sup.toFixed(2) +
+        ',A-1,D-1,"' + (p.c1||'') + '","' + (p.numRegistre||p.c2||'') + '",' + (p.c3||'') + ',' + qtyT + ',"' + ef + '"\n';
+    });
+
+  const link = document.createElement('a');
+  link.href = encodeURI(csvContent);
+  link.download = 'CCPAE_' + camp + '.csv';
+  link.click();
+  showToast('✅ CCPAE exportat!');
+}
+
+// ═══════════════════════════════════════════════════════════════
+// COMPARATIVA ENTRE CAMPANYES
+// ═══════════════════════════════════════════════════════════════
+function renderComparativa() {
+  const el = document.getElementById('comp-contingut');
+  const selEl = document.getElementById('comp-camps-sel');
+  if(!selEl || !el) return;
+
+  const camps = getCampanyes();
+  if(selEl.innerHTML === '') {
+    camps.forEach(function(c) {
+      const btn = document.createElement('button');
+      btn.className = 'btn';
+      btn.style.cssText = 'padding:.3rem .8rem;font-size:.75rem;margin:.1rem';
+      btn.textContent = c;
+      btn.onclick = function() {
+        this.classList.toggle('btn-vine');
+        buildComparativa();
+      };
+      if(c === getCampanyaActual()) btn.classList.add('btn-vine');
+      selEl.appendChild(btn);
+    });
+  }
+
+  buildComparativa();
+}
+
+function buildComparativa() {
+  const el = document.getElementById('comp-contingut');
+  if(!el) return;
+
+  const selectedCamps = Array.from(document.querySelectorAll('#comp-camps-sel .btn-vine'))
+    .map(function(b){ return b.textContent; });
+
+  if(selectedCamps.length === 0) {
+    el.innerHTML = '<p style="color:var(--fog);font-size:.84rem">Selecciona almenys una campanya per comparar.</p>';
+    return;
+  }
+
+  const v = getCostVars();
+  const supTotal = PARCEL_DATA.reduce(function(s, p){ return s + p.sup; }, 0);
+
+  // Dades per campanya
+  const data = selectedCamps.map(function(camp) {
+    const parts = JSON.parse(localStorage.getItem(camp + '_parts') || '[]');
+    const collites = getCollites(camp);
+
+    // Costos variables
+    let costVar = 0;
+    parts.forEach(function(pt) {
+      const parceles = (pt.parcela||'').split(' / ').map(function(s){ return s.trim(); }).filter(Boolean);
+      parceles.forEach(function(nom) {
+        const pInfo = PARCEL_DATA.find(function(x){ return x.nom === nom; });
+        const sup = pInfo ? pInfo.sup : 0;
+        if(sup === 0) return;
+        let acc = TIPO_TO_ACCIO[pt.tipo];
+        if(pt.tipo === 'labor' && pt.c1) acc = LABOR_TO_ACCIO[pt.c1] || null;
+        if(acc) costVar += getAccioCalcul(acc, v, pt) * sup;
+      });
+    });
+    const costFix = (parseFloat(v.costFixHa)||0) * supTotal;
+    const costTotal = costVar + costFix;
+
+    const totalKg = collites.reduce(function(s, c){ return s + c.kg; }, 0);
+    const supCol = collites.reduce(function(s, c){ return s + c.sup; }, 0);
+    const rendMig = supCol > 0 ? Math.round(totalKg / supCol) : 0;
+    const brixMig = collites.filter(function(c){return c.brix>0;}).length > 0
+      ? (collites.reduce(function(s,c){return s+c.brix;},0) / collites.filter(function(c){return c.brix>0;}).length).toFixed(1) : '—';
+
+    const nFits = parts.filter(function(p){ return p.tipo==='fitosanitario'; }).length;
+    const costHa = supTotal > 0 ? (costTotal / supTotal).toFixed(0) : '—';
+
+    return { camp, costVar: costVar.toFixed(0), costFix: costFix.toFixed(0),
+             costTotal: costTotal.toFixed(0), costHa,
+             totalKg, rendMig, brixMig, nFits };
+  });
+
+  let html = '<div style="overflow-x:auto"><table style="width:100%;font-size:.82rem;border-collapse:collapse">' +
+    '<thead><tr style="background:var(--parchment)">' +
+    '<th style="padding:.5rem .8rem;border:1px solid #D8CEBA;text-align:left">Indicador</th>' +
+    data.map(function(d){ return '<th style="padding:.5rem .8rem;border:1px solid #D8CEBA;text-align:center">' + d.camp + '</th>'; }).join('') +
+    '</tr></thead><tbody>';
+
+  const rows = [
+    { label: '💶 Cost variable (€)', key: 'costVar', unit: '€' },
+    { label: '🏗️ Cost fix (€)', key: 'costFix', unit: '€' },
+    { label: '💰 Cost total (€)', key: 'costTotal', unit: '€', bold: true },
+    { label: '📊 Cost per ha (€/ha)', key: 'costHa', unit: '€/ha', bold: true },
+    { label: '🍇 Collita total (kg)', key: 'totalKg', unit: 'kg' },
+    { label: '📈 Rendiment mig (kg/ha)', key: 'rendMig', unit: 'kg/ha' },
+    { label: '🔬 Grau Brix mig', key: 'brixMig', unit: '°Bx' },
+    { label: '🌡️ Núm. tractaments', key: 'nFits', unit: '' },
+  ];
+
+  rows.forEach(function(row, i) {
+    const bg = i % 2 === 0 ? 'white' : 'var(--parchment)';
+    html += '<tr style="background:' + bg + '">' +
+      '<td style="padding:.45rem .8rem;border:1px solid #D8CEBA;' + (row.bold?'font-weight:600':'') + '">' + row.label + '</td>' +
+      data.map(function(d) {
+        const val = d[row.key];
+        const numVal = typeof val === 'number' ? val : parseFloat(val);
+        const numVals = data.map(function(x){ return parseFloat(x[row.key]); }).filter(function(v){ return !isNaN(v); });
+        let color = '';
+        if(numVals.length > 1 && !isNaN(numVal)) {
+          const best = row.key === 'costTotal' || row.key === 'costVar' || row.key === 'costFix' || row.key === 'costHa' || row.key === 'nFits'
+            ? Math.min.apply(null, numVals) : Math.max.apply(null, numVals);
+          if(numVal === best) color = 'color:var(--ok);font-weight:700';
+        }
+        const disp = typeof val === 'number' ? val.toLocaleString('ca') : val;
+        return '<td style="padding:.45rem .8rem;border:1px solid #D8CEBA;text-align:center;font-family:monospace;' + color + '">' +
+          (disp !== '—' && disp !== '' ? disp + (row.unit ? ' ' + row.unit : '') : '—') + '</td>';
+      }).join('') + '</tr>';
+  });
+
+  html += '</tbody></table></div>';
+
+  // Si hi ha dades de collita, mostrar taula de rendiment per varietat
+  const colDataByCamp = {};
+  selectedCamps.forEach(function(c) { colDataByCamp[c] = getCollites(c); });
+  const hasCollita = selectedCamps.some(function(c){ return colDataByCamp[c].length > 0; });
+  if(hasCollita) {
+    const vars = [...new Set(PARCEL_DATA.map(function(p){ return p.varietat; }))].sort();
+    html += '<div style="margin-top:1.2rem"><strong style="font-size:.85rem">Rendiment per varietat (kg/ha)</strong>';
+    html += '<div style="overflow-x:auto;margin-top:.5rem"><table style="width:100%;font-size:.8rem;border-collapse:collapse">' +
+      '<thead><tr style="background:var(--parchment)">' +
+      '<th style="padding:.4rem .6rem;border:1px solid #D8CEBA;text-align:left">Varietat</th>' +
+      selectedCamps.map(function(c){ return '<th style="padding:.4rem .6rem;border:1px solid #D8CEBA;text-align:center">' + c + '</th>'; }).join('') +
+      '</tr></thead><tbody>';
+    vars.forEach(function(vari, i) {
+      const bg = i%2===0?'white':'var(--parchment)';
+      html += '<tr style="background:' + bg + '"><td style="padding:.4rem .6rem;border:1px solid #D8CEBA">' + vari + '</td>';
+      selectedCamps.forEach(function(c) {
+        const parcsVar = PARCEL_DATA.filter(function(p){ return p.varietat === vari; });
+        const cols = colDataByCamp[c].filter(function(x){
+          return parcsVar.some(function(p){ return p.nom === x.parcela; });
+        });
+        const kg = cols.reduce(function(s,x){ return s+x.kg; },0);
+        const sup = parcsVar.reduce(function(s,p){ return s+p.sup; },0);
+        const rend = sup > 0 && kg > 0 ? Math.round(kg/sup) : '—';
+        html += '<td style="padding:.4rem .6rem;border:1px solid #D8CEBA;text-align:center;font-family:monospace">' + rend + '</td>';
+      });
+      html += '</tr>';
+    });
+    html += '</tbody></table></div></div>';
+  }
+
+  el.innerHTML = html;
+}
+
+// ═══════════════════════════════════════════════════════════════
+// ALERTA WHATSAPP MÍLDIU — comprovació automàtica
+// ═══════════════════════════════════════════════════════════════
+function checkMildiuAlerta(meteoData) {
+  if(!meteoData || !meteoData.length) return;
+  const LLINDAR_T = 12;
+  const LLINDAR_HR = 85;
+  const LLINDAR_DIES = 3;
+
+  const municipisRisc = [];
+  meteoData.forEach(function(m) {
+    if(!m.daily) return;
+    let diesConsecutius = 0;
+    const temps = m.daily.temperature_2m_mean || [];
+    const hrs = m.daily.relative_humidity_2m_mean || m.daily.precipitation_hours || [];
+    for(let i = 0; i < temps.length; i++) {
+      if(temps[i] >= LLINDAR_T && (hrs[i] >= LLINDAR_HR || hrs[i] >= 8)) {
+        diesConsecutius++;
+        if(diesConsecutius >= LLINDAR_DIES) {
+          municipisRisc.push(m.municipi);
+          break;
+        }
+      } else {
+        diesConsecutius = 0;
+      }
+    }
+  });
+
+  if(municipisRisc.length > 0) {
+    const missatge = '🍇 ALERTA MÍLDIU — Cava Miquel Pons\n' +
+      'Condicions favorables a: ' + municipisRisc.join(', ') + '\n' +
+      'T≥12°C i HR≥85% durant ' + LLINDAR_DIES + + ' dies consecutius.\n' +
+      'Considera tractament preventiu.';
+    enviarWhatsAppAlerta(missatge);
+  }
+}
+
+
 </script>
 <script>
 if('serviceWorker' in navigator) {
