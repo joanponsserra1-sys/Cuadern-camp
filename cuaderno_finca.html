@@ -2756,51 +2756,85 @@ function mpNoms(parcelaStr) {
 let fitProds = []; // [{prodIdx, dosi, preu}]
 
 function initFitMixer() {
-  fitProds = [{ prodIdx: 0, dosi: '', preu: '' }];
+  fitProds = [{ prodIdx: 0, qtTotal: '', preu: '' }];
   renderFitMixer();
 }
 
 function renderFitMixer() {
   const container = document.getElementById('fitMixer'); if(!container) return;
   const prods = getProductes();
+  const sup = parseFloat(document.getElementById('fit-superficie')?.value) || 0;
   container.innerHTML = '';
-  fitProds.forEach((fp, i) => {
-    const options = prods.map((p, pi) =>
-      `<option value="${pi}" ${pi===fp.prodIdx?'selected':''}>${p.nom} (${p.preu}€/${p.unitat||'kg'})</option>`
-    ).join('');
+  fitProds.forEach(function(fp, i) {
+    const prod = fp.prodIdx !== '' ? prods[fp.prodIdx] : null;
+    const unitat = prod ? (prod.unitat || 'kg') : 'kg';
+    const preuCat = prod ? prod.preu : '';
+    const preuVal = parseFloat(fp.preu) || parseFloat(preuCat) || 0;
+    const qtTot  = parseFloat(fp.qtTotal) || 0;
+    const dosiHa = sup > 0 && qtTot > 0 ? (qtTot / sup) : 0;
+    const costHa = dosiHa * preuVal;
+    const costTot = qtTot * preuVal;
+
+    const options = prods.map(function(p, pi) {
+      return '<option value="' + pi + '" ' + (pi === fp.prodIdx ? 'selected' : '') + '>' +
+        p.nom + ' (' + p.preu + '€/' + (p.unitat||'kg') + ')</option>';
+    }).join('');
+
     const row = document.createElement('div');
     row.className = 'fit-prod-row';
-    row.innerHTML = `
-      <select onchange="fitProdChange(${i},'prodIdx',this.value)">
-        <option value="">— Seleccionar —</option>${options}
-      </select>
-      <span class="fp-label">Dosi</span>
-      <input type="number" value="${fp.dosi}" placeholder="${fp.prodIdx!==''&&prods[fp.prodIdx]?prods[fp.prodIdx].dosi:''}" step="0.1" min="0"
-        oninput="fitProdChange(${i},'dosi',this.value)" style="width:70px">
-      <span class="fp-label">${fp.prodIdx!==''&&prods[fp.prodIdx]?prods[fp.prodIdx].unitat||'kg/ha':'kg/ha'}</span>
-      <span class="fp-label">Preu</span>
-      <input type="number" value="${fp.preu}" placeholder="${fp.prodIdx!==''&&prods[fp.prodIdx]?prods[fp.prodIdx].preu:''}" step="0.01" min="0"
-        oninput="fitProdChange(${i},'preu',this.value)" style="width:65px">
-      <span class="fp-label">€/kg</span>
-      <span class="fp-cost" id="fp-cost-${i}">—</span>
-      ${fitProds.length>1?`<button class="fit-prod-remove" onclick="removeFitProd(${i})" title="Treure">✕</button>`:''}`;
+    row.style.cssText = 'flex-direction:column;gap:.4rem;padding:.6rem .7rem';
+    row.innerHTML =
+      // Fila 1: selector producte
+      '<div style="display:flex;gap:.4rem;align-items:center;flex-wrap:wrap">' +
+        '<select onchange="fitProdChange(' + i + ',\'prodIdx\',this.value)" style="flex:3;min-width:160px">' +
+          '<option value="">— Seleccionar producte —</option>' + options +
+        '</select>' +
+        (fitProds.length > 1 ? '<button class="fit-prod-remove" onclick="removeFitProd(' + i + ')" title="Treure" style="flex:none">✕</button>' : '') +
+      '</div>' +
+      // Fila 2: entrada total + preu → resultat automàtic
+      '<div style="display:flex;gap:.5rem;align-items:center;flex-wrap:wrap;background:#F8F4EC;border-radius:2px;padding:.4rem .6rem">' +
+        '<div style="display:flex;align-items:center;gap:.3rem;flex:1;min-width:130px">' +
+          '<span class="fp-label" style="white-space:nowrap">Total màquina</span>' +
+          '<input type="number" value="' + (fp.qtTotal||'') + '" placeholder="0.0" step="0.1" min="0"' +
+            ' oninput="fitProdChange(' + i + ',\'qtTotal\',this.value)"' +
+            ' style="width:75px;background:white;font-weight:600;font-size:.9rem" title="Total ' + unitat + ' posats a la màquina">' +
+          '<span class="fp-label">' + unitat + '</span>' +
+        '</div>' +
+        '<div style="display:flex;align-items:center;gap:.3rem;flex:1;min-width:120px">' +
+          '<span class="fp-label">Preu</span>' +
+          '<input type="number" value="' + (fp.preu||'') + '" placeholder="' + preuCat + '" step="0.01" min="0"' +
+            ' oninput="fitProdChange(' + i + ',\'preu\',this.value)"' +
+            ' style="width:70px" title="€ per ' + unitat + '">' +
+          '<span class="fp-label">€/' + unitat + '</span>' +
+        '</div>' +
+        // Resultat calculat automàticament
+        '<div style="display:flex;gap:.6rem;align-items:center;font-family:monospace;font-size:.72rem;color:var(--vine);flex-wrap:wrap" id="fp-result-' + i + '">' +
+          (sup > 0 && dosiHa > 0
+            ? '<span style="background:var(--ok-bg);border:1px solid #90C890;border-radius:2px;padding:.15rem .5rem">' + dosiHa.toFixed(2) + ' ' + unitat + '/ha</span>' +
+              '<span style="background:var(--ok-bg);border:1px solid #90C890;border-radius:2px;padding:.15rem .5rem">' + costHa.toFixed(2) + ' €/ha</span>' +
+              '<span style="background:#F0E8D0;border:1px solid #D8CEBA;border-radius:2px;padding:.15rem .5rem;color:var(--harvest)">' + costTot.toFixed(2) + ' € total</span>'
+            : '<span style="color:var(--fog);font-size:.68rem">Introdueix total màquina i superfície</span>') +
+        '</div>' +
+      '</div>';
     container.appendChild(row);
-    calcFitProdCost(i);
   });
   calcFitMixerTotal();
-  // Update hidden fields for collectData
   updateFitHiddenFields();
 }
 
 function fitProdChange(i, field, val) {
-  if(field==='prodIdx') {
-    fitProds[i].prodIdx = val===''?'':parseInt(val);
-    // Autofill dosi/preu from catalog if empty
+  if(field === 'prodIdx') {
+    fitProds[i].prodIdx = val === '' ? '' : parseInt(val);
     const prods = getProductes();
-    if(val!=='' && prods[fitProds[i].prodIdx]) {
+    if(val !== '' && prods[fitProds[i].prodIdx]) {
       const p = prods[fitProds[i].prodIdx];
-      if(!fitProds[i].dosi) fitProds[i].dosi = p.dosi;
+      // Autofill preu del catàleg si buit
       if(!fitProds[i].preu) fitProds[i].preu = p.preu;
+      // Si el catàleg té dosi per defecte i la sup és coneguda, suggerir total
+      if(p.dosi && !fitProds[i].qtTotal) {
+        const sup = parseFloat(document.getElementById('fit-superficie')?.value) || 0;
+        if(sup > 0) fitProds[i].qtTotal = (parseFloat(p.dosi) * sup).toFixed(2);
+      }
     }
   } else {
     fitProds[i][field] = val;
@@ -2809,7 +2843,7 @@ function fitProdChange(i, field, val) {
 }
 
 function addFitProd() {
-  fitProds.push({ prodIdx: '', dosi: '', preu: '' });
+  fitProds.push({ prodIdx: '', qtTotal: '', preu: '' });
   renderFitMixer();
 }
 
@@ -2819,50 +2853,70 @@ function removeFitProd(i) {
 }
 
 function calcFitProdCost(i) {
-  const fp = fitProds[i];
+  const fp    = fitProds[i];
   const prods = getProductes();
-  const dosi = parseFloat(fp.dosi) || (fp.prodIdx!==''&&prods[fp.prodIdx]?prods[fp.prodIdx].dosi:0);
-  const preu = parseFloat(fp.preu) || (fp.prodIdx!==''&&prods[fp.prodIdx]?prods[fp.prodIdx].preu:0);
-  const cost = dosi * preu;
-  const el = document.getElementById('fp-cost-'+i);
-  if(el) el.textContent = cost>0 ? cost.toFixed(2)+'€/ha' : '—';
-  return cost;
+  const preu  = parseFloat(fp.preu) || (fp.prodIdx !== '' && prods[fp.prodIdx] ? parseFloat(prods[fp.prodIdx].preu)||0 : 0);
+  const qtTot = parseFloat(fp.qtTotal) || 0;
+  const sup   = parseFloat(document.getElementById('fit-superficie')?.value) || 0;
+  const costTot = qtTot * preu;
+  const dosiHa  = sup > 0 ? qtTot / sup : 0;
+  const costHa  = dosiHa * preu;
+  // Actualitzar resultat visual (ja es fa a renderFitMixer, però per compatibilitat)
+  const el = document.getElementById('fp-cost-' + i);
+  if(el) el.textContent = costHa > 0 ? costHa.toFixed(2) + '€/ha' : '—';
+  // Retornar cost/ha per a calcFitMixerTotal (que suma €/ha de tots els productes)
+  return costHa;
 }
 
 function calcFitMixerTotal() {
-  let total = 0;
-  fitProds.forEach((fp, i) => { total += calcFitProdCost(i); });
+  // Re-renderitzar sempre (mostra dosi/ha actualitzada)
+  renderFitMixer();
+  const sup = parseFloat(document.getElementById('fit-superficie')?.value) || 0;
+  let totalCostHa = 0;
+  let totalCostAbs = 0;
+  fitProds.forEach(function(fp) {
+    const prods = getProductes();
+    const preu  = parseFloat(fp.preu) || (fp.prodIdx !== '' && prods[fp.prodIdx] ? parseFloat(prods[fp.prodIdx].preu)||0 : 0);
+    const qtTot = parseFloat(fp.qtTotal) || 0;
+    totalCostAbs += qtTot * preu;
+    if(sup > 0) totalCostHa += (qtTot / sup) * preu;
+  });
   const el = document.getElementById('fit-cost-total');
-  if(el) el.textContent = total>0 ? total.toFixed(2)+' €/ha' : '— €/ha';
-  // Auto-actualitzar display de suma quan canvia el mixer
+  if(el) el.textContent = totalCostHa > 0 ? totalCostHa.toFixed(2) + ' €/ha' : '— €/ha';
   calcFitCostTotal(false);
-  return total;
+  return totalCostHa;  // retorna €/ha per al display
 }
 
 function updateFitHiddenFields() {
   const prods = getProductes();
-  // c1 = noms productes, c3 = dosi total, c10 = cost total €/ha
-  const noms  = fitProds.filter(fp=>fp.prodIdx!=='').map(fp=>prods[fp.prodIdx]?.nom||'').filter(Boolean).join(' + ');
-  const costTotal = calcFitMixerTotal();
-  const dosiPrinc = fitProds.length>0 ? (parseFloat(fitProds[0].dosi)||0) : 0;
+  const sup   = parseFloat(document.getElementById('fit-superficie')?.value) || 0;
+  // c1 = noms productes
+  const noms = fitProds.filter(function(fp){ return fp.prodIdx !== ''; })
+    .map(function(fp){ return prods[fp.prodIdx]?.nom || ''; }).filter(Boolean).join(' + ');
+  // c3 = dosi del primer producte (kg o L / ha)
+  const fp0     = fitProds.length > 0 ? fitProds[0] : null;
+  const qt0     = fp0 ? parseFloat(fp0.qtTotal) || 0 : 0;
+  const dosiHa0 = sup > 0 && qt0 > 0 ? (qt0 / sup).toFixed(3) : '';
+  // qtyTotal = total kg/L de tots els productes (per CCPAE)
+  const qtyTotAll = fitProds.reduce(function(s, fp){ return s + (parseFloat(fp.qtTotal)||0); }, 0);
+  // c10 = cost productes €/ha (del mixer)
+  const costProdHa = calcFitMixerTotal();
   const elNom  = document.getElementById('fit-producto');
   const elDosi = document.getElementById('fit-dosis');
   const elPreu = document.getElementById('fit-preu');
+  const elQty  = document.getElementById('fit-qty-total');
   if(elNom)  elNom.value  = noms;
-  if(elDosi) elDosi.value = dosiPrinc;
-  if(elPreu) elPreu.value = costTotal > 0 ? costTotal : '';
+  if(elDosi) elDosi.value = dosiHa0;
+  if(elPreu) elPreu.value = costProdHa > 0 ? costProdHa.toFixed(4) : '';
+  if(elQty)  elQty.value  = qtyTotAll > 0 ? qtyTotAll.toFixed(3) : '';
 }
 
 function resetFitMixer() {
-  initFitMixer();
-  const ce = document.getElementById('fit-cost-extra');
-  if(ce) ce.value = '';
-  const fe = document.getElementById('fit-extra');
-  if(fe) fe.value = '';
-  const inp = document.getElementById('fit-cost-total-input');
-  if(inp) inp.value = '';
-  const ha = document.getElementById('fit-cost-ha-auto');
-  if(ha) ha.value = '';
+  fitProds = [{ prodIdx: 0, qtTotal: '', preu: '' }];
+  renderFitMixer();
+  ['fit-cost-extra','fit-extra','fit-cost-total-input','fit-cost-ha-auto'].forEach(function(id) {
+    const el = document.getElementById(id); if(el) el.value = '';
+  });
   ['fit-cost-prod-display','fit-sup-display2','fit-cost-extra-display','fit-cost-suma-display'].forEach(function(id) {
     const el = document.getElementById(id); if(el) el.textContent = '—';
   });
@@ -2916,8 +2970,10 @@ function calcCostHaGeneric(prefix) {
 function recalcAllCostHa() {
   calcCostHaFromTotal();
   calcFitCostTotal(false);
+  // Re-renderitzar mixer per actualitzar dosi/ha i cost/ha amb nova superfície
+  renderFitMixer();
+  updateFitHiddenFields();
   ['lab','rie','abo'].forEach(function(p) { calcCostHaGeneric(p); });
-  // Actualitza display superfície fitosanitari
   const sup = parseFloat(document.getElementById('fit-superficie')?.value)||0;
   const supEl = document.getElementById('fit-sup-display');
   if(supEl) supEl.textContent = sup > 0 ? sup.toFixed(4)+' ha' : '— ha';
@@ -4338,7 +4394,7 @@ function editInitFitMixer(existingProds) {
     const cats = getProductes();
     editFitProds = existingProds.map(function(ep) {
       const idx = cats.findIndex(function(c){ return c.nom === ep.nom; });
-      return { prodIdx: idx >= 0 ? idx : '', nom: ep.nom, dosi: ep.dosi||'', preu: ep.preu||'' };
+      return { prodIdx: idx >= 0 ? idx : '', nom: ep.nom, qtTotal: ep.qtTotal||'', preu: ep.preu||'' };
     });
   } else {
     editFitProds = [{ prodIdx: '', dosi: '', preu: '' }];
@@ -4388,9 +4444,13 @@ function editFitProdChange(i, field, val) {
     const prods = getProductes();
     if(val !== '' && prods[editFitProds[i].prodIdx]) {
       const p = prods[editFitProds[i].prodIdx];
-      editFitProds[i].nom  = p.nom;
-      if(!editFitProds[i].dosi) editFitProds[i].dosi = p.dosi;
+      editFitProds[i].nom = p.nom;
       if(!editFitProds[i].preu) editFitProds[i].preu = p.preu;
+      // Suggerir total màquina si hi ha dosi per defecte i sup coneguda
+      if(p.dosi && !editFitProds[i].qtTotal) {
+        const sup = parseFloat(document.getElementById('edit-fit-sup')?.value) || 0;
+        if(sup > 0) editFitProds[i].qtTotal = (parseFloat(p.dosi) * sup).toFixed(2);
+      }
     }
   } else {
     editFitProds[i][field] = val;
@@ -4409,43 +4469,47 @@ function editRemoveFitProd(i) {
 }
 
 function editCalcFitProdCost(i) {
-  const fp = editFitProds[i];
+  const fp   = editFitProds[i];
   const prods = getProductes();
-  const dosi = parseFloat(fp.dosi) || (fp.prodIdx !== '' && prods[fp.prodIdx] ? parseFloat(prods[fp.prodIdx].dosi)||0 : 0);
   const preu = parseFloat(fp.preu) || (fp.prodIdx !== '' && prods[fp.prodIdx] ? parseFloat(prods[fp.prodIdx].preu)||0 : 0);
-  const cost = dosi * preu;
-  const el = document.getElementById('efp-cost-' + i);
-  if(el) el.textContent = cost > 0 ? cost.toFixed(2) + '€/ha' : '—';
-  return cost;
+  const qtTot = parseFloat(fp.qtTotal) || 0;
+  const sup  = parseFloat(document.getElementById('edit-fit-sup')?.value) || 0;
+  const dosiHa = sup > 0 ? qtTot / sup : 0;
+  return dosiHa * preu;  // retorna €/ha
 }
 
 function editCalcFitMixerTotal() {
-  let total = 0;
-  editFitProds.forEach(function(fp, i) { total += editCalcFitProdCost(i); });
+  editRenderFitMixer();
+  const sup = parseFloat(document.getElementById('edit-fit-sup')?.value) || 0;
+  let totalCostHa = 0;
+  editFitProds.forEach(function(fp) {
+    const prods = getProductes();
+    const preu  = parseFloat(fp.preu) || (fp.prodIdx !== '' && prods[fp.prodIdx] ? parseFloat(prods[fp.prodIdx].preu)||0 : 0);
+    const qtTot = parseFloat(fp.qtTotal) || 0;
+    if(sup > 0) totalCostHa += (qtTot / sup) * preu;
+  });
   const el = document.getElementById('edit-fit-cost-mescla');
-  if(el) el.textContent = total > 0 ? total.toFixed(2) + ' €/ha' : '— €/ha';
-  // Auto-recalcular suma quan canvia el mixer
+  if(el) el.textContent = totalCostHa > 0 ? totalCostHa.toFixed(2) + ' €/ha' : '— €/ha';
   if(typeof editCalcFitCostTotal === 'function') editCalcFitCostTotal(false);
-  return total;
+  return totalCostHa;
 }
 
 function editUpdateFitHiddenFields() {
   const prods = getProductes();
+  const sup = parseFloat(document.getElementById('edit-fit-sup')?.value) || 0;
   const noms = editFitProds.filter(function(fp){ return fp.prodIdx !== '' || fp.nom; })
     .map(function(fp){ return fp.nom || (prods[fp.prodIdx] ? prods[fp.prodIdx].nom : ''); })
     .filter(Boolean).join(' + ');
-  const costTotal = editCalcFitMixerTotal();
-  const dosiPrinc = editFitProds.length > 0 ? (parseFloat(editFitProds[0].dosi)||0) : 0;
-  const reg = editFitProds.length > 0 && editFitProds[0].prodIdx !== ''
-    ? (prods[editFitProds[0].prodIdx]?.registre||'') : '';
+  const fp0    = editFitProds.length > 0 ? editFitProds[0] : null;
+  const qt0    = fp0 ? parseFloat(fp0.qtTotal)||0 : 0;
+  const dosi0  = sup > 0 && qt0 > 0 ? (qt0/sup).toFixed(3) : '';
+  const costHa = editCalcFitMixerTotal();
   const el1 = document.getElementById('edit-fit-producto');
   const el2 = document.getElementById('edit-fit-dosis');
   const el3 = document.getElementById('edit-fit-preu');
-  const el4 = document.getElementById('edit-fit-registro');
   if(el1) el1.value = noms;
-  if(el2) el2.value = dosiPrinc;
-  if(el3) el3.value = costTotal > 0 ? costTotal : '';
-  if(el4) el4.value = reg;
+  if(el2) el2.value = dosi0;
+  if(el3) el3.value = costHa > 0 ? costHa.toFixed(4) : '';
 }
 
 function editCalcFitCostTotal(apply) {
@@ -4601,11 +4665,24 @@ function editarPartModal(id) {
     document.getElementById('edit-sec-fit').style.display = 'block';
     // Reconstruir mixer des de les dades guardades
     // c1 pot ser "prod1 + prod2", intentem reconstruir
-    const nomsArr = (p.c1||'').split(' + ').map(function(s){ return s.trim(); }).filter(Boolean);
-    const existingProds = nomsArr.map(function(nom) {
-      const cat = getProductes().find(function(pr){ return pr.nom === nom; });
-      return { nom: nom, dosi: cat ? cat.dosi : (p.c3||''), preu: cat ? cat.preu : '' };
-    });
+    // Reconstruir mixer: usar fitProdsData si existeix (guarda qtTotal)
+    let existingProds = null;
+    if(p.fitProdsData && p.fitProdsData.length > 0) {
+      existingProds = p.fitProdsData.map(function(fp) {
+        const cat = getProductes().find(function(pr){ return pr.nom === fp.nom; });
+        return { nom: fp.nom, qtTotal: fp.qtTotal||'', preu: fp.preu || (cat ? cat.preu : '') };
+      });
+    } else {
+      // Compatibilitat parts antics (tenien dosi/ha, intentar estimar qtTotal)
+      const nomsArr = (p.c1||'').split(' + ').map(function(s){ return s.trim(); }).filter(Boolean);
+      const supPart = parseFloat(p.c5) || 0;
+      existingProds = nomsArr.map(function(nom) {
+        const cat = getProductes().find(function(pr){ return pr.nom === nom; });
+        const dosiHa = parseFloat(p.c3) || (cat ? parseFloat(cat.dosi)||0 : 0);
+        const qtEst = supPart > 0 && dosiHa > 0 ? (dosiHa * supPart).toFixed(2) : '';
+        return { nom: nom, qtTotal: qtEst, preu: cat ? cat.preu : '' };
+      });
+    }
     editInitFitMixer(existingProds.length > 0 ? existingProds : null);
 
     // Cost real
@@ -4758,7 +4835,7 @@ function guardarEdicio() {
       extra:     g('fit-extra'),
       numRegistre: g('fit-num-registre'),
       eficacia: g('fit-eficacia'),
-      fitProdsData: editFitProds,
+      fitProdsData: editFitProds.map(function(fp){ return { nom: fp.nom, qtTotal: fp.qtTotal, preu: fp.preu }; }),
     };
   } else if(tipo === 'labor') {
     const hi = g('lab-hi'); const hf = g('lab-hf');
