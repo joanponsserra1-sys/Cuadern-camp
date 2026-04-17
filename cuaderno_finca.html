@@ -2818,7 +2818,17 @@ function renderFitMixer() {
       '</div>';
     container.appendChild(row);
   });
-  calcFitMixerTotal();
+  // Calcular i mostrar total mixer sense recursió
+  const _sup = parseFloat(document.getElementById('fit-superficie')?.value) || 0;
+  let _totalCostHa = 0;
+  fitProds.forEach(function(_fp) {
+    const _prods = getProductes();
+    const _preu = parseFloat(_fp.preu) || (_fp.prodIdx !== '' && _prods[_fp.prodIdx] ? parseFloat(_prods[_fp.prodIdx].preu)||0 : 0);
+    const _qt = parseFloat(_fp.qtTotal) || 0;
+    if(_sup > 0 && _qt > 0) _totalCostHa += (_qt / _sup) * _preu;
+  });
+  const _elTotal = document.getElementById('fit-cost-total');
+  if(_elTotal) _elTotal.textContent = _totalCostHa > 0 ? _totalCostHa.toFixed(2) + ' €/ha' : '— €/ha';
   updateFitHiddenFields();
 }
 
@@ -2869,22 +2879,19 @@ function calcFitProdCost(i) {
 }
 
 function calcFitMixerTotal() {
-  // Re-renderitzar sempre (mostra dosi/ha actualitzada)
-  renderFitMixer();
+  // NOTA: no cridar renderFitMixer() des d'aquí — causaria bucle infinit
+  const prods = getProductes();
   const sup = parseFloat(document.getElementById('fit-superficie')?.value) || 0;
   let totalCostHa = 0;
-  let totalCostAbs = 0;
   fitProds.forEach(function(fp) {
-    const prods = getProductes();
     const preu  = parseFloat(fp.preu) || (fp.prodIdx !== '' && prods[fp.prodIdx] ? parseFloat(prods[fp.prodIdx].preu)||0 : 0);
     const qtTot = parseFloat(fp.qtTotal) || 0;
-    totalCostAbs += qtTot * preu;
-    if(sup > 0) totalCostHa += (qtTot / sup) * preu;
+    if(sup > 0 && qtTot > 0) totalCostHa += (qtTot / sup) * preu;
   });
   const el = document.getElementById('fit-cost-total');
   if(el) el.textContent = totalCostHa > 0 ? totalCostHa.toFixed(2) + ' €/ha' : '— €/ha';
   calcFitCostTotal(false);
-  return totalCostHa;  // retorna €/ha per al display
+  return totalCostHa;
 }
 
 function updateFitHiddenFields() {
@@ -4433,7 +4440,17 @@ function editRenderFitMixer() {
     container.appendChild(row);
     editCalcFitProdCost(i);
   });
-  editCalcFitMixerTotal();
+  // Calcular total sense recursió
+  const _esup = parseFloat(document.getElementById('edit-fit-sup')?.value) || 0;
+  let _etotalCostHa = 0;
+  editFitProds.forEach(function(_fp) {
+    const _prods = getProductes();
+    const _preu = parseFloat(_fp.preu) || (_fp.prodIdx !== '' && _prods[_fp.prodIdx] ? parseFloat(_prods[_fp.prodIdx].preu)||0 : 0);
+    const _qt = parseFloat(_fp.qtTotal) || 0;
+    if(_esup > 0 && _qt > 0) _etotalCostHa += (_qt / _esup) * _preu;
+  });
+  const _eelTotal = document.getElementById('edit-fit-cost-mescla');
+  if(_eelTotal) _eelTotal.textContent = _etotalCostHa > 0 ? _etotalCostHa.toFixed(2) + ' €/ha' : '— €/ha';
   editUpdateFitHiddenFields();
 }
 
@@ -4479,14 +4496,14 @@ function editCalcFitProdCost(i) {
 }
 
 function editCalcFitMixerTotal() {
-  editRenderFitMixer();
+  // NOTA: no cridar editRenderFitMixer() des d'aquí — causaria bucle infinit
+  const prods = getProductes();
   const sup = parseFloat(document.getElementById('edit-fit-sup')?.value) || 0;
   let totalCostHa = 0;
   editFitProds.forEach(function(fp) {
-    const prods = getProductes();
     const preu  = parseFloat(fp.preu) || (fp.prodIdx !== '' && prods[fp.prodIdx] ? parseFloat(prods[fp.prodIdx].preu)||0 : 0);
     const qtTot = parseFloat(fp.qtTotal) || 0;
-    if(sup > 0) totalCostHa += (qtTot / sup) * preu;
+    if(sup > 0 && qtTot > 0) totalCostHa += (qtTot / sup) * preu;
   });
   const el = document.getElementById('edit-fit-cost-mescla');
   if(el) el.textContent = totalCostHa > 0 ? totalCostHa.toFixed(2) + ' €/ha' : '— €/ha';
