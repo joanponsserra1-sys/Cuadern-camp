@@ -294,7 +294,7 @@ tbody td{padding:.55rem .8rem;color:var(--ink);vertical-align:middle;}
 .tracker-detail-close{background:none;border:none;color:var(--paper);font-size:1.2rem;cursor:pointer;opacity:.7;}
 .tracker-detail-close:hover{opacity:1;}
 .tracker-detail-body{padding:.8rem 1.2rem;}
-.fit-history-row{display:grid;grid-template-columns:90px 1fr 1fr auto;gap:.5rem;padding:.4rem 0;border-bottom:1px solid #F0E8D8;font-size:.8rem;align-items:center;}
+.fit-history-row{display:flex;flex-direction:column;gap:.2rem;padding:.55rem .8rem;border-bottom:1px solid #F0E8D8;font-size:.8rem;}
 .fit-history-row:last-child{border-bottom:none;}
 .fit-history-date{font-family:'DM Mono',monospace;color:var(--fog);font-size:.72rem;}
 .fit-history-prod{font-weight:600;color:var(--ink);}
@@ -824,7 +824,13 @@ footer{text-align:center;margin-top:1.5rem;font-family:monospace;font-size:.65re
   <div class="card">
 
     <!-- Resum numèric -->
-    <div class="tracker-summary" id="trackerSummary">
+    <div style="display:flex;justify-content:flex-end;padding:.5rem 1.5rem .2rem;gap:.5rem">
+    <button class="btn" onclick="enviarResumDiari()"
+      style="font-size:.72rem;padding:.4rem .9rem;background:var(--grape);color:white;border:none">
+      📱 Enviar resum WhatsApp/email
+    </button>
+  </div>
+  <div class="tracker-summary" id="trackerSummary">
       <div class="summary-box s-danger">
         <div class="summary-num" id="cnt-danger">—</div>
         <div class="summary-lbl">🔴 Urgents</div>
@@ -2098,6 +2104,8 @@ document.addEventListener('DOMContentLoaded', function() {
 
   // Poblar filtres de costos
   populateCostFilters();
+  // Comprovar alertes pendents (s'envia màxim 1 cop per dia)
+  checkAlertesPendents();
 });
 
 // ══════════════════════════════════════════════════
@@ -2638,6 +2646,17 @@ function renderTracker() {
     const lTxt  = last ? new Date(last+'T12:00:00').toLocaleDateString('ca-ES',{day:'numeric',month:'short',year:'numeric'}) : null;
     groups[state].push({ ...p, days, last: lTxt });
   });
+  // Ordenar cada grup per dies DESC (més dies sense tractar primer)
+  // El grup 'none' s'ordena alfabèticament per nom
+  ['danger','warn','ok'].forEach(function(s) {
+    groups[s].sort(function(a, b) {
+      if(b.days === null && a.days === null) return a.nom.localeCompare(b.nom);
+      if(b.days === null) return -1;
+      if(a.days === null) return 1;
+      return b.days - a.days;
+    });
+  });
+  groups.none.sort(function(a, b) { return a.nom.localeCompare(b.nom); });
 
   // Actualitza comptadors
   const total = PARCEL_DATA.length;
@@ -2737,29 +2756,96 @@ function showParcelaDetail(nom) {
     body.innerHTML = plagueResumHtml + '<div class="fit-history-empty">Cap tractament fitosanitari registrat per aquesta parcel·la.</div>';
   } else {
     var rows = parts.map(function(p) {
-      const data  = new Date(p.fecha + 'T12:00:00').toLocaleDateString('ca-ES',{day:'numeric',month:'short',year:'numeric'});
-      const prod  = p.c1 || '—';
-      const dosi  = p.c3 ? p.c3 + (p.c4 ? ' · ' + p.c4 : '') : '—';
-      const obj   = p.c6 || '';
-      // Badges per a cada plaga detectada en aquest tractament
+      const data    = new Date(p.fecha + 'T12:00:00').toLocaleDateString('ca-ES',{day:'numeric',month:'short',year:'numeric'});
+      const prod    = p.c1 || '—';
+      const obj     = p.c6 || '';
+      const sup     = parseFloat(p.c5) || 0;
+      const caldo   = p.c4 ? p.c4 + ' L/ha brou' : '';
+
+      // Dosi/ha calculada (c3 és dosi/ha si ve del nou formulari)
+      const dosiHa  = p.c3 ? p.c3 + ' ' + (prod.toLowerCase().includes('sofre')||prod.toLowerCase().includes('coure')?'kg/ha':'L/ha') : '';
+
+      // Cost
+      const costTotal = parseFloat(p.costTotal) || 0;
+      const costHa    = parseFloat(p.costHa) || (costTotal > 0 && sup > 0 ? costTotal/sup : 0);
+
+      // Meteo (c9: "T:X°C HR:Y% V:Z PS:Nd")
+      const meteo = p.c9 && p.c9 !== 'T:°C HR:% V:Calma PS:d' ? p.c9.replace(' PS:','  PS:') : '';
+
+      // Hores (c8)
+      const hores = p.c8 && p.c8 !== '–' && p.c8 !== '' ? '🕐 ' + p.c8 : '';
+
+      // Eficàcia
+      const efTxt = ['0-Nul·la','1-Dolenta','2-Regular','3-Bona'];
+      const eficacia = p.eficacia !== undefined && p.eficacia !== '' ? efTxt[parseInt(p.eficacia)] : '';
+
+      // Termini seguretat (de c9 PS:N)
+      const psM = (p.c9||'').match(/PS:([\d]+)d/);
+      const plazo = psM && psM[1] !== '0' ? psM[1] + ' dies PS' : '';
+
+      // Num registre
+      const numReg = p.numRegistre || p.c2 || '';
+
+      // Plagues badges
       const plagues = detectaPlagues(obj);
       const pgBadges = plagues.map(function(k) {
         const pg = PLAGUES_TRACK.find(function(x){ return x.key === k; });
         return pg ? '<span class="pbadge pbadge-ok" style="font-size:.58rem">' + pg.icon + ' ' + pg.label + '</span>' : '';
       }).join('');
-      return '<div class="fit-history-row">' +
-        '<span class="fit-history-date">' + data + '</span>' +
-        '<span class="fit-history-prod">' + prod +
-          (obj ? ' <span style="font-weight:400;color:var(--fog);font-size:.7rem">(' + obj + ')</span>' : '') +
-          (pgBadges ? '<div class="fit-history-plagues">' + pgBadges + '</div>' : '') +
-        '</span>' +
-        '<span class="fit-history-dosi">' + dosi + '</span>' +
-        '<span style="font-family:monospace;font-size:.65rem;color:var(--ok)">✓</span>' +
+
+      // Línia de detalls
+      const detalls = [
+        dosiHa,
+        caldo,
+        costHa > 0 ? costHa.toFixed(2) + ' €/ha' : '',
+        costTotal > 0 ? costTotal.toFixed(2) + ' € total' : '',
+        sup > 0 ? sup.toFixed(2) + ' ha tractades' : '',
+        hores,
+        plazo,
+        numReg ? 'Reg: ' + numReg : '',
+      ].filter(Boolean).join(' · ');
+
+      // Meteo en línia separada si existeix
+      const meteoLine = meteo ?
+        '<div style="font-family:monospace;font-size:.6rem;color:var(--fog);margin-top:.2rem;opacity:.8">' + meteo + '</div>' : '';
+
+      // Operari
+      const operari = p.operario ? '<span style="font-size:.65rem;color:var(--fog)">👤 ' + p.operario + '</span>' : '';
+
+      // Eficàcia badge
+      const efBadge = eficacia ?
+        '<span style="font-family:monospace;font-size:.58rem;padding:.1rem .4rem;border-radius:2px;background:' +
+        (eficacia.startsWith('3')?'var(--ok-bg)':eficacia.startsWith('2')?'#FFF8E0':'var(--danger-bg)') +
+        ';color:' + (eficacia.startsWith('3')?'var(--ok)':eficacia.startsWith('2')?'var(--warn)':'var(--danger)') +
+        '">⭐ ' + eficacia + '</span>' : '';
+
+      // Observacions
+      const obs = p.obs && p.obs !== 'Registre manual des del seguiment' ?
+        '<div style="font-size:.68rem;color:var(--fog);font-style:italic;margin-top:.2rem">💬 ' + p.obs + '</div>' : '';
+
+      return '<div class="fit-history-row" style="flex-direction:column;align-items:flex-start;gap:.25rem;padding:.6rem .8rem">' +
+        // Capçalera: data + producte + plagues
+        '<div style="display:flex;align-items:flex-start;gap:.6rem;width:100%;flex-wrap:wrap">' +
+          '<span class="fit-history-date" style="min-width:90px">' + data + '</span>' +
+          '<span class="fit-history-prod" style="flex:1;font-weight:600">' + prod +
+            (obj && !plagues.length ? ' <span style="font-weight:400;color:var(--fog);font-size:.7rem">→ ' + obj + '</span>' : '') +
+          '</span>' +
+          (operari || '') +
+        '</div>' +
+        // Badges plagues + eficàcia
+        (pgBadges || efBadge ?
+          '<div style="display:flex;gap:.3rem;flex-wrap:wrap">' + pgBadges + efBadge + '</div>' : '') +
+        // Detalls tècnics
+        (detalls ? '<div style="font-family:monospace;font-size:.62rem;color:var(--vine);opacity:.85">' + detalls + '</div>' : '') +
+        // Meteo
+        meteoLine +
+        // Obs
+        obs +
         '</div>';
     }).join('');
     body.innerHTML = plagueResumHtml +
-      '<div style="font-family:monospace;font-size:.65rem;color:var(--fog);margin-bottom:.5rem">' + parts.length + ' tractaments registrats</div>' +
-      rows;
+      '<div style="font-family:monospace;font-size:.65rem;color:var(--fog);margin-bottom:.5rem;letter-spacing:.06em">' +
+      parts.length + ' TRACTAMENTS REGISTRATS</div>' + rows;
   }
 
   panel.style.display = 'block';
@@ -6961,13 +7047,151 @@ function checkMildiuAlerta(meteoData) {
   });
 
   if(municipisRisc.length > 0) {
-    const missatge = '🍇 ALERTA MÍLDIU — Cava Miquel Pons\n' +
-      'Condicions favorables a: ' + municipisRisc.join(', ') + '\n' +
-      'T≥12°C i HR≥85% durant ' + LLINDAR_DIES + + ' dies consecutius.\n' +
+    const nl3 = String.fromCharCode(10);
+    const missatge = '🍇 ALERTA MÍLDIU — Cava Miquel Pons' + nl3 +
+      'Condicions favorables a: ' + municipisRisc.join(', ') + nl3 +
+      'T>=12C i HR>=85% durant ' + LLINDAR_DIES + ' dies consecutius.' + nl3 +
       'Considera tractament preventiu.';
     enviarWhatsAppAlerta(missatge);
   }
 }
+
+
+// ═══════════════════════════════════════════════════════════════
+// ALERTES WHATSAPP (CallMeBot) + RESUM DIARI
+// ═══════════════════════════════════════════════════════════════
+
+const ALERT_CONFIG = {
+  whatsapp: '+34692178541',
+  callmebotKey: '4846252',
+  emails: ['joanponsserra@gmail.com', 'joanpons@cavamiquelpons.com'],
+};
+
+function enviarWhatsAppAlerta(missatge) {
+  const phone = ALERT_CONFIG.whatsapp.replace('+', '');
+  const key   = ALERT_CONFIG.callmebotKey;
+  const url   = 'https://api.callmebot.com/whatsapp.php?phone=' + phone +
+                '&text=' + encodeURIComponent(missatge) +
+                '&apikey=' + key;
+  fetch(url, { mode: 'no-cors' })
+    .then(function() { console.log('WhatsApp enviat'); })
+    .catch(function(e) { console.warn('Error WhatsApp:', e); });
+}
+
+function enviarEmailAlerta(assumpte, cos) {
+  fetch(SCRIPT_URL, {
+    method: 'POST',
+    body: JSON.stringify({
+      tipus: 'email_alerta',
+      destinataris: ALERT_CONFIG.emails,
+      assumpte: assumpte,
+      cos: cos,
+    }),
+    headers: { 'Content-Type': 'text/plain' },
+  }).catch(function(e) { console.warn('Error email:', e); });
+}
+
+function generarResumDiari() {
+  const tr   = buildTractamentsFromParts();
+  const avui = new Date().toLocaleDateString('ca-ES', { weekday:'long', day:'numeric', month:'long' });
+  const urgents = [];
+  const vigilar = [];
+
+  PARCEL_DATA.forEach(function(p) {
+    const last  = tr[p.nom] || null;
+    const days  = daysSince(last);
+    const state = stateFor(days);
+    if(state === 'danger') urgents.push({ nom: p.nom, dies: days, varietat: p.varietat });
+    if(state === 'warn')   vigilar.push({ nom: p.nom, dies: days, varietat: p.varietat });
+  });
+
+  urgents.sort(function(a, b) { return (b.dies||0) - (a.dies||0); });
+  vigilar.sort(function(a, b) { return (b.dies||0) - (a.dies||0); });
+
+  if(urgents.length === 0 && vigilar.length === 0) return null;
+
+  var lines = [
+    String.fromCharCode(55356,57343) + ' Cuaderno de Camp - ' + avui,
+    '===========================',
+  ];
+
+  if(urgents.length > 0) {
+    lines.push(String.fromCharCode(55356,57344) + ' URGENTS (' + urgents.length + ' parcelles >14 dies):');
+    urgents.forEach(function(p) {
+      lines.push('  - ' + p.nom + ' - ' + p.dies + ' dies (' + p.varietat + ')');
+    });
+  }
+  if(vigilar.length > 0) {
+    lines.push(String.fromCharCode(55356,57345) + ' A VIGILAR (' + vigilar.length + ' parcelles 7-14 dies):');
+    vigilar.forEach(function(p) {
+      lines.push('  - ' + p.nom + ' - ' + p.dies + ' dies (' + p.varietat + ')');
+    });
+  }
+
+  lines.push('===========================');
+  lines.push('OK: ' + (PARCEL_DATA.length - urgents.length - vigilar.length) + ' parcelles tractades correctament');
+
+  return lines.join('%0A');  // URL-encoded newlines per CallMeBot
+}
+
+function enviarResumDiari() {
+  const msg = generarResumDiari();
+  if(!msg) {
+    showToast('Tot OK - no cal enviar alerta (totes les parcel·les al dia)', false, true);
+    return;
+  }
+  // WhatsApp (ja ve URL-encoded)
+  const phone = ALERT_CONFIG.whatsapp.replace('+', '');
+  const url = 'https://api.callmebot.com/whatsapp.php?phone=' + phone +
+              '&text=' + msg + '&apikey=' + ALERT_CONFIG.callmebotKey;
+  fetch(url, { mode: 'no-cors' })
+    .then(function() { console.log('WhatsApp resum enviat'); })
+    .catch(function(e) { console.warn('Error WhatsApp:', e); });
+
+  // Email
+  const assumpte = 'Resum Cuaderno de Camp - ' + new Date().toLocaleDateString('ca-ES');
+  enviarEmailAlerta(assumpte, msg.replace(/%0A/g, '<br>'));
+
+  showToast('Resum enviat per WhatsApp i email!', false, true);
+}
+
+function checkUrgentsAlerta() {
+  const tr = buildTractamentsFromParts();
+  const urgents = PARCEL_DATA.filter(function(p) {
+    return stateFor(daysSince(tr[p.nom]||null)) === 'danger';
+  });
+  if(urgents.length === 0) return null;
+
+  const noms = urgents.slice(0, 5).map(function(p) {
+    return p.nom + ' (' + (daysSince(tr[p.nom]||null)||'?') + 'd)';
+  }).join(', ');
+
+  var lines = [
+    'URGENT Cuaderno de Camp',
+    urgents.length + ' parcelles >14 dies sense tractar:',
+    noms,
+  ];
+  if(urgents.length > 5) lines.push('...i ' + (urgents.length-5) + ' mes.');
+  return lines.join('%0A');
+}
+
+function checkAlertesPendents() {
+  const avui = new Date().toISOString().split('T')[0];
+  const darrereAlerta = localStorage.getItem('darrera_alerta_data');
+  if(darrereAlerta === avui) return;
+  setTimeout(function() {
+    const msgUrgent = checkUrgentsAlerta();
+    if(msgUrgent) {
+      localStorage.setItem('darrera_alerta_data', avui);
+      const phone = ALERT_CONFIG.whatsapp.replace('+', '');
+      const url = 'https://api.callmebot.com/whatsapp.php?phone=' + phone +
+                  '&text=' + msgUrgent + '&apikey=' + ALERT_CONFIG.callmebotKey;
+      fetch(url, { mode: 'no-cors' }).catch(function(e){});
+      console.log('Alerta urgents enviada');
+    }
+  }, 3000);
+}
+
 
 
 </script>
