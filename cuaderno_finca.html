@@ -2818,7 +2818,7 @@ function renderFitMixer() {
       '</div>';
     container.appendChild(row);
   });
-  // Calcular i mostrar total mixer sense recursió
+  // Actualitzar display total mixer inline (sense recursió)
   const _sup = parseFloat(document.getElementById('fit-superficie')?.value) || 0;
   let _totalCostHa = 0;
   fitProds.forEach(function(_fp) {
@@ -2829,7 +2829,7 @@ function renderFitMixer() {
   });
   const _elTotal = document.getElementById('fit-cost-total');
   if(_elTotal) _elTotal.textContent = _totalCostHa > 0 ? _totalCostHa.toFixed(2) + ' €/ha' : '— €/ha';
-  updateFitHiddenFields();
+  // NO cridar updateFitHiddenFields aquí — evita recursió
 }
 
 function fitProdChange(i, field, val) {
@@ -2850,16 +2850,19 @@ function fitProdChange(i, field, val) {
     fitProds[i][field] = val;
   }
   renderFitMixer();
+  updateFitHiddenFields();
 }
 
 function addFitProd() {
   fitProds.push({ prodIdx: '', qtTotal: '', preu: '' });
   renderFitMixer();
+  updateFitHiddenFields();
 }
 
 function removeFitProd(i) {
   fitProds.splice(i, 1);
   renderFitMixer();
+  updateFitHiddenFields();
 }
 
 function calcFitProdCost(i) {
@@ -2900,14 +2903,19 @@ function updateFitHiddenFields() {
   // c1 = noms productes
   const noms = fitProds.filter(function(fp){ return fp.prodIdx !== ''; })
     .map(function(fp){ return prods[fp.prodIdx]?.nom || ''; }).filter(Boolean).join(' + ');
-  // c3 = dosi del primer producte (kg o L / ha)
+  // c3 = dosi del primer producte (kg/L per ha)
   const fp0     = fitProds.length > 0 ? fitProds[0] : null;
   const qt0     = fp0 ? parseFloat(fp0.qtTotal) || 0 : 0;
   const dosiHa0 = sup > 0 && qt0 > 0 ? (qt0 / sup).toFixed(3) : '';
-  // qtyTotal = total kg/L de tots els productes (per CCPAE)
+  // qtyTotal = total kg/L de tots els productes
   const qtyTotAll = fitProds.reduce(function(s, fp){ return s + (parseFloat(fp.qtTotal)||0); }, 0);
-  // c10 = cost productes €/ha (del mixer)
-  const costProdHa = calcFitMixerTotal();
+  // c10 = cost productes €/ha — calcular INLINE sense cridar calcFitMixerTotal
+  let costProdHa = 0;
+  fitProds.forEach(function(fp) {
+    const preu = parseFloat(fp.preu) || (fp.prodIdx !== '' && prods[fp.prodIdx] ? parseFloat(prods[fp.prodIdx].preu)||0 : 0);
+    const qt   = parseFloat(fp.qtTotal) || 0;
+    if(sup > 0 && qt > 0) costProdHa += (qt / sup) * preu;
+  });
   const elNom  = document.getElementById('fit-producto');
   const elDosi = document.getElementById('fit-dosis');
   const elPreu = document.getElementById('fit-preu');
@@ -2951,6 +2959,31 @@ function calcCostTractament() {
   if(field) field.value = costHa > 0 ? costHa.toFixed(2) : '';
 }
 
+function calcFitCostTotal(apply) {
+  const sup        = parseFloat(document.getElementById('fit-superficie')?.value)||0;
+  const prods      = getProductes();
+  let costProdHa   = 0;
+  fitProds.forEach(function(fp) {
+    const preu = parseFloat(fp.preu)||(fp.prodIdx!==''&&prods[fp.prodIdx]?parseFloat(prods[fp.prodIdx].preu)||0:0);
+    const qt   = parseFloat(fp.qtTotal)||0;
+    if(sup>0&&qt>0) costProdHa += (qt/sup)*preu;
+  });
+  const costExtra  = parseFloat(document.getElementById('fit-cost-extra')?.value)||0;
+  const suma       = costProdHa * sup + costExtra;
+  const d1 = document.getElementById('fit-cost-prod-display');
+  const d2 = document.getElementById('fit-sup-display2');
+  const d3 = document.getElementById('fit-cost-extra-display');
+  const d4 = document.getElementById('fit-cost-suma-display');
+  if(d1) d1.textContent = costProdHa > 0 ? costProdHa.toFixed(2) : '—';
+  if(d2) d2.textContent = sup > 0 ? sup.toFixed(2) : '—';
+  if(d3) d3.textContent = costExtra > 0 ? costExtra.toFixed(2) : '—';
+  if(d4) { d4.textContent = suma > 0 ? suma.toFixed(2) : '—'; d4.style.color = suma>0?'var(--harvest)':''; }
+  const inp = document.getElementById('fit-cost-total-input');
+  if(inp && (apply === true || !inp.value)) {
+    if(suma > 0) { inp.value = suma.toFixed(2); calcCostHaFromTotal(); }
+  }
+}
+
 function calcCostHaFromTotal() {
   const total = parseFloat(document.getElementById('fit-cost-total-input')?.value)||0;
   const sup   = parseFloat(document.getElementById('fit-superficie')?.value)||0;
@@ -2976,14 +3009,34 @@ function calcCostHaGeneric(prefix) {
 // Recalcula cost €/ha quan canvia la superfície automàticament
 function recalcAllCostHa() {
   calcCostHaFromTotal();
-  calcFitCostTotal(false);
-  // Re-renderitzar mixer per actualitzar dosi/ha i cost/ha amb nova superfície
+  // Re-renderitzar mixer: mostra dosi/ha actualitzada amb nova superfície
+  // renderFitMixer és segur aquí: NO crida cap funció de càlcul
   renderFitMixer();
   updateFitHiddenFields();
   ['lab','rie','abo'].forEach(function(p) { calcCostHaGeneric(p); });
   const sup = parseFloat(document.getElementById('fit-superficie')?.value)||0;
   const supEl = document.getElementById('fit-sup-display');
   if(supEl) supEl.textContent = sup > 0 ? sup.toFixed(4)+' ha' : '— ha';
+  // Actualitzar display de suma cost extra
+  const costProdHa = (() => {
+    const prods = getProductes(); const s = sup;
+    let t = 0;
+    fitProds.forEach(function(fp) {
+      const p = parseFloat(fp.preu)||(fp.prodIdx!==''&&prods[fp.prodIdx]?parseFloat(prods[fp.prodIdx].preu)||0:0);
+      const q = parseFloat(fp.qtTotal)||0;
+      if(s>0&&q>0) t += (q/s)*p;
+    });
+    return t;
+  })();
+  const d1 = document.getElementById('fit-cost-prod-display');
+  const d2 = document.getElementById('fit-sup-display2');
+  if(d1) d1.textContent = costProdHa > 0 ? costProdHa.toFixed(2) : '—';
+  if(d2) d2.textContent = sup > 0 ? sup.toFixed(2) : '—';
+  // Recalcular cost total (productes + extra)
+  const extra = parseFloat(document.getElementById('fit-cost-extra')?.value)||0;
+  const suma = costProdHa * sup + extra;
+  const d4 = document.getElementById('fit-cost-suma-display');
+  if(d4) { d4.textContent = suma > 0 ? suma.toFixed(2) : '—'; d4.style.color = suma>0?'var(--harvest)':''; }
 }
 
 // Definició de cada acció: com es calcula el cost/ha
