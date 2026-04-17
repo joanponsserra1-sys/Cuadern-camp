@@ -1252,6 +1252,244 @@ footer{text-align:center;margin-top:1.5rem;font-family:monospace;font-size:.65re
 
 </div>
 
+
+<!-- ══════════════════════════════════════════════════ ESTOC ══ -->
+<div class="page" id="page-estoc">
+
+  <div class="card" style="margin-bottom:1.2rem">
+    <div class="panel-header ph-harvest">⛽ &nbsp; Estoc Gasoil — Preu Mig Ponderat</div>
+    <div class="card-inner">
+      <div id="gasoilCompres"></div>
+      <div style="display:flex;gap:.6rem;flex-wrap:wrap;align-items:flex-end;margin-top:.5rem">
+        <div class="field" style="margin-bottom:0;width:130px"><label>Data</label><input type="date" id="g-data"></div>
+        <div class="field" style="margin-bottom:0;width:100px"><label>Litres</label><input type="number" id="g-litres" placeholder="0" step="1" min="0"></div>
+        <div class="field" style="margin-bottom:0;width:100px"><label>Preu €/L</label><input type="number" id="g-preu" placeholder="0.000" step="0.001" min="0"></div>
+        <button class="btn btn-harvest" onclick="addCompraGasoil()" style="margin-bottom:1rem">+ Afegir compra</button>
+      </div>
+      <div id="gasoilPMP" style="margin-top:.8rem"></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="panel-header ph-grape">🧪 &nbsp; Estoc Fitosanitaris — Catàleg i PMP</div>
+    <div class="card-inner">
+
+      <div class="section-label">Nou producte al catàleg</div>
+      <div style="display:flex;gap:.6rem;flex-wrap:wrap;align-items:flex-end;margin-bottom:1.2rem;background:var(--parchment);padding:.8rem;border-radius:2px;border:1px solid #D8CEBA">
+        <div class="field" style="margin-bottom:0;flex:2;min-width:160px"><label>Nom producte</label><input type="text" id="np-nom" placeholder="ex: Heliosufre, Scala..."></div>
+        <div class="field" style="margin-bottom:0;width:90px">
+          <label>Unitat</label>
+          <select id="np-unitat">
+            <option value="L">L (litres)</option>
+            <option value="kg">kg</option>
+            <option value="g">g</option>
+          </select>
+        </div>
+        <div class="field" style="margin-bottom:0;width:100px"><label>Núm. registre</label><input type="text" id="np-registre" placeholder="ES-..."></div>
+        <button class="btn btn-grape" onclick="addProducteEstoc()" style="margin-bottom:1rem">+ Afegir producte</button>
+      </div>
+
+      <div class="section-label">Registrar compra</div>
+      <div style="display:flex;gap:.6rem;flex-wrap:wrap;align-items:flex-end;margin-bottom:.8rem">
+        <div class="field" style="margin-bottom:0;flex:2;min-width:180px">
+          <label>Producte</label>
+          <select id="estoc-prod-sel" onchange="renderEstocProd()">
+            <option value="">— Seleccionar producte —</option>
+          </select>
+        </div>
+        <button id="btnDelProd" class="btn" onclick="delProducteEstoc()"
+          style="margin-bottom:1rem;background:#FDE8E8;color:#8A1A1A;border:1px solid #E08080;font-size:.72rem;display:none">
+          🗑 Eliminar producte
+        </button>
+      </div>
+
+      <div id="addCompraProdForm" style="display:none;background:var(--parchment);padding:.8rem;border-radius:2px;border:1px solid #D8CEBA;margin-bottom:.8rem">
+        <div style="display:flex;gap:.6rem;flex-wrap:wrap;align-items:flex-end">
+          <div class="field" style="margin-bottom:0;width:130px"><label>Data compra</label><input type="date" id="ep-data"></div>
+          <div class="field" style="margin-bottom:0;width:90px"><label>Quantitat</label><input type="number" id="ep-qty" placeholder="0" step="0.1" min="0"></div>
+          <div class="field" style="margin-bottom:0;width:90px"><label>Preu €/unitat</label><input type="number" id="ep-preu" placeholder="0.00" step="0.01" min="0"></div>
+          <div class="field" style="margin-bottom:0;width:130px"><label>Proveïdor</label><input type="text" id="ep-proveidor" placeholder="Cevipe..."></div>
+          <div class="field" style="margin-bottom:0;width:120px"><label>Núm. albarà</label><input type="text" id="ep-albara" placeholder="VFR..."></div>
+          <button class="btn btn-grape" onclick="addCompraProd()" style="margin-bottom:1rem">+ Afegir compra</button>
+        </div>
+      </div>
+
+      <div id="estocProdCompres"></div>
+      <div id="estocProdPMP" style="margin-top:.8rem"></div>
+
+    </div>
+  </div>
+
+</div>
+
+<!-- ══════════════════════════════════════════════════ COLLITA ══ -->
+<div class="page" id="page-collita">
+  <div class="card" style="margin-bottom:1.2rem">
+    <div class="panel-header ph-grape">🍇 &nbsp; Registre de Collita per Parcel·la</div>
+    <div class="card-inner">
+      <div class="section-label">Afegir registre de verema</div>
+      <div style="display:flex;gap:.6rem;flex-wrap:wrap;align-items:flex-end;background:var(--parchment);padding:.8rem;border-radius:2px;border:1px solid #D8CEBA;margin-bottom:.8rem">
+        <div class="field" style="margin-bottom:0;width:140px"><label>Data verema</label><input type="date" id="col-data"></div>
+        <div class="field" style="margin-bottom:0;flex:2;min-width:160px">
+          <label>Parcel·la</label>
+          <select id="col-parcela" onchange="colParcelaChange()">
+            <option value="">— Seleccionar —</option>
+          </select>
+        </div>
+        <div class="field" style="margin-bottom:0;width:110px"><label>kg recollits</label><input type="number" id="col-kg" placeholder="0" step="1" min="0" oninput="colCalcRendiment()"></div>
+        <div class="field" style="margin-bottom:0;width:90px"><label>Sup (ha)</label><input type="number" id="col-sup" placeholder="0.00" step="0.0001" readonly style="background:#F0F7F0;color:var(--ok);font-weight:600"></div>
+        <div class="field" style="margin-bottom:0;width:100px"><label>Rend. kg/ha</label><input type="number" id="col-rendiment" placeholder="0" readonly style="background:#F0F7F0;color:var(--ok);font-weight:600"></div>
+      </div>
+      <div style="display:flex;gap:.6rem;flex-wrap:wrap;align-items:flex-end;background:var(--parchment);padding:.8rem;border-radius:2px;border:1px solid #D8CEBA;margin-bottom:.8rem">
+        <div class="field" style="margin-bottom:0;width:100px"><label>Grau Brix (°Bx)</label><input type="number" id="col-brix" placeholder="22.0" step="0.1" min="0" max="30"></div>
+        <div class="field" style="margin-bottom:0;width:100px"><label>Acidesa (g/l)</label><input type="number" id="col-acidesa" placeholder="5.5" step="0.1" min="0"></div>
+        <div class="field" style="margin-bottom:0;width:90px"><label>pH most</label><input type="number" id="col-ph" placeholder="3.3" step="0.01" min="0"></div>
+        <div class="field" style="margin-bottom:0;flex:1;min-width:120px"><label>Destí</label>
+          <select id="col-desti"><option>Cava Miquel Pons</option><option>Venda raïm</option><option>Autoconsum</option><option>Altre</option></select>
+        </div>
+        <div class="field" style="margin-bottom:0;flex:2;min-width:140px"><label>Observacions</label><input type="text" id="col-obs" placeholder="Notes de qualitat..."></div>
+        <button class="btn btn-grape" onclick="afegirCollita()" style="margin-bottom:1rem">+ Guardar verema</button>
+      </div>
+      <div id="collita-resum" style="margin-bottom:1rem"></div>
+    </div>
+  </div>
+  <div class="card">
+    <div class="panel-header ph-soil">📊 &nbsp; Historial de collites per campanya</div>
+    <div class="card-inner">
+      <div style="display:flex;gap:.6rem;flex-wrap:wrap;align-items:center;margin-bottom:.8rem">
+        <label style="font-size:.8rem">Campanya:</label>
+        <select id="col-filt-camp" onchange="renderCollita()" style="width:140px"></select>
+        <label style="font-size:.8rem">Varietat:</label>
+        <select id="col-filt-var" onchange="renderCollita()" style="width:140px"><option value="">Totes</option></select>
+      </div>
+      <div id="collita-taula"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════════════ FITXA ══ -->
+<div class="page" id="page-fitxa">
+  <div class="card" style="margin-bottom:1rem">
+    <div class="panel-header" style="background:#2A5472">📌 &nbsp; Fitxa de Parcel·la</div>
+    <div class="card-inner">
+      <div class="field" style="margin-bottom:.8rem">
+        <label>Seleccionar parcel·la</label>
+        <select id="fitxa-sel" onchange="renderFitxa()" style="font-size:1rem;font-weight:600">
+          <option value="">— Seleccionar —</option>
+        </select>
+      </div>
+    </div>
+  </div>
+  <div id="fitxa-contingut"></div>
+</div>
+
+<!-- ══════════════════════════════════════════════════ CCPAE ══ -->
+<div class="page" id="page-ccpae">
+  <div class="card" style="margin-bottom:1rem">
+    <div class="panel-header" style="background:#1A4A2A">📄 &nbsp; Quadern CCPAE — Exportació Automàtica</div>
+    <div class="card-inner">
+      <p style="font-size:.84rem;color:var(--fog);margin-bottom:1rem;line-height:1.6">
+        Genera els fulls del Quadern d'Explotació Vegetal CCPAE a partir dels parts registrats.<br>
+        <strong>Fulls generats:</strong> Full 3 (Treballs de camp) · Full 4 (Adobats) · Full 6 (Tractaments fitosanitaris) · Full 10 (Compres)
+      </p>
+      <div style="display:flex;gap:.6rem;flex-wrap:wrap;align-items:center;margin-bottom:.8rem">
+        <label style="font-size:.8rem">Campanya:</label>
+        <select id="ccpae-camp" style="width:140px" onchange="renderCCPAE()"></select>
+        <button class="btn btn-ok" onclick="exportarCCPAE()" style="padding:.5rem 1.2rem">⬇ Exportar CSV CCPAE</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="card" style="margin-bottom:1rem">
+    <div class="panel-header ph-soil">3 · Treballs de camp</div>
+    <div style="overflow-x:auto;padding:.5rem">
+      <table style="width:100%;font-size:.75rem;border-collapse:collapse">
+        <thead><tr style="background:var(--parchment)">
+          <th style="padding:.4rem .6rem;border:1px solid #ccc;text-align:left">Data</th>
+          <th style="padding:.4rem .6rem;border:1px solid #ccc;text-align:left">Núm. finca</th>
+          <th style="padding:.4rem .6rem;border:1px solid #ccc;text-align:left">Sup. (ha)</th>
+          <th style="padding:.4rem .6rem;border:1px solid #ccc;text-align:left">Cultiu</th>
+          <th style="padding:.4rem .6rem;border:1px solid #ccc;text-align:left">Treball</th>
+        </tr></thead>
+        <tbody id="ccpae-t3-body"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="card" style="margin-bottom:1rem">
+    <div class="panel-header ph-leaf">4 · Adobats</div>
+    <div style="overflow-x:auto;padding:.5rem">
+      <table style="width:100%;font-size:.75rem;border-collapse:collapse">
+        <thead><tr style="background:var(--parchment)">
+          <th style="padding:.4rem .6rem;border:1px solid #ccc">Núm. finca</th>
+          <th style="padding:.4rem .6rem;border:1px solid #ccc">Sup. (ha)</th>
+          <th style="padding:.4rem .6rem;border:1px solid #ccc">Data</th>
+          <th style="padding:.4rem .6rem;border:1px solid #ccc">Producte</th>
+          <th style="padding:.4rem .6rem;border:1px solid #ccc">Quantitat (kg)</th>
+          <th style="padding:.4rem .6rem;border:1px solid #ccc">N aplicat (kg)</th>
+          <th style="padding:.4rem .6rem;border:1px solid #ccc">Dosi N/ha</th>
+          <th style="padding:.4rem .6rem;border:1px solid #ccc">Aplicador</th>
+        </tr></thead>
+        <tbody id="ccpae-t4-body"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="card" style="margin-bottom:1rem">
+    <div class="panel-header ph-grape">6 · Tractaments fitosanitaris</div>
+    <div style="overflow-x:auto;padding:.5rem">
+      <table style="width:100%;font-size:.72rem;border-collapse:collapse">
+        <thead><tr style="background:var(--parchment)">
+          <th style="padding:.4rem .5rem;border:1px solid #ccc">Data</th>
+          <th style="padding:.4rem .5rem;border:1px solid #ccc">Núm. finca</th>
+          <th style="padding:.4rem .5rem;border:1px solid #ccc">Cultiu</th>
+          <th style="padding:.4rem .5rem;border:1px solid #ccc">Plaga</th>
+          <th style="padding:.4rem .5rem;border:1px solid #ccc">Sup. (ha)</th>
+          <th style="padding:.4rem .5rem;border:1px solid #ccc">Aplicador</th>
+          <th style="padding:.4rem .5rem;border:1px solid #ccc">Producte</th>
+          <th style="padding:.4rem .5rem;border:1px solid #ccc">Núm. reg.</th>
+          <th style="padding:.4rem .5rem;border:1px solid #ccc">Dosi</th>
+          <th style="padding:.4rem .5rem;border:1px solid #ccc">Qty total</th>
+          <th style="padding:.4rem .5rem;border:1px solid #ccc">Eficàcia</th>
+        </tr></thead>
+        <tbody id="ccpae-t6-body"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="panel-header ph-harvest">10 · Compres de matèries primeres</div>
+    <div style="overflow-x:auto;padding:.5rem">
+      <table style="width:100%;font-size:.75rem;border-collapse:collapse">
+        <thead><tr style="background:var(--parchment)">
+          <th style="padding:.4rem .6rem;border:1px solid #ccc">Data</th>
+          <th style="padding:.4rem .6rem;border:1px solid #ccc">Producte</th>
+          <th style="padding:.4rem .6rem;border:1px solid #ccc">Qualificació</th>
+          <th style="padding:.4rem .6rem;border:1px solid #ccc">Quantitat</th>
+          <th style="padding:.4rem .6rem;border:1px solid #ccc">Proveïdor</th>
+          <th style="padding:.4rem .6rem;border:1px solid #ccc">Albarà</th>
+        </tr></thead>
+        <tbody id="ccpae-t10-body"></tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════ COMPARATIVA ══ -->
+<div class="page" id="page-comparativa">
+  <div class="card" style="margin-bottom:1rem">
+    <div class="panel-header" style="background:#3A2A5A">📊 &nbsp; Comparativa entre Campanyes</div>
+    <div class="card-inner">
+      <div style="display:flex;gap:.6rem;flex-wrap:wrap;align-items:center;margin-bottom:1rem">
+        <label style="font-size:.8rem">Campanyes a comparar:</label>
+        <div id="comp-camps-sel" style="display:flex;gap:.4rem;flex-wrap:wrap"></div>
+      </div>
+      <div id="comp-contingut"></div>
+    </div>
+  </div>
+</div>
+
+
 <!-- Modal d'edició de parts -->
 <div id="editModal" style="display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.7);z-index:200;overflow-y:auto;padding:1rem">
   <div style="background:var(--paper);border-radius:2px;max-width:680px;margin:1.5rem auto;overflow:hidden">
