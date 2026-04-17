@@ -1861,6 +1861,8 @@ function applyConfigFromSheets(config) {
         }
         if(clau === 'productes_fitosanitaris') {
           renderProducteTaula();
+          // Re-renderitzar mixer perquè mostri els nous productes
+          renderFitMixer();
         }
         if(clau === 'cost_vars' && typeof parsed === 'object') {
           // Aplica totes les variables de cost d'un cop
@@ -2033,6 +2035,25 @@ let currentType = 'fitosanitario';
 })();
 
 document.addEventListener('DOMContentLoaded', function() {
+  // Si el localStorage té els productes per defecte (de versions anteriors),
+  // netejar-los per deixar la llista buida (l'usuari afegirà els seus)
+  (function() {
+    const saved = localStorage.getItem('productes_fitosanitaris');
+    if(saved) {
+      try {
+        const prods = JSON.parse(saved);
+        const defaultNoms = ['Sofre pols','Sofre mullable','Coure hidròxid',
+          'Oxiclorur coure 50%','Oxiclorur coure 80%','Caldo bordalesès',
+          'Mancozeb','Folpet','Azoxistrobina','Captan'];
+        // Si tots els productes guardats són del default, netejar
+        const allDefault = prods.every(function(p){ return defaultNoms.includes(p.nom); });
+        if(allDefault && prods.length > 0) {
+          localStorage.removeItem('productes_fitosanitaris');
+          console.log('Productes per defecte eliminats — llista neta');
+        }
+      } catch(e) {}
+    }
+  })();
   document.getElementById('fecha').valueAsDate = new Date();
   // Assegura que sempre hi ha una campanya activa
   getCampanyaActual(); // inicialitza si cal
@@ -2912,25 +2933,23 @@ const COST_DEFAULTS = {
   amort: 332.19  // €/ha/any — Total 24.409,25€ ÷ 73,48ha SCP (2024)
 };
 
-// Catàleg de productes per defecte (2024)
-const PRODUCTES_DEFAULT = [
-  { nom:'Sofre pols',              preu:0.825, dosi:32,  unitat:'kg/ha' },
-  { nom:'Sofre mullable',          preu:1.20,  dosi:4,   unitat:'kg/ha' },
-  { nom:'Coure hidròxid',          preu:7.50,  dosi:2.5, unitat:'kg/ha' },
-  { nom:'Oxiclorur coure 50%',     preu:4.80,  dosi:3.0, unitat:'kg/ha' },
-  { nom:'Oxiclorur coure 80%',     preu:6.20,  dosi:2.0, unitat:'kg/ha' },
-  { nom:'Caldo bordalesès',        preu:3.50,  dosi:4.0, unitat:'kg/ha' },
-  { nom:'Mancozeb',                preu:4.20,  dosi:2.0, unitat:'kg/ha' },
-  { nom:'Folpet',                  preu:6.50,  dosi:1.5, unitat:'kg/ha' },
-  { nom:'Azoxistrobina',           preu:28.00, dosi:0.5, unitat:'L/ha'  },
-  { nom:'Captan',                  preu:5.20,  dosi:1.5, unitat:'kg/ha' },
-];
+// Catàleg de productes — buit per defecte, l'usuari afegeix els seus
+const PRODUCTES_DEFAULT = [];
 
 function getProductes() {
-  try { return JSON.parse(localStorage.getItem('productes_fitosanitaris') || 'null') || PRODUCTES_DEFAULT; }
-  catch { return PRODUCTES_DEFAULT; }
+  try {
+    const saved = localStorage.getItem('productes_fitosanitaris');
+    if(saved === null) return []; // cap producte registrat → llista buida
+    const parsed = JSON.parse(saved);
+    return Array.isArray(parsed) ? parsed : [];
+  } catch { return []; }
 }
-function saveProductes(p) { localStorage.setItem('productes_fitosanitaris', JSON.stringify(p)); syncConfigToSheets('productes_fitosanitaris', p); }
+function saveProductes(p) {
+  localStorage.setItem('productes_fitosanitaris', JSON.stringify(p));
+  syncConfigToSheets('productes_fitosanitaris', p);
+  // Re-renderitzar mixer per reflectir canvis al catàleg
+  if(document.getElementById('fitMixer')) renderFitMixer();
+}
 
 function renderProducteTaula() {
   const tbody = document.getElementById('producteTbody'); if(!tbody) return;
@@ -2994,7 +3013,7 @@ function mpNoms(parcelaStr) {
 let fitProds = []; // [{prodIdx, dosi, preu}]
 
 function initFitMixer() {
-  fitProds = [{ prodIdx: 0, qtTotal: '', preu: '' }];
+  fitProds = [{ prodIdx: '', qtTotal: '', preu: '' }];
   renderFitMixer();
 }
 
@@ -3165,7 +3184,7 @@ function updateFitHiddenFields() {
 }
 
 function resetFitMixer() {
-  fitProds = [{ prodIdx: 0, qtTotal: '', preu: '' }];
+  fitProds = [{ prodIdx: '', qtTotal: '', preu: '' }];
   renderFitMixer();
   ['fit-cost-extra','fit-extra','fit-cost-total-input','fit-cost-ha-auto'].forEach(function(id) {
     const el = document.getElementById(id); if(el) el.value = '';
@@ -5529,8 +5548,8 @@ function aplicarPMPSelProd(pmp) {
   const nom = document.getElementById('estoc-prod-sel')?.value;
   if(!nom) return;
   aplicarPMPProducte(nom, pmp);
-}
-function delCompraProdIdx(i) {
+  renderFitMixer(); // Actualitza preus al mixer
+}function delCompraProdIdx(i) {
   const nom = document.getElementById('estoc-prod-sel')?.value;
   if(!nom) return;
   delCompraProd(nom, i);
