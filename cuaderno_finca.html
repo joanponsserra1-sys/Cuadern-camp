@@ -2520,7 +2520,7 @@ function getUltimsPerPlaga(nomParcela) {
   const result = {};
   getParts()
     .filter(p => p.tipo === 'fitosanitario' && p.parcela &&
-      p.parcela.split(' / ').some(n => n.trim() === nomParcela))
+      mpNoms(p.parcela).indexOf(nomParcela) !== -1)
     .forEach(p => {
       const plagues = detectaPlagues(p.c6);
       // Si no s'especifica plaga però és fitosanitari, compta com a general
@@ -2628,20 +2628,94 @@ async function syncTractamentsFromSheets() {
 }
 
 function buildTractamentsFromParts() {
-  // Recalcula l'ultim tractament fitosanitari per parcel·la
-  // directament des dels parts actuals (ignora la cache)
-  const tr = {};
+  // Per cada parcel·la, agrupa els parts fitosanitaris en "cicles":
+  // - Cicle: seqüència de parts amb ≤12 dies entre consecutius
+  // - Si el cicle suma ≥100% → data semàfor = primer part del cicle
+  // - Si el cicle és parcial (no arriba al 100%) → data semàfor = primer part
+  // - Part al 100% sol → la seva pròpia data (cas normal)
+  // - Si no hi ha % (part antic sense parcelaDetail) → tractar com 100%
+
+  const MAX_DIES_CICLE = 12; // dies màxims entre parts del mateix cicle
+
+  // 1. Recopilar tots els parts fitosanitaris per parcel·la amb la seva data i %
+  const perParcela = {}; // { nomParcela: [{fecha, pct}] }
+
   getParts().forEach(function(part) {
     if(part.tipo !== 'fitosanitario') return;
     if(!part.fecha || !part.parcela) return;
-    const parceles = part.parcela.split(' / ').map(function(n){ return n.trim(); });
-    parceles.forEach(function(nom) {
+
+    const parcelesRaw = part.parcela.split(' / ');
+    parcelesRaw.forEach(function(s) {
+      const nom = mpNom(s);
       if(!nom) return;
-      if(!tr[nom] || part.fecha > tr[nom]) tr[nom] = part.fecha;
+
+      // Extreure % d'aquesta parcel·la en aquest part
+      // Primer buscar a parcelaDetail, després al nom "Nom (XX%)"
+      let pct = 100;
+      if(part.parcelaDetail) {
+        const d = part.parcelaDetail.find(function(x){ return x.nom === nom; });
+        if(d) pct = d.pct;
+      } else {
+        const m = s.trim().match(/\((\d+)%\)$/);
+        if(m) pct = parseInt(m[1]);
+      }
+
+      if(!perParcela[nom]) perParcela[nom] = [];
+      perParcela[nom].push({ fecha: part.fecha, pct: pct });
     });
   });
-  // Also include manual log-parcela entries from tractaments cache
-  // but only if the part still exists (cross-check)
+
+  // 2. Per cada parcel·la, agrupar en cicles i determinar la data del semàfor
+  const tr = {};
+
+  function difDies(d1, d2) {
+    // Diferència en dies entre dues dates 'YYYY-MM-DD'
+    return Math.abs((new Date(d2 + 'T12:00:00') - new Date(d1 + 'T12:00:00')) / 86400000);
+  }
+
+  Object.keys(perParcela).forEach(function(nom) {
+    // Ordenar per data ASC
+    const parts = perParcela[nom].slice().sort(function(a, b) {
+      return a.fecha.localeCompare(b.fecha);
+    });
+
+    // Agrupar en cicles
+    const cicles = [];
+    var cicleActual = null;
+
+    parts.forEach(function(p) {
+      if(!cicleActual) {
+        cicleActual = { parts: [p], dataInici: p.fecha, dataFi: p.fecha, pctTotal: p.pct };
+      } else {
+        const diesDif = difDies(cicleActual.dataFi, p.fecha);
+        if(diesDif <= MAX_DIES_CICLE) {
+          // Afegir al cicle actual
+          cicleActual.parts.push(p);
+          cicleActual.dataFi = p.fecha;
+          cicleActual.pctTotal += p.pct;
+        } else {
+          // Cicle nou
+          cicles.push(cicleActual);
+          cicleActual = { parts: [p], dataInici: p.fecha, dataFi: p.fecha, pctTotal: p.pct };
+        }
+      }
+    });
+    if(cicleActual) cicles.push(cicleActual);
+
+    // 3. Regla del semàfor:
+    // El semàfor sempre mostra el primer part del cicle MÉS RECENT,
+    // sigui complet (≥100%) o obert (<100%).
+    // Cada cicle nou (>12 dies del darrer part) és independent.
+    // Exemples:
+    //   01/01(70%) + 03/01(30%) = cicle complet → semàfor 01/01
+    //   01/01(100%) ja tancat; 15/03(60%) nou cicle → semàfor 15/03
+    //   01/01(70%) tancat per temps; 20/01(30%) nou cicle → semàfor 20/01
+
+    if(cicles.length > 0) {
+      tr[nom] = cicles[cicles.length - 1].dataInici;
+    }
+  });
+
   return tr;
 }
 
@@ -2741,7 +2815,7 @@ function showParcelaDetail(nom) {
   // Filtra parts fitosanitaris d'aquesta parcel·la
   const parts = getParts().filter(function(p) {
     return p.tipo === 'fitosanitario' &&
-      p.parcela && p.parcela.split(' / ').some(function(n){ return n.trim() === nom; });
+      p.parcela && mpNoms(p.parcela).indexOf(nom) !== -1;
   }).sort(function(a,b){ return b.fecha.localeCompare(a.fecha); });
 
   title.textContent = nom + ' — Historial fitosanitari';
@@ -3679,7 +3753,7 @@ function renderCostParceles() {
   const accioIds = new Set();
 
   parts.forEach(part => {
-    const parceles = part.parcela ? part.parcela.split(' / ').map(p=>p.trim()) : [];
+    const parceles = part.parcela ? mpNoms(part.parcela) : [];
     parceles.forEach(nomP => {
       if(!nomP) return;
       const parcelInfo = PARCEL_DATA.find(p => p.nom === nomP);
@@ -5315,7 +5389,7 @@ function guardarEdicio() {
 
   // Actualitza semàfor
   if(updated.tipo === 'fitosanitario' && updated.parcela && updated.fecha) {
-    updated.parcela.split(' / ').forEach(function(nom) { saveTractament(nom.trim(), updated.fecha); });
+    mpNoms(updated.parcela).forEach(function(nom) { saveTractament(nom, updated.fecha); });
   }
 
   document.getElementById('editModal').style.display = 'none';
@@ -6211,7 +6285,7 @@ async function renderMapa() {
     // Historial fitosanitari per popup
     const partsFit = getParts().filter(function(pt) {
       return pt.tipo === 'fitosanitario' &&
-        pt.parcela && pt.parcela.split(' / ').some(function(n){ return n.trim() === p.nom; });
+        pt.parcela && mpNoms(pt.parcela).indexOf(p.nom) !== -1;
     }).sort(function(a,b){ return b.fecha.localeCompare(a.fecha); }).slice(0, 5);
 
     const histHtml = partsFit.length > 0
@@ -6603,7 +6677,7 @@ function renderFitxa() {
   camps.forEach(function(camp) {
     const partsC = JSON.parse(localStorage.getItem(camp + '_parts') || '[]')
       .filter(function(pt) {
-        return (pt.parcela||'').split(' / ').map(function(s){ return s.trim(); }).indexOf(nom) !== -1;
+        return mpNoms(pt.parcela).indexOf(nom) !== -1;
       });
     let total = 0;
     partsC.forEach(function(pt) {
@@ -6857,7 +6931,7 @@ function exportarCCPAE() {
   allParts.filter(function(p){ return p.tipo==='labor'; })
     .sort(function(a,b){ return a.fecha.localeCompare(b.fecha); })
     .forEach(function(p) {
-      const parceles = (p.parcela||'').split(' / ').map(function(s){ return s.trim(); });
+      const parceles = mpNoms(p.parcela);
       const sup = getSupParceles(parceles);
       const finques = parceles.length === PARCEL_DATA.length ? 'Totes'
         : [...new Set(parceles.map(getNomFincaCCPAE))].join('+');
@@ -6870,7 +6944,7 @@ function exportarCCPAE() {
   allParts.filter(function(p){ return p.tipo==='fitosanitario'; })
     .sort(function(a,b){ return a.fecha.localeCompare(b.fecha); })
     .forEach(function(p) {
-      const parceles = (p.parcela||'').split(' / ').map(function(s){ return s.trim(); });
+      const parceles = mpNoms(p.parcela);
       const sup = getSupParceles(parceles);
       const finques = parceles.length === PARCEL_DATA.length ? 'Totes'
         : [...new Set(parceles.map(getNomFincaCCPAE))].join('+');
