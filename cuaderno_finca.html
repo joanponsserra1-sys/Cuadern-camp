@@ -2464,9 +2464,7 @@ function guardarPart() {
   // Per al seguiment, actualitza cada parcel·la individualment
   if(d.tipo==='fitosanitario') {
     mpSelected_list.forEach(function(entry){ saveTractament(entry.nom, d.fecha); });
-    // DEBUG: mostrar el que es guarda
-    console.log('[guardarPart DEBUG] parcela:', d.parcela);
-    console.log('[guardarPart DEBUG] parcelaDetail:', JSON.stringify(d.parcelaDetail));
+
   }
 
   // Sincronitza amb Google Sheets (en segon pla)
@@ -2691,15 +2689,18 @@ function buildTractamentsFromParts() {
         cicleActual = { parts: [p], dataInici: p.fecha, dataFi: p.fecha, pctTotal: p.pct };
       } else {
         const diesDif = difDies(cicleActual.dataFi, p.fecha);
-        if(diesDif <= MAX_DIES_CICLE) {
-          // Afegir al cicle actual
+        const cicleJaComplet = cicleActual.parts.some(function(x){ return x.pct >= 100; });
+
+        if(cicleJaComplet || diesDif > MAX_DIES_CICLE) {
+          // Cicle nou: o bé el cicle anterior ja tenia un 100%,
+          // o bé han passat més de 12 dies
+          cicles.push(cicleActual);
+          cicleActual = { parts: [p], dataInici: p.fecha, dataFi: p.fecha, pctTotal: p.pct };
+        } else {
+          // Afegir al cicle actual (tots parcials i dins de 12 dies)
           cicleActual.parts.push(p);
           cicleActual.dataFi = p.fecha;
           cicleActual.pctTotal += p.pct;
-        } else {
-          // Cicle nou
-          cicles.push(cicleActual);
-          cicleActual = { parts: [p], dataInici: p.fecha, dataFi: p.fecha, pctTotal: p.pct };
         }
       }
     });
@@ -2715,19 +2716,26 @@ function buildTractamentsFromParts() {
     //   01/01(70%) tancat per temps; 20/01(30%) nou cicle → semàfor 20/01
 
     if(cicles.length > 0) {
-      tr[nom] = cicles[cicles.length - 1].dataInici;
-    }
-  });
+      const cicle = cicles[cicles.length - 1];
 
-  // DEBUG temporal — eliminar un cop verificat
-  const DEBUG_NOM = 'Modesta';
-  Object.keys(perParcela).forEach(function(nom) {
-    if(nom.includes(DEBUG_NOM)) {
-      console.log('[Semàfor DEBUG] ' + nom + ':');
-      perParcela[nom].forEach(function(p) {
-        console.log('  part: ' + p.fecha + ' pct=' + p.pct + '%');
-      });
-      console.log('  → data semàfor: ' + (tr[nom] || 'cap'));
+      // Si dins del cicle hi ha algun part al 100% (tractament total),
+      // agafar la data del part al 100% MÉS RECENT del cicle —
+      // un 100% és un reset complet independent del % anterior
+      var dataReset = null;
+      for(var pi = cicle.parts.length - 1; pi >= 0; pi--) {
+        if(cicle.parts[pi].pct >= 100) {
+          dataReset = cicle.parts[pi].fecha;
+          break;
+        }
+      }
+
+      if(dataReset) {
+        // Hi ha un part total → data = el part total (pot ser posterior al parcial)
+        tr[nom] = dataReset;
+      } else {
+        // Tots els parts del cicle son parcials → data = primer part del cicle
+        tr[nom] = cicle.dataInici;
+      }
     }
   });
 
