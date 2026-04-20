@@ -1912,8 +1912,22 @@ function setCampanyaActiva(c) {
   syncConfigToSheets('campanya_activa', c);
 }
 function getCampanyes() {
-  try { return JSON.parse(localStorage.getItem('campanyes_list') || '["2025-26"]'); }
-  catch { return ['2025-26']; }
+  // Detectar totes les campanyes que tenen parts O collites al localStorage
+  const saved = [];
+  try { saved.push(...JSON.parse(localStorage.getItem('campanyes_list') || '[]')); } catch{}
+  // Escanejar claus del localStorage
+  for(let i = 0; i < localStorage.length; i++) {
+    const k = localStorage.key(i);
+    if(!k) continue;
+    const m = k.match(/^(\d{4}-\d{2,4})_(parts|collites)$/);
+    if(m && !saved.includes(m[1])) saved.push(m[1]);
+  }
+  // Sempre incloure la campanya activa
+  const activa = getCampanyaActual();
+  if(!saved.includes(activa)) saved.push(activa);
+  // Ordenar
+  saved.sort(function(a,b){ return b.localeCompare(a); });
+  return saved.length > 0 ? saved : ['2025-26'];
 }
 function saveCampanyes(list) {
   localStorage.setItem('campanyes_list', JSON.stringify(list));
@@ -6451,7 +6465,11 @@ function renderCollita() {
     const camps = getCampanyes();
     selC.innerHTML = '';
     camps.forEach(function(c) { const o = document.createElement('option'); o.value = c; o.textContent = c; selC.appendChild(o); });
-    if(!selC.value) selC.value = getCampanyaActual();
+    // Seleccionar la campanya amb més collites si la campanya activa no en té
+    if(!selC.value || getCollites(selC.value).length === 0) {
+      const campMesDades = camps.find(function(c){ return getCollites(c).length > 0; });
+      selC.value = campMesDades || getCampanyaActual();
+    }
   }
 
   const campSel = document.getElementById('col-filt-camp')?.value || getCampanyaActual();
@@ -6916,13 +6934,23 @@ function buildComparativa() {
     const parts = JSON.parse(localStorage.getItem(camp + '_parts') || '[]');
     const collites = getCollites(camp);
 
-    // Costos variables
+    // Costos variables (usant costTotal guardat al part si disponible)
     let costVar = 0;
     parts.forEach(function(pt) {
-      const parceles = (pt.parcela||'').split(' / ').map(function(s){ return s.trim(); }).filter(Boolean);
+      // Usar costTotal real del part si existeix
+      if(pt.costTotal && parseFloat(pt.costTotal) > 0) {
+        costVar += parseFloat(pt.costTotal);
+        return;
+      }
+      const parceles = mpNoms(pt.parcela);
       parceles.forEach(function(nom) {
         const pInfo = PARCEL_DATA.find(function(x){ return x.nom === nom; });
-        const sup = pInfo ? pInfo.sup : 0;
+        const pct = (function() {
+          if(!pt.parcelaDetail) return 100;
+          const d = pt.parcelaDetail.find(function(x){ return x.nom === nom; });
+          return d ? d.pct : 100;
+        })();
+        const sup = pInfo ? pInfo.sup * pct / 100 : 0;
         if(sup === 0) return;
         let acc = TIPO_TO_ACCIO[pt.tipo];
         if(pt.tipo === 'labor' && pt.c1) acc = LABOR_TO_ACCIO[pt.c1] || null;
@@ -6932,18 +6960,42 @@ function buildComparativa() {
     const costFix = (parseFloat(v.costFixHa)||0) * supTotal;
     const costTotal = costVar + costFix;
 
+    // Ingressos de la campanya: 
+    // 1) dels registres de collita (injectats o manuals)
+    const ingresCol = collites.reduce(function(s, c){ return s + (c.ingres||0); }, 0);
+    // 2) de la pestanya d'ingressos (ck('ingres') per aquesta campanya)
+    let ingresRaim = 0, ingresSubv = 0, ingresSin = 0;
+    try {
+      const ingresLS = JSON.parse(localStorage.getItem(camp + '_ingres') || '{"raim":[],"subv":[],"sin":[]}');
+      ingresRaim = (ingresLS.raim||[]).reduce(function(s,i){ return s+(parseFloat(i.ingres)||(parseFloat(i.kg)*parseFloat(i.preu))||0); }, 0);
+      ingresSubv = (ingresLS.subv||[]).reduce(function(s,i){ return s+(parseFloat(i.import)||0); }, 0);
+      ingresSin  = (ingresLS.sin||[]).reduce(function(s,i){ return s+(parseFloat(i.import)||0); }, 0);
+    } catch(e){}
+    // Prioritzar els de collita (més detallats), si no n'hi ha usar pestanya ingressos
+    const ingresTotal = ingresCol > 0 ? ingresCol + ingresSubv + ingresSin
+                                      : ingresRaim + ingresSubv + ingresSin;
+    const marge = ingresTotal > 0 ? ingresTotal - costTotal : null;
+    const margeHa = supTotal > 0 && marge !== null ? (marge / supTotal).toFixed(0) : null;
+
     const totalKg = collites.reduce(function(s, c){ return s + c.kg; }, 0);
-    const supCol = collites.reduce(function(s, c){ return s + c.sup; }, 0);
+    const totalKgTeu = collites.reduce(function(s, c){ return s + (c.kg_teu||c.kg); }, 0);
+    const supCol = collites.reduce(function(s, c){ return s + (c.sup||0); }, 0);
     const rendMig = supCol > 0 ? Math.round(totalKg / supCol) : 0;
     const brixMig = collites.filter(function(c){return c.brix>0;}).length > 0
       ? (collites.reduce(function(s,c){return s+c.brix;},0) / collites.filter(function(c){return c.brix>0;}).length).toFixed(1) : '—';
-
     const nFits = parts.filter(function(p){ return p.tipo==='fitosanitario'; }).length;
     const costHa = supTotal > 0 ? (costTotal / supTotal).toFixed(0) : '—';
+    const ingresHa = supTotal > 0 && ingresTotal > 0 ? (ingresTotal / supTotal).toFixed(0) : '—';
 
-    return { camp, costVar: costVar.toFixed(0), costFix: costFix.toFixed(0),
+    return { camp,
+             costVar: costVar.toFixed(0), costFix: costFix.toFixed(0),
              costTotal: costTotal.toFixed(0), costHa,
-             totalKg, rendMig, brixMig, nFits };
+             ingresTotal: ingresTotal > 0 ? ingresTotal.toFixed(0) : '—',
+             ingresHa,
+             marge: marge !== null ? marge.toFixed(0) : '—',
+             margeHa: margeHa || '—',
+             totalKg, totalKgTeu: totalKgTeu.toFixed(0),
+             rendMig, brixMig, nFits };
   });
 
   let html = '<div style="overflow-x:auto"><table style="width:100%;font-size:.82rem;border-collapse:collapse">' +
@@ -6953,33 +7005,62 @@ function buildComparativa() {
     '</tr></thead><tbody>';
 
   const rows = [
+    { label: '🍇 Collita bruta (kg)', key: 'totalKg', unit: 'kg' },
+    { label: '🍇 Collita teva (kg)', key: 'totalKgTeu', unit: 'kg' },
+    { label: '📈 Rendiment mig (kg/ha)', key: 'rendMig', unit: 'kg/ha' },
+    { label: '🔬 Grau Brix mig', key: 'brixMig', unit: '°Bx' },
+    { label: '─────', key: null },
+    { label: '💵 Ingressos raïm+subv (€)', key: 'ingresTotal', unit: '€', bold: true, ingres: true },
+    { label: '💵 Ingressos per ha (€/ha)', key: 'ingresHa', unit: '€/ha', ingres: true },
+    { label: '─────', key: null },
     { label: '💶 Cost variable (€)', key: 'costVar', unit: '€' },
     { label: '🏗️ Cost fix (€)', key: 'costFix', unit: '€' },
     { label: '💰 Cost total (€)', key: 'costTotal', unit: '€', bold: true },
     { label: '📊 Cost per ha (€/ha)', key: 'costHa', unit: '€/ha', bold: true },
-    { label: '🍇 Collita total (kg)', key: 'totalKg', unit: 'kg' },
-    { label: '📈 Rendiment mig (kg/ha)', key: 'rendMig', unit: 'kg/ha' },
-    { label: '🔬 Grau Brix mig', key: 'brixMig', unit: '°Bx' },
+    { label: '─────', key: null },
+    { label: '📊 MARGE (€)', key: 'marge', unit: '€', bold: true, marge: true },
+    { label: '📊 MARGE per ha (€/ha)', key: 'margeHa', unit: '€/ha', marge: true },
+    { label: '─────', key: null },
     { label: '🌡️ Núm. tractaments', key: 'nFits', unit: '' },
   ];
 
-  rows.forEach(function(row, i) {
-    const bg = i % 2 === 0 ? 'white' : 'var(--parchment)';
+  var bgIdx = 0;
+  rows.forEach(function(row) {
+    if(!row.key) {
+      // Separador visual
+      html += '<tr><td colspan="' + (data.length+1) + '" style="padding:.1rem;background:#E8DCC8;border:none"></td></tr>';
+      return;
+    }
+    const bg = bgIdx++ % 2 === 0 ? 'white' : 'var(--parchment)';
+    const labelStyle = 'padding:.45rem .8rem;border:1px solid #D8CEBA;' +
+      (row.bold ? 'font-weight:600;' : '') +
+      (row.marge ? 'background:#E8F5E8;' : '') +
+      (row.ingres ? 'background:#EEF5E8;' : '');
+
     html += '<tr style="background:' + bg + '">' +
-      '<td style="padding:.45rem .8rem;border:1px solid #D8CEBA;' + (row.bold?'font-weight:600':'') + '">' + row.label + '</td>' +
+      '<td style="' + labelStyle + '">' + row.label + '</td>' +
       data.map(function(d) {
         const val = d[row.key];
-        const numVal = typeof val === 'number' ? val : parseFloat(val);
-        const numVals = data.map(function(x){ return parseFloat(x[row.key]); }).filter(function(v){ return !isNaN(v); });
-        let color = '';
-        if(numVals.length > 1 && !isNaN(numVal)) {
-          const best = row.key === 'costTotal' || row.key === 'costVar' || row.key === 'costFix' || row.key === 'costHa' || row.key === 'nFits'
-            ? Math.min.apply(null, numVals) : Math.max.apply(null, numVals);
-          if(numVal === best) color = 'color:var(--ok);font-weight:700';
+        if(val === undefined || val === '—' || val === null) {
+          return '<td style="padding:.45rem .8rem;border:1px solid #D8CEBA;text-align:center;color:var(--fog)">—</td>';
         }
-        const disp = typeof val === 'number' ? val.toLocaleString('ca') : val;
-        return '<td style="padding:.45rem .8rem;border:1px solid #D8CEBA;text-align:center;font-family:monospace;' + color + '">' +
-          (disp !== '—' && disp !== '' ? disp + (row.unit ? ' ' + row.unit : '') : '—') + '</td>';
+        const numVal = parseFloat(val);
+        const numVals = data.map(function(x){ return parseFloat(x[row.key]); }).filter(function(v){ return !isNaN(v) && v > 0; });
+        // Determinar color millor/pitjor
+        let color = '';
+        if(numVals.length > 1 && !isNaN(numVal) && numVal > 0) {
+          const isCost = ['costTotal','costVar','costFix','costHa','nFits'].includes(row.key);
+          const isMarge = row.marge;
+          const best = isCost ? Math.min.apply(null,numVals) : Math.max.apply(null,numVals);
+          const worst = isCost ? Math.max.apply(null,numVals) : Math.min.apply(null,numVals);
+          if(numVal === best) color = 'color:var(--ok);font-weight:700';
+          else if(numVal === worst && numVals.length > 1) color = 'color:var(--danger)';
+          if(isMarge) color = numVal > 0 ? 'color:var(--ok);font-weight:700' : 'color:var(--danger);font-weight:700';
+        }
+        const dispNum = !isNaN(numVal) ? numVal.toLocaleString('ca') : val;
+        const tdStyle = 'padding:.45rem .8rem;border:1px solid #D8CEBA;text-align:center;font-family:monospace;' + color +
+          (row.marge ? 'background:#F0FAF0;' : '') + (row.ingres ? 'background:#F0F7E8;' : '');
+        return '<td style="' + tdStyle + '">' + dispNum + (row.unit ? ' ' + row.unit : '') + '</td>';
       }).join('') + '</tr>';
   });
 
@@ -7013,6 +7094,67 @@ function buildComparativa() {
       html += '</tr>';
     });
     html += '</tbody></table></div></div>';
+  }
+
+  // ── Bloc especial: Costos campanya activa vs Ingressos campanya anterior ──
+  const campActiva = getCampanyaActual();
+  const camps_all = getCampanyes();
+  const idxActiva = camps_all.indexOf(campActiva);
+  const campAnterior = idxActiva < camps_all.length - 1 ? camps_all[idxActiva + 1] : null;
+
+  if(campAnterior && selectedCamps.includes(campActiva)) {
+    var ingAntTotal = 0;
+    try {
+      const colAnt = getCollites(campAnterior);
+      ingAntTotal = colAnt.reduce(function(s,c){ return s+(c.ingres||0); }, 0);
+      if(ingAntTotal === 0) {
+        const ingAntLS = JSON.parse(localStorage.getItem(campAnterior + '_ingres') || '{"raim":[]}');
+        ingAntTotal = (ingAntLS.raim||[]).reduce(function(s,i){
+          return s+(parseFloat(i.ingres)||(parseFloat(i.kg)*parseFloat(i.preu))||0);
+        }, 0);
+      }
+    } catch(e){}
+
+    if(ingAntTotal > 0) {
+      const dActiva = data.find(function(d){ return d.camp === campActiva; });
+      const costActiva = dActiva ? parseFloat(dActiva.costTotal)||0 : 0;
+      const pct = ingAntTotal > 0 ? Math.min(100,(costActiva / ingAntTotal * 100)).toFixed(1) : 0;
+      const romanent = ingAntTotal - costActiva;
+      const colorRef = romanent >= 0 ? 'var(--ok)' : 'var(--danger)';
+      const bgRef = romanent >= 0 ? '#E8F5E8' : '#FDE8E8';
+
+      html += '<div style="background:' + bgRef + ';border:2px solid ' + colorRef + ';border-radius:2px;padding:1rem 1.2rem;margin-top:1.2rem">' +
+        '<div style="font-family:monospace;font-size:.7rem;color:var(--fog);letter-spacing:.08em;text-transform:uppercase;margin-bottom:.8rem">' +
+          String.fromCharCode(55357,56616) + ' Referencia: Costos ' + campActiva + ' vs Ingressos ' + campAnterior +
+        '</div>' +
+        '<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:.8rem;margin-bottom:.8rem">' +
+          '<div style="text-align:center;background:white;border-radius:2px;padding:.6rem">' +
+            '<div style="font-family:monospace;font-size:1.4rem;font-weight:700;color:var(--vine)">' + Math.round(ingAntTotal).toLocaleString('ca') + ' \u20ac</div>' +
+            '<div style="font-size:.7rem;color:var(--fog)">Ingressos collita ' + campAnterior + '</div>' +
+          '</div>' +
+          '<div style="text-align:center;background:white;border-radius:2px;padding:.6rem">' +
+            '<div style="font-family:monospace;font-size:1.4rem;font-weight:700;color:var(--harvest)">' + Math.round(costActiva).toLocaleString('ca') + ' \u20ac</div>' +
+            '<div style="font-size:.7rem;color:var(--fog)">Costos acumulats ' + campActiva + '</div>' +
+          '</div>' +
+          '<div style="text-align:center;background:white;border-radius:2px;padding:.6rem">' +
+            '<div style="font-family:monospace;font-size:1.1rem;font-weight:600;color:' + colorRef + '">' + pct + '% consumit</div>' +
+            '<div style="height:10px;background:#E0D8C8;border-radius:5px;margin:.4rem 0;overflow:hidden">' +
+              '<div style="height:100%;width:' + pct + '%;background:' + colorRef + ';border-radius:5px"></div>' +
+            '</div>' +
+            '<div style="font-size:.68rem;color:var(--fog)">dels ingressos anteriors</div>' +
+          '</div>' +
+          '<div style="text-align:center;background:white;border-radius:2px;padding:.6rem">' +
+            '<div style="font-family:monospace;font-size:1.4rem;font-weight:700;color:' + colorRef + '">' +
+              (romanent >= 0 ? '+' : '') + Math.round(romanent).toLocaleString('ca') + ' \u20ac' +
+            '</div>' +
+            '<div style="font-size:.7rem;color:var(--fog)">' + (romanent >= 0 ? 'Romanent disponible' : 'D\u00e8ficit provisional') + '</div>' +
+          '</div>' +
+        '</div>' +
+        '<div style="font-size:.72rem;color:var(--fog);font-style:italic">' +
+          'Nota: els costos de ' + campActiva + ' son els acumulats fins avui. Un cop acabi la verema s\'afegiran els ingressos de la nova collita.' +
+        '</div>' +
+      '</div>';
+    }
   }
 
   el.innerHTML = html;
