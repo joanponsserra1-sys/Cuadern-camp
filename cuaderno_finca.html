@@ -2443,8 +2443,15 @@ function collectData() {
     : '';
   // Guardar també el detall per als càlculs
   const parcelaDetail = mpSelected_list.map(function(e){ return { nom: e.nom, pct: e.pct }; });
+  // Calcular superfície efectiva des de mpSelected_list (fiable, no depèn de DOM)
+  const supTractada = mpSelected_list.reduce(function(s, entry) {
+    const p = PARCEL_DATA.find(function(x){ return x.nom === entry.nom; });
+    return s + (p ? p.sup * entry.pct / 100 : 0);
+  }, 0);
   const base = { id: Date.now(), tipo:currentType, fecha:g('fecha'),
-                 parcela:parceles, parcelaDetail:parcelaDetail, operario:g('operario'), obs:g('observaciones') };
+                 parcela:parceles, parcelaDetail:parcelaDetail,
+                 supTractada: Math.round(supTractada * 10000) / 10000,
+                 operario:g('operario'), obs:g('observaciones') };
   const sp = {
     fitosanitario: ()=>({ c1:g('fit-producto'), c2:g('fit-registro'), c3:g('fit-dosis'),
       c4:g('fit-caldo'), c5:g('fit-superficie'), c6:g('fit-objetivo'), c7:g('fit-tipo'), qtyTotal:g('fit-qty-total'),
@@ -2877,8 +2884,13 @@ function showParcelaDetail(nom) {
       const data    = new Date(p.fecha + 'T12:00:00').toLocaleDateString('ca-ES',{day:'numeric',month:'short',year:'numeric'});
       const prod    = p.c1 || '—';
       const obj     = p.c6 || '';
-      // c5 = superfície tractada en ha (pot ser 0 en parts nous si no es va guardar)
-      const sup = parseFloat(p.c5) || 0;
+      // Superfície tractada: prioritzar supTractada (guardat correctament),
+      // fallback a c5 (pot estar corrupte), amb sanity check
+      let sup = parseFloat(p.supTractada) || 0;
+      if(sup <= 0 || sup > 100) {
+        sup = parseFloat(p.c5) || 0;
+        if(sup > 100) sup = 0; // valor corrupte (data ISO)
+      }
       const caldo   = p.c4 ? p.c4 + ' L/ha brou' : '';
 
       // Dosi/ha calculada (c3 és dosi/ha si ve del nou formulari)
@@ -3537,7 +3549,17 @@ const ACCIONS_COST = [
 
       if(part) {
         const costTotal = parseFloat(part.c10) || 0;  // cost total del producte (€)
-        const sup       = parseFloat(part.c5)  || 0;  // superfície tractada (ha)
+        // superfície tractada: usar supTractada (fiable) o calcular des de parcelaDetail
+        let sup = parseFloat(part.supTractada) || 0;
+        if(sup <= 0 && part.parcelaDetail) {
+          sup = part.parcelaDetail.reduce(function(s, d) {
+            var pi = PARCEL_DATA.find(function(x){ return x.nom === d.nom; });
+            return s + (pi ? pi.sup * d.pct / 100 : 0);
+          }, 0);
+        }
+        if(sup <= 0) sup = parseFloat(part.c5) || 0;
+        // Sanity check: si sup > total de la finca (73ha) és un valor corrupte
+        if(sup > 100) sup = 0;
         const dosi      = parseFloat((part.c3||'').toString().replace(',','.').match(/[\d.]+/)?.[0]) || 0;
 
         if(costTotal > 0) {
@@ -3810,37 +3832,74 @@ function renderCostParceles() {
       }
 
       // Calcular cost per aquesta parcel·la
+      // sup ja ve de PARCEL_DATA (fiable), mai de c5 (pot estar corrupte)
       let cost = 0;
       if(accioId === 'fitosanitario') {
-        const costHaPart = parseFloat(part.costHa) || 0;
+        const costHaPart    = parseFloat(part.costHa)    || 0;
         const costTotalPart = parseFloat(part.costTotal) || 0;
 
         if(costHaPart > 0) {
-          // costHa = €/ha guardat directament → multiplicar per sup efectiva
-          cost = costHaPart * sup;
-        } else if(costTotalPart > 0) {
-          // costTotal = € totals del tractament → repartir per sup total tractada
-          const supTotalPart = mpNoms(part.parcela).reduce(function(s2, n2) {
-            var pctN = 100;
+          // costHa guardat directament (€/ha de tot el tractament)
+          // Però aquest €/ha és per la sup TOTAL tractada, no per parcel·la
+          // Cal ponderar per la superfície d'aquesta parcel·la dins del total
+          const supTotalTractada = (function() {
+            var st = parseFloat(part.supTractada) || 0;
+            if(st > 0 && st <= 100) return st;
+            // Recalcular des de parcelaDetail
             if(part.parcelaDetail) {
-              var dd = part.parcelaDetail.find(function(x){ return x.nom === n2; });
-              if(dd) pctN = dd.pct;
-            } else {
-              var rawN = (part.parcela||'').split(' / ')
-                .find(function(sx){ return mpNom(sx) === n2; }) || '';
-              var mN = rawN.match(/\((\d+)%\)$/);
-              if(mN) pctN = parseInt(mN[1]);
+              return part.parcelaDetail.reduce(function(s2, d) {
+                var pi2 = PARCEL_DATA.find(function(x){ return x.nom === d.nom; });
+                return s2 + (pi2 ? pi2.sup * d.pct / 100 : 0);
+              }, 0);
             }
-            var pInfo2 = PARCEL_DATA.find(function(x){ return x.nom === n2; });
-            return s2 + (pInfo2 ? pInfo2.sup * pctN / 100 : 0);
-          }, 0);
-          if(supTotalPart > 0 && sup > 0) {
-            cost = costTotalPart * (sup / supTotalPart);
+            return mpNoms(part.parcela).reduce(function(s2, n2) {
+              var pi2 = PARCEL_DATA.find(function(x){ return x.nom === n2; });
+              return s2 + (pi2 ? pi2.sup : 0);
+            }, 0);
+          })();
+          // pct d'aquesta parcel·la en el tractament
+          var pctAquesta = 100;
+          if(part.parcelaDetail) {
+            var dAq = part.parcelaDetail.find(function(x){ return x.nom === nomP; });
+            if(dAq) pctAquesta = dAq.pct;
           }
-          // Si supTotalPart = 0 (dades incompletes) no afegir cost erroni
+          const supAquesta = parcelInfo.sup * pctAquesta / 100;
+          if(supTotalTractada > 0) {
+            cost = costHaPart * supTotalTractada * (supAquesta / supTotalTractada);
+          } else {
+            cost = costHaPart * supAquesta;
+          }
+        } else if(costTotalPart > 0) {
+          // costTotal = € totals → repartir proporcionalment
+          var supTotalPart2 = (function() {
+            var st2 = parseFloat(part.supTractada) || 0;
+            if(st2 > 0 && st2 <= 100) return st2;
+            if(part.parcelaDetail) {
+              return part.parcelaDetail.reduce(function(s2, d) {
+                var pi2 = PARCEL_DATA.find(function(x){ return x.nom === d.nom; });
+                return s2 + (pi2 ? pi2.sup * d.pct / 100 : 0);
+              }, 0);
+            }
+            return mpNoms(part.parcela).reduce(function(s2, n2) {
+              var pi2 = PARCEL_DATA.find(function(x){ return x.nom === n2; });
+              return s2 + (pi2 ? pi2.sup : 0);
+            }, 0);
+          })();
+          var pctAq2 = 100;
+          if(part.parcelaDetail) {
+            var dAq2 = part.parcelaDetail.find(function(x){ return x.nom === nomP; });
+            if(dAq2) pctAq2 = dAq2.pct;
+          }
+          const supAq2 = parcelInfo.sup * pctAq2 / 100;
+          if(supTotalPart2 > 0 && supAq2 > 0) {
+            cost = costTotalPart * (supAq2 / supTotalPart2);
+          }
         } else {
-          // Fallback: càlcul automàtic per gasoil + m.o. + producte catàleg
-          cost = getAccioCalcul(accioId, v, part) * sup;
+          // Fallback gasoil+m.o. — usar sup de PARCEL_DATA, NO c5
+          const vFit = getVars();
+          const gasoilHa = 5.0 * vFit.gasoil;
+          const maObraHa = 0.5 * (vFit.salari / 160);
+          cost = (gasoilHa + maObraHa) * sup;
         }
       } else {
         cost = getAccioCalcul(accioId, v, part) * sup;
