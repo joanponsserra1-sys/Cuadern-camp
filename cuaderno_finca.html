@@ -933,6 +933,13 @@ footer{text-align:center;margin-top:1.5rem;font-family:monospace;font-size:.65re
         <button class="btn btn-vine" onclick="exportJSON()">⬇ Còpia de seguretat (JSON)</button>
       </div>
       <div style="margin-top:1.5rem;padding-top:1.5rem;border-top:1px solid #D8CEBA;">
+        <h3 style="margin-bottom:.4rem">🔗 Compartir amb el tècnic (només lectura)</h3>
+        <p style="font-size:.84rem;color:var(--fog);margin-bottom:.8rem">Genera un link que permet al tècnic veure els parts, el semàfor i l'historial sense poder editar res.</p>
+        <div class="btn-row">
+          <button class="btn" onclick="obrirModalCompartir()" style="background:#2A5472;color:white;border:none">🔗 Generar link de compartir</button>
+        </div>
+      </div>
+      <div style="margin-top:1.5rem;padding-top:1.5rem;border-top:1px solid #D8CEBA;">
         <h3 style="margin-bottom:.4rem">Restaurar còpia de seguretat</h3>
         <p>Carrega un fitxer JSON exportat prèviament per restaurar les dades.</p>
         <div class="btn-row">
@@ -2870,7 +2877,8 @@ function showParcelaDetail(nom) {
       const data    = new Date(p.fecha + 'T12:00:00').toLocaleDateString('ca-ES',{day:'numeric',month:'short',year:'numeric'});
       const prod    = p.c1 || '—';
       const obj     = p.c6 || '';
-      const sup     = parseFloat(p.c5) || 0;
+      // c5 = superfície tractada en ha (pot ser 0 en parts nous si no es va guardar)
+      const sup = parseFloat(p.c5) || 0;
       const caldo   = p.c4 ? p.c4 + ' L/ha brou' : '';
 
       // Dosi/ha calculada (c3 és dosi/ha si ve del nou formulari)
@@ -2910,7 +2918,7 @@ function showParcelaDetail(nom) {
         caldo,
         costHa > 0 ? costHa.toFixed(2) + ' €/ha' : '',
         costTotal > 0 ? costTotal.toFixed(2) + ' € total' : '',
-        sup > 0 ? sup.toFixed(2) + ' ha tractades' : '',
+        (sup > 0 && sup < 200) ? sup.toFixed(2) + ' ha tractades' : '',
         hores,
         plazo,
         numReg ? 'Reg: ' + numReg : '',
@@ -3801,11 +3809,39 @@ function renderCostParceles() {
         }
       }
 
-      // Calcular cost: per fitosanitaris usar costTotal del part si disponible
+      // Calcular cost per aquesta parcel·la
       let cost = 0;
-      if(accioId === 'fitosanitario' && part.costTotal && parseFloat(part.costTotal) > 0) {
-        // costTotal ja és el cost real total del tractament en €
-        cost = parseFloat(part.costTotal);
+      if(accioId === 'fitosanitario') {
+        const costHaPart = parseFloat(part.costHa) || 0;
+        const costTotalPart = parseFloat(part.costTotal) || 0;
+
+        if(costHaPart > 0) {
+          // costHa = €/ha guardat directament → multiplicar per sup efectiva
+          cost = costHaPart * sup;
+        } else if(costTotalPart > 0) {
+          // costTotal = € totals del tractament → repartir per sup total tractada
+          const supTotalPart = mpNoms(part.parcela).reduce(function(s2, n2) {
+            var pctN = 100;
+            if(part.parcelaDetail) {
+              var dd = part.parcelaDetail.find(function(x){ return x.nom === n2; });
+              if(dd) pctN = dd.pct;
+            } else {
+              var rawN = (part.parcela||'').split(' / ')
+                .find(function(sx){ return mpNom(sx) === n2; }) || '';
+              var mN = rawN.match(/\((\d+)%\)$/);
+              if(mN) pctN = parseInt(mN[1]);
+            }
+            var pInfo2 = PARCEL_DATA.find(function(x){ return x.nom === n2; });
+            return s2 + (pInfo2 ? pInfo2.sup * pctN / 100 : 0);
+          }, 0);
+          if(supTotalPart > 0 && sup > 0) {
+            cost = costTotalPart * (sup / supTotalPart);
+          }
+          // Si supTotalPart = 0 (dades incompletes) no afegir cost erroni
+        } else {
+          // Fallback: càlcul automàtic per gasoil + m.o. + producte catàleg
+          cost = getAccioCalcul(accioId, v, part) * sup;
+        }
       } else {
         cost = getAccioCalcul(accioId, v, part) * sup;
       }
@@ -6372,6 +6408,8 @@ async function renderMapa() {
 // ══════════════════════════════════════════════════
 //  VISTA DE COMPARTIR (TECNIC - NOMES LECTURA)
 // ══════════════════════════════════════════════════
+function obrirModalCompartir() { generarLinkCompartir(); }
+
 function generarLinkCompartir() {
   // La vista de nomes lectura carrega les dades directament de Google Sheets
   // Generem una URL especial que apunta a una versio read-only
@@ -7034,9 +7072,26 @@ function buildComparativa() {
     // Costos variables (usant costTotal guardat al part si disponible)
     let costVar = 0;
     parts.forEach(function(pt) {
-      // Usar costTotal real del part si existeix
-      if(pt.costTotal && parseFloat(pt.costTotal) > 0) {
-        costVar += parseFloat(pt.costTotal);
+      // Usar costHa o costTotal real del part si existeix
+      const chaPt = parseFloat(pt.costHa) || 0;
+      const ctPt  = parseFloat(pt.costTotal) || 0;
+      if(chaPt > 0) {
+        costVar += chaPt * sup;
+        return;
+      }
+      if(ctPt > 0) {
+        const supTotalPt = mpNoms(pt.parcela).reduce(function(s2, n2) {
+          var pctN2 = 100;
+          if(pt.parcelaDetail) {
+            var dd2 = pt.parcelaDetail.find(function(x){ return x.nom === n2; });
+            if(dd2) pctN2 = dd2.pct;
+          }
+          var pInfo2 = PARCEL_DATA.find(function(x){ return x.nom === n2; });
+          return s2 + (pInfo2 ? pInfo2.sup * pctN2 / 100 : 0);
+        }, 0);
+        if(supTotalPt > 0 && sup > 0) {
+          costVar += ctPt * (sup / supTotalPt);
+        }
         return;
       }
       const parceles = mpNoms(pt.parcela);
