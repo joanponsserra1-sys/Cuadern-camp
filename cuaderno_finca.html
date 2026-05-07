@@ -5695,6 +5695,10 @@ function renderEstocProd() {
   const pmpD = document.getElementById('estocProdPMP');
   const btnD = document.getElementById('btnDelProd');
 
+  // Netejar contenidor d'usos quan canvia el producte
+  const viejUsos = document.getElementById('estoc-usos-campanya');
+  if(viejUsos) viejUsos.remove();
+
   if(!nom) {
     if(form) form.style.display = 'none';
     if(comp) comp.innerHTML = '';
@@ -5763,8 +5767,110 @@ function renderEstocProd() {
       pmpD.innerHTML = '';
     }
   }
+
+  // ── Ús en parts de la campanya actual ──────────────────────
+  renderUsoCampanya(nom, unitat, prod);
 }
 
+function getUsosProducte(nom) {
+  // Sumar tots els qtyTotal dels parts fitosanitaris de la campanya activa
+  // on el producte nom apareix (c1 pot ser "Prod1 + Prod2")
+  const camp   = getCampanyaActual();
+  const parts  = JSON.parse(localStorage.getItem(camp + '_parts') || '[]');
+  const usos   = [];
+
+  parts.forEach(function(p) {
+    if(p.tipo !== 'fitosanitario') return;
+    if(!p.c1) return;
+    // Buscar el nom del producte a c1 (pot ser "Prod1 + Prod2")
+    const nomsBuscats = (p.c1||'').split(' + ').map(function(s){ return s.trim().toLowerCase(); });
+    const nomNorm = nom.toLowerCase().trim();
+    const idxProd = nomsBuscats.findIndex(function(n){ return n === nomNorm || n.includes(nomNorm) || nomNorm.includes(n); });
+    if(idxProd === -1) return;
+
+    // Obtenir qtTotal: de fitProdsData si existeix, o de qtyTotal del part
+    var qt = 0;
+    if(p.fitProdsData && p.fitProdsData[idxProd]) {
+      qt = parseFloat(p.fitProdsData[idxProd].qtTotal) || 0;
+    } else if(p.qtyTotal) {
+      // Part antic: qtyTotal és el total de tots els productes
+      // Si hi ha un sol producte, usar qtyTotal directament
+      if(nomsBuscats.length === 1) {
+        qt = parseFloat(p.qtyTotal) || 0;
+      }
+    }
+    if(qt > 0) {
+      usos.push({ fecha: p.fecha, parcela: p.parcela, qt: qt, id: p.id });
+    }
+  });
+
+  usos.sort(function(a,b){ return b.fecha.localeCompare(a.fecha); });
+  return usos;
+}
+
+function renderUsoCampanya(nom, unitat, prod) {
+  const camp = getCampanyaActual();
+  const usos = getUsosProducte(nom);
+
+  // Contenidor (crear si no existeix)
+  var cont = document.getElementById('estoc-usos-campanya');
+  if(!cont) {
+    const pmpD = document.getElementById('estocProdPMP');
+    if(!pmpD) return;
+    cont = document.createElement('div');
+    cont.id = 'estoc-usos-campanya';
+    cont.style.marginTop = '.8rem';
+    pmpD.parentNode.insertBefore(cont, pmpD.nextSibling);
+  }
+
+  if(usos.length === 0) {
+    cont.innerHTML = '<div style="background:var(--parchment);border:1px solid #D8CEBA;border-radius:2px;padding:.6rem 1rem;font-size:.83rem;color:var(--fog);font-style:italic">' +
+      'Cap ús registrat per <strong>' + nom + '</strong> a la campanya ' + camp + '</div>';
+    return;
+  }
+
+  const totalQt = usos.reduce(function(s, u){ return s + u.qt; }, 0);
+  // Cost total (PMP del catàleg si disponible)
+  const preu = prod ? (parseFloat(prod.preu) || 0) : 0;
+  const costTotal = preu > 0 ? totalQt * preu : 0;
+
+  var rows = usos.map(function(u) {
+    const dataFmt = new Date(u.fecha + 'T12:00:00').toLocaleDateString('ca-ES', {day:'numeric', month:'short'});
+    const parcs = mpNoms(u.parcela).join(', ');
+    return '<tr>' +
+      '<td style="padding:.3rem .6rem;border-bottom:1px solid #F0E8D8;font-size:.77rem">' + dataFmt + '</td>' +
+      '<td style="padding:.3rem .6rem;border-bottom:1px solid #F0E8D8;font-size:.77rem;font-family:monospace;text-align:right">' + u.qt.toFixed(1) + ' ' + unitat + '</td>' +
+      '<td style="padding:.3rem .6rem;border-bottom:1px solid #F0E8D8;font-size:.72rem;color:var(--fog)">' + parcs + '</td>' +
+      '</tr>';
+  }).join('');
+
+  cont.innerHTML =
+    '<div style="background:#EEF5FF;border:1px solid #B8D0F0;border-radius:2px;padding:.6rem 1rem;margin-bottom:.4rem">' +
+      '<div style="font-family:monospace;font-size:.65rem;color:#4466AA;letter-spacing:.08em;text-transform:uppercase;margin-bottom:.5rem">' +
+        '📊 Ús campanya ' + camp +
+      '</div>' +
+      '<div style="display:flex;gap:1.2rem;align-items:center;flex-wrap:wrap">' +
+        '<div>' +
+          '<span style="font-family:monospace;font-size:1.5rem;font-weight:700;color:#2244AA">' + totalQt.toFixed(1) + '</span>' +
+          '<span style="font-size:.8rem;color:#4466AA;margin-left:.3rem">' + unitat + ' total aplicat</span>' +
+        '</div>' +
+        (costTotal > 0 ?
+          '<div>' +
+            '<span style="font-family:monospace;font-size:1.1rem;font-weight:600;color:#664422">' + costTotal.toFixed(2) + ' €</span>' +
+            '<span style="font-size:.72rem;color:var(--fog);margin-left:.3rem">cost estimat (PMP)</span>' +
+          '</div>' : '') +
+        '<div style="font-size:.72rem;color:var(--fog)">' + usos.length + ' part' + (usos.length>1?'s':'') + '</div>' +
+      '</div>' +
+    '</div>' +
+    '<table style="width:100%;border-collapse:collapse">' +
+      '<thead><tr style="background:var(--parchment)">' +
+        '<th style="padding:.3rem .6rem;text-align:left;font-size:.68rem">Data</th>' +
+        '<th style="padding:.3rem .6rem;text-align:right;font-size:.68rem">Quantitat</th>' +
+        '<th style="padding:.3rem .6rem;text-align:left;font-size:.68rem">Parcel·les</th>' +
+      '</tr></thead>' +
+      '<tbody>' + rows + '</tbody>' +
+    '</table>';
+}
 
 function addCompraProd() {
   const nom  = document.getElementById('estoc-prod-sel')?.value;
