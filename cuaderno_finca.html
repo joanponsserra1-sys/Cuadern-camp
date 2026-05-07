@@ -2099,29 +2099,34 @@ document.addEventListener('DOMContentLoaded', function() {
 //  NAV
 // ══════════════════════════════════════════════════
 function showPage(name) {
-  if(name === 'collita')    { renderCollita(); }
-  if(name === 'fitxa')      { renderFitxaSelector(); }
-  if(name === 'ccpae')      { initCCPAE(); renderCCPAE(); }
-  if(name === 'comparativa'){ renderComparativa(); }
+  // Primer: fer visible la pàgina
   document.querySelectorAll('.page').forEach(p=>p.classList.remove('visible'));
   document.querySelectorAll('.main-nav-btn').forEach(b=>b.classList.remove('active'));
-  document.getElementById('page-'+name).classList.add('visible');
-  document.getElementById('nav-'+name).classList.add('active');
-  if(name==='seguimiento') {
-    renderTracker();
-    // Sync from Sheets in background
-    syncTractamentsFromSheets().then(() => renderTracker());
+  const pageEl = document.getElementById('page-'+name);
+  const navEl  = document.getElementById('nav-'+name);
+  if(pageEl) pageEl.classList.add('visible');
+  if(navEl)  navEl.classList.add('active');
+
+  // Després: renderitzar contingut (amb try/catch per evitar bloquejos)
+  try {
+    if(name==='seguimiento') {
+      renderTracker();
+      syncTractamentsFromSheets().then(function(){ renderTracker(); });
+    }
+    if(name==='historial')    renderHistorial();
+    if(name==='exportar')     updateExportStats();
+    if(name==='costos') {
+      loadCostVars(); renderCostos();
+      renderDropdownEditors(); populateCostFilters();
+    }
+    if(name==='estoc')        renderEstoc();
+    if(name==='collita')      renderCollita();
+    if(name==='fitxa')        renderFitxaSelector();
+    if(name==='ccpae')        { initCCPAE(); renderCCPAE(); }
+    if(name==='comparativa')  renderComparativa();
+  } catch(e) {
+    console.error('showPage render error [' + name + ']:', e);
   }
-  if(name==='historial')   renderHistorial();
-  if(name==='exportar')    updateExportStats();
-  if(name==='costos') {
-    loadCostVars();
-    renderCostos();
-    renderDropdownEditors();
-    populateCostFilters();
-  }
-  if(name==='estoc')   { renderEstoc(); }
-  if(name==='mapa')    { renderMapa(); }
   if(name==='meteo') {
     renderMeteo();
     renderEPI();
@@ -5740,39 +5745,60 @@ function renderEstocProd() {
 }
 
 function getUsosProducte(nom) {
-  // Sumar tots els qtyTotal dels parts fitosanitaris de la campanya activa
-  // on el producte nom apareix (c1 pot ser "Prod1 + Prod2")
-  const camp   = getCampanyaActual();
-  const parts  = JSON.parse(localStorage.getItem(camp + '_parts') || '[]');
-  const usos   = [];
+  const camp  = getCampanyaActual();
+  const parts = JSON.parse(localStorage.getItem(camp + '_parts') || '[]');
+  const usos  = [];
+  const nomNorm = nom.toLowerCase().trim();
 
   parts.forEach(function(p) {
     if(p.tipo !== 'fitosanitario') return;
-    if(!p.c1) return;
-    // Buscar el nom del producte a c1 (pot ser "Prod1 + Prod2")
-    const nomsBuscats = (p.c1||'').split(' + ').map(function(s){ return s.trim().toLowerCase(); });
-    const nomNorm = nom.toLowerCase().trim();
-    const idxProd = nomsBuscats.findIndex(function(n){ return n === nomNorm || n.includes(nomNorm) || nomNorm.includes(n); });
-    if(idxProd === -1) return;
 
-    // Obtenir qtTotal: de fitProdsData si existeix, o de qtyTotal del part
+    // 1. Buscar per nom a fitProdsData (més fiable — guarda qtTotal per producte)
+    if(p.fitProdsData && p.fitProdsData.length > 0) {
+      p.fitProdsData.forEach(function(fp) {
+        const fpNom = (fp.nom||'').toLowerCase().trim();
+        if(fpNom === nomNorm || fpNom.includes(nomNorm) || nomNorm.includes(fpNom)) {
+          const qt = parseFloat(fp.qtTotal) || 0;
+          if(qt > 0) {
+            usos.push({ fecha: p.fecha, parcela: p.parcela, qt: qt, id: p.id });
+          }
+        }
+      });
+      return; // ja hem processat amb fitProdsData
+    }
+
+    // 2. Fallback: buscar a c1 (pot ser "Prod1 + Prod2")
+    if(!p.c1) return;
+    const nomsC1 = (p.c1||'').split(' + ').map(function(s){ return s.trim().toLowerCase(); });
+    const trobat = nomsC1.some(function(n){ return n === nomNorm || n.includes(nomNorm) || nomNorm.includes(n); });
+    if(!trobat) return;
+
+    // qtTotal del part (total de tots els productes junts)
     var qt = 0;
-    if(p.fitProdsData && p.fitProdsData[idxProd]) {
-      qt = parseFloat(p.fitProdsData[idxProd].qtTotal) || 0;
-    } else if(p.qtyTotal) {
-      // Part antic: qtyTotal és el total de tots els productes
-      // Si hi ha un sol producte, usar qtyTotal directament
-      if(nomsBuscats.length === 1) {
-        qt = parseFloat(p.qtyTotal) || 0;
+    if(p.qtyTotal && parseFloat(p.qtyTotal) > 0) {
+      // Si hi ha un sol producte, tot el qtyTotal és d'aquest producte
+      if(nomsC1.length === 1) {
+        qt = parseFloat(p.qtyTotal);
+      } else {
+        // Múltiples productes sense fitProdsData: no podem saber quant correspon a cada un
+        // Anotar amb qt=0 però registrar el part (per mostrar que s'ha usat)
+        qt = 0;
       }
     }
-    if(qt > 0) {
-      usos.push({ fecha: p.fecha, parcela: p.parcela, qt: qt, id: p.id });
-    }
+    // Afegir el part independentment de qt (pot ser qt=0 si no en tenim dades)
+    usos.push({ fecha: p.fecha, parcela: p.parcela, qt: qt, id: p.id, qtDesconegut: qt === 0 });
   });
 
-  usos.sort(function(a,b){ return b.fecha.localeCompare(a.fecha); });
-  return usos;
+  // Deduplicar per id (un part pot aparèixer múltiples cops si fitProdsData té duplicats)
+  const vistos = {};
+  const neteja = usos.filter(function(u) {
+    if(vistos[u.id + '_' + u.qt]) return false;
+    vistos[u.id + '_' + u.qt] = true;
+    return true;
+  });
+
+  neteja.sort(function(a,b){ return b.fecha.localeCompare(a.fecha); });
+  return neteja;
 }
 
 function renderUsoCampanya(nom, unitat, prod) {
@@ -5804,9 +5830,10 @@ function renderUsoCampanya(nom, unitat, prod) {
   var rows = usos.map(function(u) {
     const dataFmt = new Date(u.fecha + 'T12:00:00').toLocaleDateString('ca-ES', {day:'numeric', month:'short'});
     const parcs = mpNoms(u.parcela).join(', ');
+    const qtDisp = u.qtDesconegut ? '<span style="color:var(--fog)">mescla</span>' : u.qt.toFixed(1) + ' ' + unitat;
     return '<tr>' +
       '<td style="padding:.3rem .6rem;border-bottom:1px solid #F0E8D8;font-size:.77rem">' + dataFmt + '</td>' +
-      '<td style="padding:.3rem .6rem;border-bottom:1px solid #F0E8D8;font-size:.77rem;font-family:monospace;text-align:right">' + u.qt.toFixed(1) + ' ' + unitat + '</td>' +
+      '<td style="padding:.3rem .6rem;border-bottom:1px solid #F0E8D8;font-size:.77rem;font-family:monospace;text-align:right">' + qtDisp + '</td>' +
       '<td style="padding:.3rem .6rem;border-bottom:1px solid #F0E8D8;font-size:.72rem;color:var(--fog)">' + parcs + '</td>' +
       '</tr>';
   }).join('');
@@ -6970,7 +6997,9 @@ function kv(label, val) {
 // ═══════════════════════════════════════════════════════════════
 function initCCPAE() {
   const selC = document.getElementById('ccpae-camp');
-  if(!selC || selC.options.length > 0) return;
+  if(!selC) return;
+  // Reconstruir sempre per tenir les campanyes actualitzades
+  selC.innerHTML = '';
   getCampanyes().forEach(function(c) {
     const o = document.createElement('option');
     o.value = c; o.textContent = c; selC.appendChild(o);
@@ -7113,46 +7142,150 @@ function renderCCPAE() {
   }
 }
 
-function exportarCCPAE() {
-  const camp = document.getElementById('ccpae-camp')?.value || getCampanyaActual();
-  // Generar CSV simple per a cada full
-  let csvContent = 'data:text/csv;charset=utf-8,';
+function formatDataCCPAE(d) {
+  if(!d) return '';
+  try {
+    if(d.match(/^\d{4}-\d{2}-\d{2}/)) {
+      var p = d.substring(0,10).split('-');
+      return p[2] + '/' + p[1] + '/' + p[0];
+    }
+    return d;
+  } catch(e){ return d; }
+}
 
-  csvContent += 'FULL 3 - TREBALLS DE CAMP\n';
-  csvContent += 'Data,Num Finca,Sup (ha),Cultiu,Treball\n';
+function exportarCCPAE() {
+  const camp     = document.getElementById('ccpae-camp')?.value || getCampanyaActual();
   const allParts = JSON.parse(localStorage.getItem(camp + '_parts') || '[]');
-  allParts.filter(function(p){ return p.tipo==='labor'; })
+  const collites = getCollites(camp);
+  const efTxt    = ['0-Nul·la','1-Dolenta','2-Regular','3-Bona'];
+
+  // Full 3: Treballs de camp
+  const f3 = allParts.filter(function(p){ return p.tipo==='labor'; })
     .sort(function(a,b){ return a.fecha.localeCompare(b.fecha); })
-    .forEach(function(p) {
-      const parceles = mpNoms(p.parcela);
-      const sup = getSupParceles(parceles);
-      const finques = parceles.length === PARCEL_DATA.length ? 'Totes'
-        : [...new Set(parceles.map(getNomFincaCCPAE))].join('+');
-      csvContent += '"' + (p.fecha||'') + '","' + finques + '",' + sup.toFixed(2) + ',Vinya,"' + (p.c1||'') + '"\n';
+    .map(function(p) {
+      const noms    = mpNoms(p.parcela);
+      const sup     = getSupParceles(noms);
+      const finques = noms.length >= PARCEL_DATA.length ? 'Totes'
+        : [...new Set(noms.map(getNomFincaCCPAE))].join(', ');
+      return [ formatDataCCPAE(p.fecha), finques,
+               sup > 0 ? sup.toFixed(2) : '', 'Vinya',
+               (p.c1||'') + (p.c2 ? ' - ' + p.c2 : ''), '' ];
     });
 
-  csvContent += '\nFULL 6 - TRACTAMENTS FITOSANITARIS\n';
-  csvContent += 'Data,Num Finca,Cultiu,Plaga,Sup (ha),Aplicador,Maquina,Producte,Num Registre,Dosi,Qty Total,Eficacia\n';
-  const efTxt = ['0-Nul\'la','1-Dolenta','2-Regular','3-Bona'];
+  // Full 4: Adobats
+  const f4 = allParts.filter(function(p){ return p.tipo==='abonado'; })
+    .sort(function(a,b){ return a.fecha.localeCompare(b.fecha); })
+    .map(function(p) {
+      const noms    = mpNoms(p.parcela);
+      const sup     = getSupParceles(noms);
+      const finques = noms.length >= PARCEL_DATA.length ? 'Totes'
+        : [...new Set(noms.map(getNomFincaCCPAE))].join(', ');
+      const qty     = parseFloat(p.c4) || 0;
+      const nM      = (p.c7||'').match(/N:([\d.]+)/);
+      const nPct    = nM ? parseFloat(nM[1]) : 0;
+      const nKg     = qty > 0 && nPct > 0 ? (qty * nPct / 100).toFixed(1) : '';
+      const nHa     = (sup > 0 && nKg) ? (parseFloat(nKg) / sup).toFixed(1) : '';
+      return [ finques, 'Vinya', sup > 0 ? sup.toFixed(2) : '',
+               formatDataCCPAE(p.fecha), p.c2||'', p.c2||'', p.c7||'', '',
+               '', qty > 0 ? qty.toString() : '', nKg, nHa ];
+    });
+
+  // Full 6: Tractaments fitosanitaris
+  const f6 = [];
   allParts.filter(function(p){ return p.tipo==='fitosanitario'; })
     .sort(function(a,b){ return a.fecha.localeCompare(b.fecha); })
     .forEach(function(p) {
-      const parceles = mpNoms(p.parcela);
-      const sup = getSupParceles(parceles);
-      const finques = parceles.length === PARCEL_DATA.length ? 'Totes'
-        : [...new Set(parceles.map(getNomFincaCCPAE))].join('+');
-      const qtyT = sup > 0 && p.c3 ? (parseFloat(p.c3)*sup).toFixed(2) : (p.qtyTotal||'');
-      const ef = p.eficacia !== undefined && p.eficacia !== '' ? efTxt[parseInt(p.eficacia)]||'' : '';
-      csvContent += '"' + (p.fecha||'') + '","' + finques + '",Vinya,"' + (p.c6||'') + '",' + sup.toFixed(2) +
-        ',A-1,D-1,"' + (p.c1||'') + '","' + (p.numRegistre||p.c2||'') + '",' + (p.c3||'') + ',' + qtyT + ',"' + ef + '"\n';
+      const noms = mpNoms(p.parcela);
+      const finquesMap = {};
+      noms.forEach(function(nom) {
+        const finca = getNomFincaCCPAE(nom);
+        var pctN = 100;
+        if(p.parcelaDetail) {
+          var dd = p.parcelaDetail.find(function(x){ return x.nom === nom; });
+          if(dd) pctN = dd.pct;
+        }
+        const pInfo = PARCEL_DATA.find(function(x){ return x.nom === nom; });
+        const supN  = pInfo ? pInfo.sup * pctN / 100 : 0;
+        finquesMap[finca] = (finquesMap[finca] || 0) + supN;
+      });
+      const qtyT  = p.qtyTotal ? parseFloat(p.qtyTotal).toFixed(1) : '';
+      const ef    = (p.eficacia !== undefined && p.eficacia !== '') ? (efTxt[parseInt(p.eficacia)]||'') : '';
+      const caldo = p.c4 ? p.c4 + ' L/ha' : '';
+      Object.keys(finquesMap).forEach(function(finca) {
+        const sup = finquesMap[finca];
+        f6.push([ formatDataCCPAE(p.fecha), finca, 'Vinya', p.c6||'',
+                  sup > 0 ? sup.toFixed(2) : '', 'A-1', 'D-1',
+                  qtyT || caldo, p.c1||'',
+                  p.numRegistre || p.c2 || '', p.c3 ? p.c3.toString() : '', ef ]);
+      });
     });
 
-  const link = document.createElement('a');
-  link.href = encodeURI(csvContent);
-  link.download = 'CCPAE_' + camp + '.csv';
-  link.click();
-  showToast('✅ CCPAE exportat!');
+  // Full 10: Compres de fitosanitaris (de l'estoc)
+  const f10 = [];
+  try {
+    const estoc = JSON.parse(localStorage.getItem('estoc') || '{}');
+    Object.keys(estoc).forEach(function(nom) {
+      (estoc[nom] || []).forEach(function(c) {
+        f10.push([ formatDataCCPAE(c.data), nom, 'X', '', '', '', '', '',
+                   c.qty ? parseFloat(c.qty).toFixed(1) : '',
+                   c.proveidor || '', c.albara || '' ]);
+      });
+    });
+  } catch(e) {}
+
+  // Full 11: Recol·lecció
+  const f11 = [];
+  if(collites.length > 0) {
+    const perVar = {};
+    collites.forEach(function(c) {
+      var v = c.varietat || 'Vinya';
+      if(!perVar[v]) perVar[v] = { kg:0, kg_teu:0, sup:0, dates:[] };
+      perVar[v].kg     += c.kg || 0;
+      perVar[v].kg_teu += c.kg_teu || c.kg || 0;
+      perVar[v].sup    += c.sup || 0;
+      if(c.data) perVar[v].dates.push(c.data);
+    });
+    Object.keys(perVar).forEach(function(vari) {
+      var d = perVar[vari];
+      var dates = d.dates.slice().sort();
+      var rend  = d.sup > 0 ? Math.round(d.kg / d.sup).toString() : '';
+      f11.push([ camp, vari,
+                 dates[0] ? formatDataCCPAE(dates[0]) : '', '',
+                 dates[dates.length-1] ? formatDataCCPAE(dates[dates.length-1]) : '',
+                 'Totes', d.sup > 0 ? d.sup.toFixed(2) : '', '',
+                 d.kg_teu > 0 ? Math.round(d.kg_teu).toString() : '', '',
+                 d.kg > 0 ? Math.round(d.kg).toString() : '', rend ]);
+    });
+  }
+
+  // Generar CSV per camp amb format correcte per importar a Excel
+  var lines = [];
+  var append = function(label, headers, rows) {
+    lines.push(label);
+    lines.push(headers.join(';'));
+    rows.forEach(function(r){ lines.push(r.map(function(v){ return '"'+String(v||'').replace(/"/g,'""')+'"'; }).join(';')); });
+    lines.push('');
+  };
+
+  append('FULL 3 - TREBALLS DE CAMP',
+    ['Data','Num.Finca','Sup.(ha)','Cultiu','Treball','Quantitat'], f3);
+  append('FULL 4 - ADOBATS',
+    ['Num.Finca','Cultiu','Sup.(ha)','Data','Nom comercial','Desc.','Composicio','Origen','Conc.','Quantitat','N aplicat(kg)','N(kg/ha)'], f4);
+  append('FULL 6 - TRACTAMENTS FITOSANITARIS',
+    ['Data','Num.Finca','Cultiu','Plaga','Sup.(ha)','Aplicador','Maquina','Brou','Producte','Num.reg','Dosi','Eficacia'], f6);
+  append('FULL 10 - COMPRES MATERIES PRIMERES',
+    ['Data','Producte','ECO','','','CVL','','AUT','Quantitat','Proveidor','Albara'], f10);
+  append('FULL 11 - RECOLECCIO',
+    ['Campanya','Producte','Data inici','','Data final','Finques','Sup.(ha)','','Venda','Autoconsum','Total','Rendiment(kg/ha)'], f11);
+
+  var blob = new Blob([lines.join('\n')], { type: 'text/csv;charset=utf-8;' });
+  var url  = URL.createObjectURL(blob);
+  var a    = document.createElement('a');
+  a.href = url; a.download = 'CCPAE_' + camp + '.csv'; a.click();
+  URL.revokeObjectURL(url);
+  showToast('CCPAE exportat - ' + (f6.length) + ' tractaments, ' + (f3.length) + ' labors', false, true);
 }
+
 
 // ═══════════════════════════════════════════════════════════════
 // COMPARATIVA ENTRE CAMPANYES
@@ -7201,40 +7334,48 @@ function buildComparativa() {
     const parts = JSON.parse(localStorage.getItem(camp + '_parts') || '[]');
     const collites = getCollites(camp);
 
-    // Costos variables (usant costTotal guardat al part si disponible)
+    // Costos variables per campanya
     let costVar = 0;
     parts.forEach(function(pt) {
-      // Usar costHa o costTotal real del part si existeix
-      const chaPt = parseFloat(pt.costHa) || 0;
       const ctPt  = parseFloat(pt.costTotal) || 0;
-      if(chaPt > 0) {
-        costVar += chaPt * sup;
-        return;
-      }
+      const chaPt = parseFloat(pt.costHa)    || 0;
+
       if(ctPt > 0) {
-        const supTotalPt = mpNoms(pt.parcela).reduce(function(s2, n2) {
-          var pctN2 = 100;
-          if(pt.parcelaDetail) {
-            var dd2 = pt.parcelaDetail.find(function(x){ return x.nom === n2; });
-            if(dd2) pctN2 = dd2.pct;
-          }
-          var pInfo2 = PARCEL_DATA.find(function(x){ return x.nom === n2; });
-          return s2 + (pInfo2 ? pInfo2.sup * pctN2 / 100 : 0);
-        }, 0);
-        if(supTotalPt > 0 && sup > 0) {
-          costVar += ctPt * (sup / supTotalPt);
-        }
+        // costTotal = cost real total del tractament en € → sumar directament
+        costVar += ctPt;
         return;
       }
-      const parceles = mpNoms(pt.parcela);
-      parceles.forEach(function(nom) {
+
+      if(chaPt > 0) {
+        // costHa = €/ha → multiplicar per la superfície total tractada en aquest part
+        const supPt = (function() {
+          var st = parseFloat(pt.supTractada) || 0;
+          if(st > 0 && st < 200) return st;
+          if(pt.parcelaDetail) {
+            return pt.parcelaDetail.reduce(function(s2, d) {
+              var pi = PARCEL_DATA.find(function(x){ return x.nom === d.nom; });
+              return s2 + (pi ? pi.sup * d.pct / 100 : 0);
+            }, 0);
+          }
+          return mpNoms(pt.parcela).reduce(function(s2, n2) {
+            var pi = PARCEL_DATA.find(function(x){ return x.nom === n2; });
+            return s2 + (pi ? pi.sup : 0);
+          }, 0);
+        })();
+        if(supPt > 0 && supPt < 200) costVar += chaPt * supPt;
+        return;
+      }
+
+      // Fallback: calcular des de ACCIONS_COST per cada parcel·la
+      mpNoms(pt.parcela).forEach(function(nom) {
         const pInfo = PARCEL_DATA.find(function(x){ return x.nom === nom; });
+        if(!pInfo) return;
         const pct = (function() {
           if(!pt.parcelaDetail) return 100;
           const d = pt.parcelaDetail.find(function(x){ return x.nom === nom; });
           return d ? d.pct : 100;
         })();
-        const sup = pInfo ? pInfo.sup * pct / 100 : 0;
+        const sup = pInfo.sup * pct / 100;
         if(sup === 0) return;
         let acc = TIPO_TO_ACCIO[pt.tipo];
         if(pt.tipo === 'labor' && pt.c1) acc = LABOR_TO_ACCIO[pt.c1] || null;
