@@ -535,7 +535,7 @@ footer{text-align:center;margin-top:1.5rem;font-family:monospace;font-size:.65re
   <button class="main-nav-btn" onclick="showPage('costos')" id="nav-costos"><span class="nav-icon">💶</span>Costos</button>
   <button class="main-nav-btn" onclick="showPage('meteo')" id="nav-meteo"><span class="nav-icon">🌡️</span>Risc Meteo</button>
   <button class="main-nav-btn" onclick="showPage('estoc')" id="nav-estoc"><span class="nav-icon">📦</span>Estoc</button>
-  <button class="main-nav-btn" onclick="showPage('mapa')" id="nav-mapa"><span class="nav-icon">🗺️</span>Mapa</button>
+
   <button class="main-nav-btn" onclick="showPage('collita')" id="nav-collita"><span class="nav-icon">🍇</span>Collita</button>
   <button class="main-nav-btn" onclick="showPage('fitxa')" id="nav-fitxa"><span class="nav-icon">📌</span>Fitxa</button>
   <button class="main-nav-btn" onclick="showPage('ccpae')" id="nav-ccpae"><span class="nav-icon">📄</span>CCPAE</button>
@@ -1184,40 +1184,6 @@ footer{text-align:center;margin-top:1.5rem;font-family:monospace;font-size:.65re
     </div>
   </div>
 
-</div>
-
-<div class="page" id="page-mapa">
-  <div class="card" style="margin-bottom:.8rem">
-    <div class="panel-header" style="background:#1A3A5A">🗺️ &nbsp; Mapa de parcel·les — Cava Miquel Pons · Penedès</div>
-    <div style="padding:.8rem 1.2rem;display:flex;gap:.8rem;flex-wrap:wrap;align-items:center">
-      <div class="field" style="margin-bottom:0;width:160px">
-        <label>Municipi</label>
-        <select id="mapa-filt-mun" onchange="renderMapa()">
-          <option value="">Tots</option>
-          <option>Avinyonet</option><option>Castellet</option><option>Font Rubi</option>
-          <option>La Granada</option><option>Santa Fe</option><option>Subirats</option><option>Vilafranca</option>
-        </select>
-      </div>
-      <div class="field" style="margin-bottom:0;width:160px">
-        <label>Varietat</label>
-        <select id="mapa-filt-var" onchange="renderMapa()">
-          <option value="">Totes</option>
-        </select>
-      </div>
-      <div style="display:flex;gap:.5rem;flex-wrap:wrap;align-items:center;font-family:monospace;font-size:.7rem">
-        <span style="background:#E53935;color:white;border-radius:50%;width:14px;height:14px;display:inline-block"></span> Urgent (&gt;14d)
-        <span style="background:#FFC107;color:white;border-radius:50%;width:14px;height:14px;display:inline-block"></span> Vigilar (7-14d)
-        <span style="background:#4CAF50;color:white;border-radius:50%;width:14px;height:14px;display:inline-block"></span> OK (&lt;7d)
-        <span style="background:#9E9E9E;color:white;border-radius:50%;width:14px;height:14px;display:inline-block"></span> Sense dades
-      </div>
-    </div>
-    <div id="mapa-container" style="height:520px;border-radius:0 0 2px 2px;overflow:hidden"></div>
-  </div>
-
-  <div class="card">
-    <div class="panel-header ph-soil">📋 &nbsp; Llista de parcel·les</div>
-    <div id="mapa-llista" style="padding:.8rem"></div>
-  </div>
 </div>
 
 <div class="page" id="page-meteo">
@@ -3646,6 +3612,7 @@ const LABOR_TO_ACCIO = {
 
 };
 
+function getCostVars() { return getVars(); }
 function getVars() {
   const n = id => parseFloat(document.getElementById(id)?.value || 0);
   return {
