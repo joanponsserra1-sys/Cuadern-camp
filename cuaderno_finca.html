@@ -2855,16 +2855,21 @@ function showParcelaDetail(nom) {
       const data    = new Date(p.fecha + 'T12:00:00').toLocaleDateString('ca-ES',{day:'numeric',month:'short',year:'numeric'});
       const prod    = p.c1 || '—';
       const obj     = p.c6 || '';
-      // Superfície tractada: prioritzar supTractada (guardat correctament),
-      // fallback a c5 (pot estar corrupte), amb sanity check
-      let sup = parseFloat(p.supTractada) || 0;
-      if(sup <= 0 || sup > 100) {
-        sup = parseFloat(p.c5) || 0;
-        if(sup > 100) sup = 0; // valor corrupte (data ISO)
+      // Superfície d'AQUESTA parcel·la en aquest part (no la total del tractament)
+      const pInfoLocal = PARCEL_DATA.find(function(x){ return x.nom === nom; });
+      var pctLocal = 100;
+      if(p.parcelaDetail) {
+        const dLocal = p.parcelaDetail.find(function(x){ return x.nom === nom; });
+        if(dLocal) pctLocal = dLocal.pct;
+      } else {
+        // Intentar extreure % del text "Nom (XX%)"
+        const rawLocal = (p.parcela||'').split(' / ')
+          .find(function(s){ return mpNom(s) === nom; }) || '';
+        const mLocal = rawLocal.match(/\((\d+)%\)/);
+        if(mLocal) pctLocal = parseInt(mLocal[1]);
       }
-      // ── Productes amb dosis detallades ──────────────────────
-      // Preferir fitProdsData (nou format: qtTotal per màquina)
-      // Fallback a c1+c3 (format antic: dosi/ha)
+      const sup = pInfoLocal ? pInfoLocal.sup * pctLocal / 100 : 0;
+      // ── Productes amb dosi/ha ────────────────────────────────
       var prodLines = '';
       var tipusAplicacio = (p.c7||'').toLowerCase();
       var esPols = tipusAplicacio.includes('pols') ||
@@ -2872,46 +2877,46 @@ function showParcelaDetail(nom) {
                    (p.c1||'').toLowerCase().includes('novazufre') ||
                    (p.c1||'').toLowerCase().includes('soffre pa');
 
-      if(p.fitProdsData && p.fitProdsData.length > 0) {
-        // Nou format: qtTotal posats a la màquina, calcular dosi/ha
+      // c3 = dosi/ha del primer producte (calculat al formulari)
+      // fitProdsData = [{nom, qtTotal, preu}] per cada producte de la mescla
+      var supTotal = parseFloat(p.supTractada) || 0;
+      if(supTotal <= 0 || supTotal > 200) supTotal = 0;
+
+      if(p.fitProdsData && p.fitProdsData.length > 0 && supTotal > 0) {
         var lines2 = p.fitProdsData
-          .filter(function(fp){ return fp.nom && (parseFloat(fp.qtTotal)||0) > 0; })
+          .filter(function(fp){ return fp.nom; })
           .map(function(fp) {
             var qt    = parseFloat(fp.qtTotal) || 0;
-            var unitat = (fp.nom||'').toLowerCase().includes('sofre')||
-                         (fp.nom||'').toLowerCase().includes('coure') ? 'kg' : 'L';
-            var dosiStr = '';
-            if(sup > 0 && sup < 200 && qt > 0) {
-              var dosiHaV = qt / sup;
-              dosiStr = dosiHaV.toFixed(2) + ' ' + unitat + '/ha';
-            }
-            return '<span style="font-weight:600">' + fp.nom + '</span>' +
-                   (dosiStr ? ' → <span style="color:var(--vine)">' + dosiStr + '</span>' : '') +
-                   (qt > 0 ? ' <span style="color:var(--fog);font-size:.65rem">(' + qt.toFixed(1) + ' ' + unitat + ' total)</span>' : '');
+            var isPols = (fp.nom||'').toLowerCase().includes('sofre pols') ||
+                         (fp.nom||'').toLowerCase().includes('novazufre') ||
+                         (fp.nom||'').toLowerCase().includes('soffre pa');
+            var unitat = isPols ? 'kg/ha' : 'L/ha';
+            var dosiHaV = qt > 0 && supTotal > 0 ? qt / supTotal : 0;
+            var dosiStr = dosiHaV > 0 ? dosiHaV.toFixed(2) + ' ' + unitat : '';
+            return '<span style="font-weight:600">' + (fp.nom||'') + '</span>' +
+                   (dosiStr ? ' <span style="color:var(--vine)">' + dosiStr + '</span>' : '');
           });
         if(lines2.length > 0) prodLines = lines2.join('<br>');
       }
 
-      // Si no hi ha fitProdsData, usar c1+c3
+      // Fallback: c1 (noms) + c3 (dosi/ha del primer producte)
       if(!prodLines && p.c1) {
-        var nomsProds = (p.c1||'').split(' + ');
-        var dosiAntic = parseFloat(p.c3) || 0;
-        var unitatAntic = esPols ? 'kg/ha' : 'L/ha';
-        if(dosiAntic > 0 && nomsProds.length === 1) {
-          prodLines = '<span style="font-weight:600">' + p.c1 + '</span>' +
-                      ' → <span style="color:var(--vine)">' + dosiAntic.toFixed(2) + ' ' + unitatAntic + '</span>';
-        } else {
-          prodLines = nomsProds.map(function(n){ return '<span style="font-weight:600">' + n.trim() + '</span>'; }).join(' + ');
-        }
+        var nomsProds = p.c1.split(' + ');
+        var dosiC3 = parseFloat(p.c3) || 0;
+        var unitatC3 = esPols ? 'kg/ha' : 'L/ha';
+        prodLines = nomsProds.map(function(n, i) {
+          return '<span style="font-weight:600">' + n.trim() + '</span>' +
+                 (i === 0 && dosiC3 > 0 ? ' <span style="color:var(--vine)">' + dosiC3 + ' ' + unitatC3 + '</span>' : '');
+        }).join('<br>');
       }
 
-      // Brou (c4 = L/ha) — mostrar només si és polvorització (no pols)
-      var brouLine = '';
+      // Brou (c4 = L/ha) — afegir als productes si és polvorització foliar
       if(!esPols && p.c4 && parseFloat(p.c4) > 0) {
         var brouHa = parseFloat(p.c4);
-        var brouTot = (sup > 0 && sup < 200) ? (brouHa * sup).toFixed(0) + ' L total' : '';
-        brouLine = brouHa + ' L/ha brou' + (brouTot ? ' (' + brouTot + ')' : '');
+        prodLines += (prodLines ? '<br>' : '') +
+          '<span style="color:#2255AA">💧 Brou: <strong>' + brouHa + ' L/ha</strong></span>';
       }
+      var brouLine = ''; // ja inclòs a prodLines
 
       // Cost
       const costTotal = parseFloat(p.costTotal) || 0;
@@ -2943,7 +2948,6 @@ function showParcelaDetail(nom) {
 
       // Línia de detalls secundaris (brou, cost, sup, hores...)
       const detalls = [
-        brouLine,
         (sup > 0 && sup < 200) ? sup.toFixed(2) + ' ha tractades' : '',
         costHa > 0 ? costHa.toFixed(2) + ' €/ha' : '',
         costTotal > 0 ? costTotal.toFixed(2) + ' € total' : '',
