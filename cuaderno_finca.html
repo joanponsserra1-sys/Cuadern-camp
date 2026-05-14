@@ -2093,6 +2093,108 @@ document.addEventListener('DOMContentLoaded', function() {
   populateCostFilters();
   // Comprovar alertes pendents (s'envia màxim 1 cop per dia)
   checkAlertesPendents();
+
+  // ── Migració retrocompatible de parts fitosanitaris ──────────
+  // Recalcula fitProdsData i supTractada per parts antics que no els tenien
+  (function migrarParts() {
+    var camps = getCampanyes();
+    camps.forEach(function(camp) {
+      var key   = camp + '_parts';
+      var parts = [];
+      try { parts = JSON.parse(localStorage.getItem(key) || '[]'); } catch(e){ return; }
+      var changed = false;
+
+      parts.forEach(function(p) {
+        if(p.tipo !== 'fitosanitario') return;
+
+        // 1. Calcular supTractada si manca
+        if(!p.supTractada || parseFloat(p.supTractada) <= 0 || parseFloat(p.supTractada) > 200) {
+          var supCalc = 0;
+          if(p.parcelaDetail && p.parcelaDetail.length > 0) {
+            supCalc = p.parcelaDetail.reduce(function(s, d) {
+              var pi = PARCEL_DATA.find(function(x){ return x.nom === d.nom; });
+              return s + (pi ? pi.sup * (d.pct||100) / 100 : 0);
+            }, 0);
+          } else if(p.parcela) {
+            supCalc = mpNoms(p.parcela).reduce(function(s, nom) {
+              var pi = PARCEL_DATA.find(function(x){ return x.nom === nom; });
+              return s + (pi ? pi.sup : 0);
+            }, 0);
+          }
+          if(supCalc > 0 && supCalc < 200) {
+            p.supTractada = Math.round(supCalc * 10000) / 10000;
+            changed = true;
+          }
+        }
+
+        var supT = parseFloat(p.supTractada) || 0;
+
+        // 2. Reconstruir fitProdsData si manca
+        if(!p.fitProdsData || p.fitProdsData.length === 0) {
+          var nomsC1 = (p.c1||'').split(' + ').map(function(s){ return s.trim(); }).filter(Boolean);
+          if(nomsC1.length > 0 && supT > 0) {
+            // c3 pot ser: dosi/ha (valor petit <50) o total litres (valor gran)
+            var c3val = parseFloat(p.c3) || 0;
+            // qtyTotal = total litres de tots els productes junts
+            var qtyTot = parseFloat(p.qtyTotal) || 0;
+
+            p.fitProdsData = nomsC1.map(function(nom, i) {
+              // Unitat: sofre/coure → kg, resta → L
+              var isPols = nom.toLowerCase().includes('sofre pols') ||
+                           nom.toLowerCase().includes('novazufre') ||
+                           nom.toLowerCase().includes('soffre pa');
+              var unitat = isPols ? 'kg' : 'L';
+
+              // Dosi/ha: si c3 és raonable (< 50) i hi ha un sol producte → usar c3
+              // Si múltiples productes i qtyTotal existeix → repartir per igual (aproximació)
+              var dosiHa = 0;
+              var qtT    = 0;
+              if(nomsC1.length === 1) {
+                // Un sol producte: usar c3 si és raonable, sinó qtyTotal/sup
+                if(c3val > 0 && c3val < 100) {
+                  dosiHa = c3val;
+                  qtT    = parseFloat((dosiHa * supT).toFixed(2));
+                } else if(qtyTot > 0 && supT > 0) {
+                  dosiHa = parseFloat((qtyTot / supT).toFixed(2));
+                  qtT    = qtyTot;
+                }
+              } else {
+                // Múltiples productes: no podem saber el qtTotal de cada un
+                // Guardar sense dosiHa — es mostrarà com a "mescla X L/ha (total)"
+                dosiHa = 0;
+                qtT    = 0;
+              }
+              return { nom: nom, qtTotal: qtT, dosiHa: dosiHa, unitat: unitat, preu: 0 };
+            });
+            changed = true;
+          }
+        } else {
+          // 3. fitProdsData existeix però pot no tenir dosiHa
+          var needsDosiHa = p.fitProdsData.some(function(fp){ return !fp.dosiHa && fp.qtTotal > 0; });
+          if(needsDosiHa && supT > 0) {
+            p.fitProdsData = p.fitProdsData.map(function(fp) {
+              if(!fp.dosiHa && parseFloat(fp.qtTotal) > 0) {
+                fp.dosiHa = parseFloat((parseFloat(fp.qtTotal) / supT).toFixed(2));
+                // Afegir unitat si manca
+                if(!fp.unitat) {
+                  var isPols2 = (fp.nom||'').toLowerCase().includes('sofre pols') ||
+                                (fp.nom||'').toLowerCase().includes('novazufre');
+                  fp.unitat = isPols2 ? 'kg' : 'L';
+                }
+              }
+              return fp;
+            });
+            changed = true;
+          }
+        }
+      });
+
+      if(changed) {
+        localStorage.setItem(key, JSON.stringify(parts));
+        console.log('[Migració] ' + camp + ': parts fitosanitaris actualitzats');
+      }
+    });
+  })();
 });
 
 // ══════════════════════════════════════════════════
@@ -2424,12 +2526,36 @@ function collectData() {
                  supTractada: Math.round(supTractada * 10000) / 10000,
                  operario:g('operario'), obs:g('observaciones') };
   const sp = {
-    fitosanitario: ()=>({ c1:g('fit-producto'), c2:g('fit-registro'), c3:g('fit-dosis'),
-      c4:g('fit-caldo'), c5:g('fit-superficie'), c6:g('fit-objetivo'), c7:g('fit-tipo'), qtyTotal:g('fit-qty-total'),
-      c8:g('fit-hora-ini')+'–'+g('fit-hora-fin'), c9:'T:'+g('fit-temp')+'°C HR:'+g('fit-hr')+'% V:'+g('fit-viento')+' PS:'+g('fit-plazo')+'d',
-      c10: g('fit-preu'), costTotal: g('fit-cost-total-input'), costHa: g('fit-cost-ha-auto'),
-      numRegistre: g('fit-num-registre'), eficacia: g('fit-eficacia'),
-      costExtra: g('fit-cost-extra'), extra: g('fit-extra') }),
+    fitosanitario: ()=>{
+      // Superfície efectiva des de mpSelected_list
+      const supEf = mpSelected_list.reduce(function(s, e) {
+        const pi = PARCEL_DATA.find(function(x){ return x.nom === e.nom; });
+        return s + (pi ? pi.sup * e.pct / 100 : 0);
+      }, 0);
+      // fitProdsData: guardar nom + qtTotal + dosiHa + unitat per cada producte
+      const prods = getProductes();
+      const fpData = fitProds.filter(function(fp){ return fp.prodIdx !== '' || fp.qtTotal; }).map(function(fp) {
+        const prodCat = fp.prodIdx !== '' ? prods[fp.prodIdx] : null;
+        const nomFp   = prodCat ? prodCat.nom : (fp.nom || '');
+        const unitFp  = prodCat ? (prodCat.unitat || 'L') : 'L';
+        const qt      = parseFloat(fp.qtTotal) || 0;
+        const dosiHa  = supEf > 0 && qt > 0 ? parseFloat((qt / supEf).toFixed(2)) : 0;
+        return { nom: nomFp, qtTotal: qt, dosiHa: dosiHa, unitat: unitFp, preu: parseFloat(fp.preu)||0 };
+      }).filter(function(fp){ return fp.nom; });
+      return {
+        c1: g('fit-producto'), c2: g('fit-registro'),
+        c3: fpData.length > 0 && fpData[0].dosiHa > 0 ? fpData[0].dosiHa : g('fit-dosis'),
+        c4: g('fit-caldo'),
+        c5: supEf > 0 ? supEf.toFixed(4) : g('fit-superficie'),
+        c6: g('fit-objetivo'), c7: g('fit-tipo'), qtyTotal: g('fit-qty-total'),
+        c8: g('fit-hora-ini')+'–'+g('fit-hora-fin'),
+        c9: 'T:'+g('fit-temp')+'°C HR:'+g('fit-hr')+'% V:'+g('fit-viento')+' PS:'+g('fit-plazo')+'d',
+        c10: g('fit-preu'), costTotal: g('fit-cost-total-input'), costHa: g('fit-cost-ha-auto'),
+        numRegistre: g('fit-num-registre'), eficacia: g('fit-eficacia'),
+        costExtra: g('fit-cost-extra'), extra: g('fit-extra'),
+        fitProdsData: fpData,
+      };
+    },
     labor:   ()=>({ c1:g('lab-tipo'), c2:g('lab-maquina'), c3:g('lab-hora-ini')+'–'+g('lab-hora-fin'), c4:g('lab-superficie'), c5:g('lab-fenologia'), costTotal: g('lab-cost-total'), costHa: g('lab-cost-ha') }),
     riego:   ()=>({ c1:g('rie-tipo'), c2:g('rie-origen'), c3:g('rie-hora-ini')+'–'+g('rie-hora-fin'), c4:g('rie-caudal'), c5:g('rie-volumen'), c6:g('rie-superficie'), c7:g('rie-motivo') }),
     abonado: ()=>({ c1:g('abo-tipo'), c2:g('abo-producto'), c3:g('abo-dosis'), c4:g('abo-cantidad'), c5:g('abo-superficie'), c6:g('abo-forma'), c7:'N:'+g('abo-n')+' P:'+g('abo-p')+' K:'+g('abo-k') }),
@@ -2879,35 +3005,42 @@ function showParcelaDetail(nom) {
 
       // c3 = dosi/ha del primer producte (calculat al formulari)
       // fitProdsData = [{nom, qtTotal, preu}] per cada producte de la mescla
-      var supTotal = parseFloat(p.supTractada) || 0;
-      if(supTotal <= 0 || supTotal > 200) supTotal = 0;
-
-      if(p.fitProdsData && p.fitProdsData.length > 0 && supTotal > 0) {
-        var lines2 = p.fitProdsData
-          .filter(function(fp){ return fp.nom; })
-          .map(function(fp) {
-            var qt    = parseFloat(fp.qtTotal) || 0;
-            var isPols = (fp.nom||'').toLowerCase().includes('sofre pols') ||
-                         (fp.nom||'').toLowerCase().includes('novazufre') ||
-                         (fp.nom||'').toLowerCase().includes('soffre pa');
-            var unitat = isPols ? 'kg/ha' : 'L/ha';
-            var dosiHaV = qt > 0 && supTotal > 0 ? qt / supTotal : 0;
-            var dosiStr = dosiHaV > 0 ? dosiHaV.toFixed(2) + ' ' + unitat : '';
-            return '<span style="font-weight:600">' + (fp.nom||'') + '</span>' +
-                   (dosiStr ? ' <span style="color:var(--vine)">' + dosiStr + '</span>' : '');
-          });
-        if(lines2.length > 0) prodLines = lines2.join('<br>');
-      }
-
-      // Fallback: c1 (noms) + c3 (dosi/ha del primer producte)
-      if(!prodLines && p.c1) {
+      if(p.fitProdsData && p.fitProdsData.length > 0) {
+        // Nou format: dosiHa ja guardada per cada producte
+        var lines2 = p.fitProdsData.filter(function(fp){ return fp.nom; }).map(function(fp) {
+          var dosiHaFp = parseFloat(fp.dosiHa) || 0;
+          var unitatFp = fp.unitat || (esPols ? 'kg' : 'L');
+          var dosiStr  = dosiHaFp > 0 ? dosiHaFp.toFixed(2) + ' ' + unitatFp + '/ha' : '';
+          return '<span style="font-weight:600">' + fp.nom + '</span>' +
+                 (dosiStr ? ' <span style="color:var(--vine);font-family:monospace">' + dosiStr + '</span>' : '');
+        });
+        prodLines = lines2.join('<br>');
+      } else if(p.c1) {
+        // Parts antics sense fitProdsData
         var nomsProds = p.c1.split(' + ');
         var dosiC3 = parseFloat(p.c3) || 0;
+        if(dosiC3 > 100) dosiC3 = 0; // c3 > 100 = total litres, no dosi/ha
         var unitatC3 = esPols ? 'kg/ha' : 'L/ha';
-        prodLines = nomsProds.map(function(n, i) {
-          return '<span style="font-weight:600">' + n.trim() + '</span>' +
-                 (i === 0 && dosiC3 > 0 ? ' <span style="color:var(--vine)">' + dosiC3 + ' ' + unitatC3 + '</span>' : '');
-        }).join('<br>');
+
+        // Calcular dosi mescla total si tenim qtyTotal i supTractada
+        var qtyTotP   = parseFloat(p.qtyTotal) || 0;
+        var supTotP   = parseFloat(p.supTractada) || 0;
+        if(supTotP <= 0 || supTotP > 200) supTotP = 0;
+        var dosiMescla = qtyTotP > 0 && supTotP > 0 ? (qtyTotP / supTotP).toFixed(2) : 0;
+
+        if(nomsProds.length === 1 && dosiC3 > 0) {
+          // Un sol producte amb dosi/ha coneguda
+          prodLines = '<span style="font-weight:600">' + nomsProds[0].trim() + '</span>' +
+                      ' <span style="color:var(--vine);font-family:monospace">' + dosiC3 + ' ' + unitatC3 + '</span>';
+        } else {
+          // Múltiples productes: mostrar noms + dosi mescla total
+          prodLines = nomsProds.map(function(n){ return '<span style="font-weight:600">' + n.trim() + '</span>'; }).join('<br>');
+          if(dosiMescla > 0) {
+            prodLines += '<br><span style="color:var(--fog);font-size:.72rem">Mescla total: ' +
+                         '<span style="color:var(--vine);font-family:monospace">' + dosiMescla + ' L/ha</span>' +
+                         ' — re-edita el part per veure dosis individuals</span>';
+          }
+        }
       }
 
       // Brou (c4 = L/ha) — afegir als productes si és polvorització foliar
