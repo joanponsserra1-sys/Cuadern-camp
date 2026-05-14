@@ -5408,8 +5408,9 @@ function editTogglePlaga(btn, nom) {
 
 // ── EDITAR PART MODAL ────────────────────────────────────────
 function editarPartModal(id) {
+  try {
   const p = getParts().find(function(x){ return String(x.id) === String(id); });
-  if(!p) return;
+  if(!p) { console.error('Part no trobat:', id); showToast('⚠ Part no trobat', true); return; }
 
   // Inicialitzar selector de parcel·les
   editInitParcelaSelector();
@@ -5421,8 +5422,8 @@ function editarPartModal(id) {
   document.getElementById('edit-operario').value = p.operario||'';
   document.getElementById('edit-obs').value   = p.obs||'';
 
-  // Parcel·les
-  editParcelesSelected = (p.parcela||'').split(' / ').map(function(s){ return s.trim(); }).filter(Boolean);
+  // Parcel·les — netejar % del nom
+  editParcelesSelected = (p.parcela||'').split(' / ').map(function(s){ return mpNom(s); }).filter(Boolean);
   editRenderPills();
 
   // Títol
@@ -5572,6 +5573,10 @@ function editarPartModal(id) {
 
   document.getElementById('editModal').style.display = 'block';
   document.getElementById('editModal').scrollTop = 0;
+  } catch(err) {
+    console.error('editarPartModal error:', err);
+    showToast('⚠ Error obrint editor: ' + err.message, true);
+  }
 }
 
 // ── GUARDAR EDICIÓ ───────────────────────────────────────────
