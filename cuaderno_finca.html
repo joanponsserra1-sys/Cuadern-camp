@@ -627,11 +627,13 @@ footer{text-align:center;margin-top:1.5rem;font-family:monospace;font-size:.65re
           </div>
         </div>
 
-        <!-- Hidden field for legacy collectData compat -->
+        <!-- Hidden fields for collectData -->
         <input type="hidden" id="fit-producto" value="">
         <input type="hidden" id="fit-registro" value="">
         <input type="hidden" id="fit-dosis" value="">
         <input type="hidden" id="fit-preu" value="">
+        <input type="hidden" id="fit-qty-total" value="">
+        <input type="hidden" id="fit-prods-data" value="">
 
         <div class="row row-2">
           <div class="field"><label>Volum brou (L/Ha)</label><input type="number" id="fit-caldo" placeholder="300" step="1" min="0"></div>
@@ -2532,16 +2534,24 @@ function collectData() {
         const pi = PARCEL_DATA.find(function(x){ return x.nom === e.nom; });
         return s + (pi ? pi.sup * e.pct / 100 : 0);
       }, 0);
-      // fitProdsData: guardar nom + qtTotal + dosiHa + unitat per cada producte
+      // fitProdsData: llegir del camp hidden (calculat per updateFitHiddenFields)
+      // Fallback: calcular des de fitProds si el camp no té valor
       const prods = getProductes();
-      const fpData = fitProds.filter(function(fp){ return fp.prodIdx !== '' || fp.qtTotal; }).map(function(fp) {
-        const prodCat = fp.prodIdx !== '' ? prods[fp.prodIdx] : null;
-        const nomFp   = prodCat ? prodCat.nom : (fp.nom || '');
-        const unitFp  = prodCat ? (prodCat.unitat || 'L') : 'L';
-        const qt      = parseFloat(fp.qtTotal) || 0;
-        const dosiHa  = supEf > 0 && qt > 0 ? parseFloat((qt / supEf).toFixed(2)) : 0;
-        return { nom: nomFp, qtTotal: qt, dosiHa: dosiHa, unitat: unitFp, preu: parseFloat(fp.preu)||0 };
-      }).filter(function(fp){ return fp.nom; });
+      var fpData = [];
+      const fpHidden = g('fit-prods-data');
+      if(fpHidden) {
+        try { fpData = JSON.parse(fpHidden); } catch(e) {}
+      }
+      if(!fpData || fpData.length === 0) {
+        fpData = fitProds.filter(function(fp){ return fp.prodIdx !== '' || fp.qtTotal; }).map(function(fp) {
+          const prodCat = fp.prodIdx !== '' ? prods[fp.prodIdx] : null;
+          const nomFp   = prodCat ? prodCat.nom : (fp.nom || '');
+          const unitFp  = prodCat ? (prodCat.unitat || 'L') : 'L';
+          const qt      = parseFloat(fp.qtTotal) || 0;
+          const dosiHa  = supEf > 0 && qt > 0 ? parseFloat((qt / supEf).toFixed(2)) : 0;
+          return { nom: nomFp, qtTotal: qt, dosiHa: dosiHa, unitat: unitFp, preu: parseFloat(fp.preu)||0 };
+        }).filter(function(fp){ return fp.nom; });
+      }
       return {
         c1: g('fit-producto'), c2: g('fit-registro'),
         c3: fpData.length > 0 && fpData[0].dosiHa > 0 ? fpData[0].dosiHa : g('fit-dosis'),
@@ -3550,16 +3560,29 @@ function updateFitHiddenFields() {
   const elDosi = document.getElementById('fit-dosis');
   const elPreu = document.getElementById('fit-preu');
   const elQty  = document.getElementById('fit-qty-total');
+  const elFpd  = document.getElementById('fit-prods-data');
   if(elNom)  elNom.value  = noms;
   if(elDosi) elDosi.value = dosiHa0;
   if(elPreu) elPreu.value = costProdHa > 0 ? costProdHa.toFixed(4) : '';
   if(elQty)  elQty.value  = qtyTotAll > 0 ? qtyTotAll.toFixed(3) : '';
+  // Guardar fitProdsData com a JSON per recuperar-ho al collectData
+  if(elFpd) {
+    const fpArr = fitProds.filter(function(fp){ return fp.prodIdx !== '' || fp.qtTotal; }).map(function(fp) {
+      const prodCat = fp.prodIdx !== '' ? prods[fp.prodIdx] : null;
+      const nomFp   = prodCat ? prodCat.nom : (fp.nom || '');
+      const unitFp  = prodCat ? (prodCat.unitat || 'L') : 'L';
+      const qt      = parseFloat(fp.qtTotal) || 0;
+      const dosiHaFp = sup > 0 && qt > 0 ? parseFloat((qt / sup).toFixed(2)) : 0;
+      return { nom: nomFp, qtTotal: qt, dosiHa: dosiHaFp, unitat: unitFp, preu: parseFloat(fp.preu)||0 };
+    }).filter(function(fp){ return fp.nom; });
+    elFpd.value = JSON.stringify(fpArr);
+  }
 }
 
 function resetFitMixer() {
   fitProds = [{ prodIdx: '', qtTotal: '', preu: '' }];
   renderFitMixer();
-  ['fit-cost-extra','fit-extra','fit-cost-total-input','fit-cost-ha-auto'].forEach(function(id) {
+  ['fit-cost-extra','fit-extra','fit-cost-total-input','fit-cost-ha-auto','fit-prods-data'].forEach(function(id) {
     const el = document.getElementById(id); if(el) el.value = '';
   });
   ['fit-cost-prod-display','fit-sup-display2','fit-cost-extra-display','fit-cost-suma-display'].forEach(function(id) {
