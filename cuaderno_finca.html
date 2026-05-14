@@ -2862,10 +2862,56 @@ function showParcelaDetail(nom) {
         sup = parseFloat(p.c5) || 0;
         if(sup > 100) sup = 0; // valor corrupte (data ISO)
       }
-      const caldo   = p.c4 ? p.c4 + ' L/ha brou' : '';
+      // ── Productes amb dosis detallades ──────────────────────
+      // Preferir fitProdsData (nou format: qtTotal per màquina)
+      // Fallback a c1+c3 (format antic: dosi/ha)
+      var prodLines = '';
+      var tipusAplicacio = (p.c7||'').toLowerCase();
+      var esPols = tipusAplicacio.includes('pols') ||
+                   (p.c1||'').toLowerCase().includes('sofre pols') ||
+                   (p.c1||'').toLowerCase().includes('novazufre') ||
+                   (p.c1||'').toLowerCase().includes('soffre pa');
 
-      // Dosi/ha calculada (c3 és dosi/ha si ve del nou formulari)
-      const dosiHa  = p.c3 ? p.c3 + ' ' + (prod.toLowerCase().includes('sofre')||prod.toLowerCase().includes('coure')?'kg/ha':'L/ha') : '';
+      if(p.fitProdsData && p.fitProdsData.length > 0) {
+        // Nou format: qtTotal posats a la màquina, calcular dosi/ha
+        var lines2 = p.fitProdsData
+          .filter(function(fp){ return fp.nom && (parseFloat(fp.qtTotal)||0) > 0; })
+          .map(function(fp) {
+            var qt    = parseFloat(fp.qtTotal) || 0;
+            var unitat = (fp.nom||'').toLowerCase().includes('sofre')||
+                         (fp.nom||'').toLowerCase().includes('coure') ? 'kg' : 'L';
+            var dosiStr = '';
+            if(sup > 0 && sup < 200 && qt > 0) {
+              var dosiHaV = qt / sup;
+              dosiStr = dosiHaV.toFixed(2) + ' ' + unitat + '/ha';
+            }
+            return '<span style="font-weight:600">' + fp.nom + '</span>' +
+                   (dosiStr ? ' → <span style="color:var(--vine)">' + dosiStr + '</span>' : '') +
+                   (qt > 0 ? ' <span style="color:var(--fog);font-size:.65rem">(' + qt.toFixed(1) + ' ' + unitat + ' total)</span>' : '');
+          });
+        if(lines2.length > 0) prodLines = lines2.join('<br>');
+      }
+
+      // Si no hi ha fitProdsData, usar c1+c3
+      if(!prodLines && p.c1) {
+        var nomsProds = (p.c1||'').split(' + ');
+        var dosiAntic = parseFloat(p.c3) || 0;
+        var unitatAntic = esPols ? 'kg/ha' : 'L/ha';
+        if(dosiAntic > 0 && nomsProds.length === 1) {
+          prodLines = '<span style="font-weight:600">' + p.c1 + '</span>' +
+                      ' → <span style="color:var(--vine)">' + dosiAntic.toFixed(2) + ' ' + unitatAntic + '</span>';
+        } else {
+          prodLines = nomsProds.map(function(n){ return '<span style="font-weight:600">' + n.trim() + '</span>'; }).join(' + ');
+        }
+      }
+
+      // Brou (c4 = L/ha) — mostrar només si és polvorització (no pols)
+      var brouLine = '';
+      if(!esPols && p.c4 && parseFloat(p.c4) > 0) {
+        var brouHa = parseFloat(p.c4);
+        var brouTot = (sup > 0 && sup < 200) ? (brouHa * sup).toFixed(0) + ' L total' : '';
+        brouLine = brouHa + ' L/ha brou' + (brouTot ? ' (' + brouTot + ')' : '');
+      }
 
       // Cost
       const costTotal = parseFloat(p.costTotal) || 0;
@@ -2895,13 +2941,12 @@ function showParcelaDetail(nom) {
         return pg ? '<span class="pbadge pbadge-ok" style="font-size:.58rem">' + pg.icon + ' ' + pg.label + '</span>' : '';
       }).join('');
 
-      // Línia de detalls
+      // Línia de detalls secundaris (brou, cost, sup, hores...)
       const detalls = [
-        dosiHa,
-        caldo,
+        brouLine,
+        (sup > 0 && sup < 200) ? sup.toFixed(2) + ' ha tractades' : '',
         costHa > 0 ? costHa.toFixed(2) + ' €/ha' : '',
         costTotal > 0 ? costTotal.toFixed(2) + ' € total' : '',
-        (sup > 0 && sup < 200) ? sup.toFixed(2) + ' ha tractades' : '',
         hores,
         plazo,
         numReg ? 'Reg: ' + numReg : '',
@@ -2926,19 +2971,22 @@ function showParcelaDetail(nom) {
         '<div style="font-size:.68rem;color:var(--fog);font-style:italic;margin-top:.2rem">💬 ' + p.obs + '</div>' : '';
 
       return '<div class="fit-history-row" style="flex-direction:column;align-items:flex-start;gap:.25rem;padding:.6rem .8rem">' +
-        // Capçalera: data + producte + plagues
-        '<div style="display:flex;align-items:flex-start;gap:.6rem;width:100%;flex-wrap:wrap">' +
-          '<span class="fit-history-date" style="min-width:90px">' + data + '</span>' +
-          '<span class="fit-history-prod" style="flex:1;font-weight:600">' + prod +
-            (obj && !plagues.length ? ' <span style="font-weight:400;color:var(--fog);font-size:.7rem">→ ' + obj + '</span>' : '') +
-          '</span>' +
-          (operari || '') +
+        // Capçalera: data + plagues + eficàcia + operari
+        '<div style="display:flex;align-items:center;gap:.5rem;width:100%;flex-wrap:wrap;margin-bottom:.1rem">' +
+          '<span class="fit-history-date">' + data + '</span>' +
+          (pgBadges ? '<span style="display:flex;gap:.2rem;flex-wrap:wrap">' + pgBadges + '</span>' : '') +
+          (efBadge || '') +
+          (operari ? '<span style="margin-left:auto">' + operari + '</span>' : '') +
         '</div>' +
-        // Badges plagues + eficàcia
-        (pgBadges || efBadge ?
-          '<div style="display:flex;gap:.3rem;flex-wrap:wrap">' + pgBadges + efBadge + '</div>' : '') +
-        // Detalls tècnics
-        (detalls ? '<div style="font-family:monospace;font-size:.62rem;color:var(--vine);opacity:.85">' + detalls + '</div>' : '') +
+        // Plaga/objectiu si no hi ha badges
+        (!plagues.length && obj ?
+          '<div style="font-size:.72rem;color:var(--fog)">→ ' + obj + '</div>' : '') +
+        // Productes amb dosis (línia principal)
+        (prodLines ?
+          '<div style="font-size:.8rem;line-height:1.5">' + prodLines + '</div>' : '') +
+        // Detalls secundaris: brou, sup, cost, hores...
+        (detalls ?
+          '<div style="font-family:monospace;font-size:.62rem;color:var(--fog);margin-top:.1rem">' + detalls + '</div>' : '') +
         // Meteo
         meteoLine +
         // Obs
