@@ -5289,7 +5289,8 @@ function editCalcFitMixerTotal() {
   });
   const el = document.getElementById('edit-fit-cost-mescla');
   if(el) el.textContent = totalCostHa > 0 ? totalCostHa.toFixed(2) + ' €/ha' : '— €/ha';
-  if(typeof editCalcFitCostTotal === 'function') editCalcFitCostTotal(false);
+  // NO cridar editCalcFitCostTotal aquí — causaria bucle:
+  // editRenderFitMixer → editUpdateFitHiddenFields → editCalcFitMixerTotal → editCalcFitCostTotal → editCalcFitMixerTotal
   return totalCostHa;
 }
 
