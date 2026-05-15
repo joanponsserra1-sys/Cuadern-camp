@@ -5380,25 +5380,73 @@ function editGetSupParceles() {
 function editRenderPills() {
   const container = document.getElementById('edit-parcela-pills');
   if(!container) return;
-  container.innerHTML = editParcelesSelected.length === 0
-    ? '<span style="color:var(--fog);font-size:.75rem">Cap parcel·la</span>'
-    : editParcelesSelected.map(function(nom) {
-        const p = PARCEL_DATA.find(function(x){ return x.nom === nom; });
-        return '<span style="display:inline-flex;align-items:center;gap:.2rem;background:var(--vine);color:white;border-radius:2px;padding:.15rem .5rem;font-family:monospace;font-size:.65rem">' +
-          nom + (p ? ' (' + p.sup.toFixed(2) + 'ha)' : '') +
-          '<button onclick="editRemoveParcela(\'' + nom.replace(/\\/g,'\\\\').replace(/'/g,"\\'") + '\')" style="background:none;border:none;color:rgba(255,255,255,.7);cursor:pointer;font-size:.75rem;padding:0;margin-left:.2rem">✕</button></span>';
-      }).join('');
-  document.getElementById('edit-parcela').value = editParcelesSelected.join(' / ');
-  // Actualitzar superfície
-  const sup = editGetSupParceles();
-  ['edit-fit-sup','edit-lab-sup','edit-abo-sup'].forEach(function(id) {
-    const el = document.getElementById(id);
-    if(el) el.value = sup > 0 ? sup.toFixed(4) : '';
+  container.innerHTML = '';
+
+  if(editParcelesSelected.length === 0) {
+    container.innerHTML = '<span style="color:var(--fog);font-size:.75rem">Cap parcel·la</span>';
+    const ep = document.getElementById('edit-parcela');
+    if(ep) ep.value = '';
+    return;
+  }
+
+  editParcelesSelected.forEach(function(entry, idx) {
+    const nom   = typeof entry === 'string' ? entry : entry.nom;
+    const pct   = typeof entry === 'object' && entry.pct != null ? entry.pct : 100;
+    const pInfo = PARCEL_DATA.find(function(x){ return x.nom === nom; });
+    const supEf = pInfo ? (pInfo.sup * pct / 100).toFixed(2) : '?';
+
+    const pill = document.createElement('span');
+    pill.style.cssText = 'display:inline-flex;align-items:center;gap:.25rem;background:var(--vine);color:white;border-radius:2px;padding:.15rem .4rem .15rem .55rem;font-family:monospace;font-size:.65rem;margin:.1rem';
+
+    const nomSpan = document.createElement('span');
+    nomSpan.textContent = nom;
+    pill.appendChild(nomSpan);
+
+    // % editable
+    const pctWrap = document.createElement('span');
+    pctWrap.style.cssText = 'display:inline-flex;align-items:center;gap:.1rem;background:rgba(0,0,0,.15);border-radius:2px;padding:.05rem .25rem';
+    const pctInput = document.createElement('input');
+    pctInput.type = 'number'; pctInput.min = '1'; pctInput.max = '100'; pctInput.step = '5';
+    pctInput.value = pct;
+    pctInput.style.cssText = 'width:36px;background:transparent;border:none;color:inherit;font-size:.7rem;font-family:monospace;font-weight:600;padding:0;text-align:right';
+    pctInput.addEventListener('click', function(e){ e.stopPropagation(); });
+    pctInput.addEventListener('input', function(e) {
+      e.stopPropagation();
+      var v = Math.min(100, Math.max(1, parseInt(this.value)||100));
+      if(typeof entry === 'object') entry.pct = v;
+      this.value = v;
+      editUpdateSuperficie();
+    });
+    const pctLbl = document.createElement('span');
+    pctLbl.textContent = '%'; pctLbl.style.cssText = 'font-size:.65rem;opacity:.8';
+    pctWrap.appendChild(pctInput);
+    pctWrap.appendChild(pctLbl);
+    pill.appendChild(pctWrap);
+
+    const supSpan = document.createElement('span');
+    supSpan.textContent = supEf + 'ha'; supSpan.style.cssText = 'font-size:.62rem;opacity:.75';
+    pill.appendChild(supSpan);
+
+    const btn = document.createElement('button');
+    btn.textContent = '✕';
+    btn.setAttribute('data-nom', nom);
+    btn.style.cssText = 'background:none;border:none;color:rgba(255,255,255,.7);cursor:pointer;font-size:.75rem;padding:0;margin-left:.2rem';
+    btn.addEventListener('click', function(e){ e.stopPropagation(); editRemoveParcela(this); });
+    pill.appendChild(btn);
+    container.appendChild(pill);
   });
-  editCalcFitCostHa();
-  editCalcLabCostHa();
-  editCalcAboCostHa();
+
+  // Guardar valor
+  const ep = document.getElementById('edit-parcela');
+  if(ep) ep.value = editParcelesSelected.map(function(e) {
+    var n = typeof e==='string'?e:e.nom;
+    var p = typeof e==='object'&&e.pct!=null?e.pct:100;
+    return p < 100 ? n+' ('+p+'%)' : n;
+  }).join(' / ');
+
+  editUpdateSuperficie();
 }
+
 
 function editAddParcela(sel) {
   const nom = sel.value;
