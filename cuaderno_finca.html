@@ -5199,45 +5199,75 @@ function editRenderFitMixer() {
   const container = document.getElementById('editFitMixer');
   if(!container) return;
   const prods = getProductes();
+  const sup   = parseFloat(document.getElementById('edit-fit-sup')?.value) || 0;
   container.innerHTML = '';
+
   editFitProds.forEach(function(fp, i) {
-    const options = prods.map(function(p, pi) {
-      return '<option value="' + pi + '" ' + (pi === fp.prodIdx ? 'selected' : '') + '>' + p.nom + ' (' + p.preu + '€/' + (p.unitat||'kg') + ')</option>';
-    }).join('');
-    // Si el producte no és al catàleg però té nom, afegir-lo
+    const prod    = fp.prodIdx !== '' && fp.prodIdx != null ? prods[fp.prodIdx] : null;
+    const unitat  = prod ? (prod.unitat||'L') : 'L';
+    const preuCat = prod ? prod.preu : '';
+    const preuVal = parseFloat(fp.preu) || parseFloat(preuCat) || 0;
+    const qt      = parseFloat(fp.qtTotal) || 0;
+    const dosiHa  = sup > 0 && qt > 0 ? (qt/sup).toFixed(2) : null;
+    const costHa  = dosiHa ? (parseFloat(dosiHa)*preuVal).toFixed(2) : null;
+
     let extraOpt = '';
-    if(fp.prodIdx === '' && fp.nom) {
+    if((fp.prodIdx === '' || fp.prodIdx == null) && fp.nom) {
       extraOpt = '<option value="__custom__" selected>' + fp.nom + ' (manual)</option>';
     }
+    const options = prods.map(function(p, pi) {
+      return '<option value="' + pi + '" ' + (pi === fp.prodIdx ? 'selected' : '') + '>' +
+        p.nom + ' (' + p.preu + '\u20ac/' + (p.unitat||'L') + ')</option>';
+    }).join('');
+
     const row = document.createElement('div');
     row.className = 'fit-prod-row';
+    row.style.cssText = 'flex-direction:column;gap:.4rem;padding:.6rem .7rem;background:#FAFAF8;border-radius:2px;margin-bottom:.4rem;border:1px solid #E8DCC8';
+
     row.innerHTML =
-      '<select onchange="editFitProdChange(' + i + ',\'prodIdx\',this.value)">' +
-        '<option value="">— Seleccionar —</option>' + extraOpt + options +
-      '</select>' +
-      '<span class="fp-label">Dosi</span>' +
-      '<input type="number" value="' + (fp.dosi||'') + '" placeholder="kg/ha" step="0.1" min="0"' +
-        ' oninput="editFitProdChange(' + i + ',\'dosi\',this.value)" style="width:70px">' +
-      '<span class="fp-label">€/kg</span>' +
-      '<input type="number" value="' + (fp.preu||'') + '" placeholder="0.00" step="0.01" min="0"' +
-        ' oninput="editFitProdChange(' + i + ',\'preu\',this.value)" style="width:65px">' +
-      '<span class="fp-cost" id="efp-cost-' + i + '">—</span>' +
-      (editFitProds.length > 1 ? '<button class="fit-prod-remove" onclick="editRemoveFitProd(' + i + ')" title="Treure">✕</button>' : '');
+      '<div style="display:flex;gap:.4rem;align-items:center">' +
+        '<select onchange="editFitProdChange(' + i + ',\'prodIdx\',this.value)" style="flex:3;min-width:140px">' +
+          '<option value="">— Seleccionar producte —</option>' + extraOpt + options +
+        '</select>' +
+        (editFitProds.length > 1 ?
+          '<button class="fit-prod-remove" onclick="editRemoveFitProd(' + i + ')" title="Treure" style="flex:none">✕</button>' : '') +
+      '</div>' +
+      '<div style="display:flex;gap:.5rem;align-items:center;flex-wrap:wrap;background:#F8F4EC;border-radius:2px;padding:.4rem .6rem">' +
+        '<div style="display:flex;align-items:center;gap:.3rem">' +
+          '<span style="font-size:.75rem;color:var(--fog);white-space:nowrap">Total màquina</span>' +
+          '<input type="number" value="' + (qt||'') + '" placeholder="0.0" step="0.1" min="0"' +
+            ' oninput="editFitProdChange(' + i + ',\'qtTotal\',this.value)"' +
+            ' style="width:80px;background:white;font-weight:700;font-size:.95rem;border:2px solid var(--vine);border-radius:2px;padding:.2rem .4rem">' +
+          '<span style="font-size:.8rem;color:var(--vine);font-weight:600">' + unitat + '</span>' +
+        '</div>' +
+        '<div style="display:flex;align-items:center;gap:.3rem">' +
+          '<span style="font-size:.75rem;color:var(--fog)">Preu</span>' +
+          '<input type="number" value="' + (fp.preu||'') + '" placeholder="' + preuCat + '" step="0.01" min="0"' +
+            ' oninput="editFitProdChange(' + i + ',\'preu\',this.value)"' +
+            ' style="width:65px">' +
+          '<span style="font-size:.75rem;color:var(--fog)">\u20ac/' + unitat + '</span>' +
+        '</div>' +
+        (dosiHa ?
+          '<div style="display:flex;gap:.4rem;font-family:monospace;font-size:.78rem">' +
+            '<span style="background:var(--ok-bg);border:1px solid #90C890;border-radius:2px;padding:.2rem .6rem;color:var(--ok);font-weight:700">' +
+              dosiHa + ' ' + unitat + '/ha</span>' +
+            (costHa ? '<span style="background:#F0F8E8;border:1px solid #B0D890;border-radius:2px;padding:.2rem .6rem;color:var(--harvest)">' + costHa + ' \u20ac/ha</span>' : '') +
+          '</div>' :
+          '<span style="font-size:.72rem;color:var(--fog);font-style:italic">Introdueix total per calcular dosi/ha</span>') +
+      '</div>';
+
     container.appendChild(row);
-    editCalcFitProdCost(i);
   });
-  // Calcular total sense recursió
-  const _esup = parseFloat(document.getElementById('edit-fit-sup')?.value) || 0;
-  let _etotalCostHa = 0;
-  editFitProds.forEach(function(_fp) {
-    const _prods = getProductes();
-    const _preu = parseFloat(_fp.preu) || (_fp.prodIdx !== '' && _prods[_fp.prodIdx] ? parseFloat(_prods[_fp.prodIdx].preu)||0 : 0);
-    const _qt = parseFloat(_fp.qtTotal) || 0;
-    if(_esup > 0 && _qt > 0) _etotalCostHa += (_qt / _esup) * _preu;
+
+  // Total cost mescla
+  let totalCostHa = 0;
+  editFitProds.forEach(function(fp) {
+    const pr = parseFloat(fp.preu)||(fp.prodIdx!=null&&fp.prodIdx!==''&&prods[fp.prodIdx]?parseFloat(prods[fp.prodIdx].preu)||0:0);
+    const qt = parseFloat(fp.qtTotal)||0;
+    if(sup > 0 && qt > 0) totalCostHa += (qt/sup)*pr;
   });
-  const _eelTotal = document.getElementById('edit-fit-cost-mescla');
-  if(_eelTotal) _eelTotal.textContent = _etotalCostHa > 0 ? _etotalCostHa.toFixed(2) + ' €/ha' : '— €/ha';
-  // NO cridar editUpdateFitHiddenFields aquí - trenca el cicle
+  const elTotal = document.getElementById('edit-fit-cost-mescla');
+  if(elTotal) elTotal.textContent = totalCostHa > 0 ? totalCostHa.toFixed(2) + ' \u20ac/ha' : '\u2014 \u20ac/ha';
 }
 
 function editFitProdChange(i, field, val) {
