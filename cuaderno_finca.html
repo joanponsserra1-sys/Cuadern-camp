@@ -2810,7 +2810,8 @@ function buildTractamentsFromParts() {
         cicleActual = { parts: [p], dataInici: p.fecha, dataFi: p.fecha, pctTotal: p.pct };
       } else {
         const diesDif = difDies(cicleActual.dataFi, p.fecha);
-        const cicleJaComplet = cicleActual.parts.some(function(x){ return x.pct >= 100; });
+        const cicleJaComplet = cicleActual.parts.some(function(x){ return x.pct >= 100; })
+                            || cicleActual.pctTotal >= 100;
 
         if(cicleJaComplet || diesDif > MAX_DIES_CICLE) {
           // Cicle nou: o bé el cicle anterior ja tenia un 100%,
