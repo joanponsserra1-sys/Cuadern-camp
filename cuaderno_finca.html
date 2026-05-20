@@ -989,10 +989,22 @@ footer{text-align:center;margin-top:1.5rem;font-family:monospace;font-size:.65re
           <input type="number" id="v-amort" value="332.19" step="0.01" min="0" oninput="renderCostos()">
           <div class="var-unit">€ / ha / any · <span style="color:var(--fog)">Total: 24.409€ ÷ 73,48ha SCP</span></div>
         </div>
-        <div class="var-box" style="border:1.5px solid #5B8A5B">
-          <label>Costos fixos / ha <span style="color:var(--ok);font-size:.65rem">(imputació total)</span></label>
-          <input type="number" id="v-fixos" value="0" step="1" min="0" oninput="saveCostVars();renderCostos()">
-          <div class="var-unit">€ / ha / any · <span style="color:var(--fog)">Poda, arrendaments, assegurances...</span></div>
+        <div class="var-box" style="border:1.5px solid #5B8A5B;grid-column:span 2">
+          <label>Costos fixos totals any <span style="color:var(--ok);font-size:.65rem">(poda, arrendaments, assegurances, llicències...)</span></label>
+          <div style="display:flex;gap:.6rem;align-items:flex-end;flex-wrap:wrap">
+            <div style="flex:1;min-width:160px">
+              <input type="number" id="v-fixos-total" value="0" step="100" min="0"
+                oninput="calcFixosHa();saveCostVars();renderCostos()"
+                placeholder="Import total anual en €"
+                style="font-size:1.1rem;font-weight:600;width:100%">
+              <div class="var-unit">€ total anual</div>
+            </div>
+            <div style="flex:1;min-width:120px">
+              <input type="number" id="v-fixos" readonly
+                style="background:#F0F7F0;color:var(--ok);font-weight:600;font-size:1.1rem;width:100%">
+              <div class="var-unit">€ / ha / any · <span style="color:var(--fog)">÷ 73,48 ha total finca</span></div>
+            </div>
+          </div>
         </div>
       </div>
       <button class="btn btn-vine" onclick="resetVariables()">↺ Restaurar valors 2024</button>
@@ -2220,7 +2232,7 @@ function showPage(name) {
     if(name==='historial')    renderHistorial();
     if(name==='exportar')     updateExportStats();
     if(name==='costos') {
-      loadCostVars(); renderCostos();
+      loadCostVars(); // calcFixosHa ja es crida dins loadCostVars renderCostos();
       renderDropdownEditors(); populateCostFilters();
     }
     if(name==='estoc')        renderEstoc();
@@ -3826,13 +3838,26 @@ const LABOR_TO_ACCIO = {
 
 };
 
+function calcFixosHa() {
+  const total = parseFloat(document.getElementById('v-fixos-total')?.value) || 0;
+  const supTotal = PARCEL_DATA.reduce(function(s, p){ return s + p.sup; }, 0);
+  const haVal = supTotal > 0 ? total / supTotal : 0;
+  const el = document.getElementById('v-fixos');
+  if(el) el.value = haVal > 0 ? haVal.toFixed(2) : '0';
+  localStorage.setItem('cost_v-fixos-total', total);
+}
+
 function getCostVars() { return getVars(); }
 function getVars() {
-  const n = id => parseFloat(document.getElementById(id)?.value || 0);
+  const n = id => parseFloat(document.getElementById(id)?.value || 0) || 0;
+  const fixosHa = n('v-fixos'); // ja és €/ha calculat per calcFixosHa
+  const amort   = n('v-amort');
   return {
     gasoil: n('v-gasoil'), salari: n('v-salari'),
     fertilitzant: n('v-fertilitzant'), dosiFert: n('v-dosi-fert'),
-    amort: n('v-amort'), fixos: n('v-fixos')
+    amort: amort, fixos: fixosHa,
+    // costFixHa = amort + fixos (tots dos en €/ha)
+    costFixHa: amort + fixosHa,
   };
 }
 
@@ -3842,12 +3867,15 @@ function resetVariables() {
   document.getElementById('v-fertilitzant').value = COST_DEFAULTS.fertilitzant;
   document.getElementById('v-dosi-fert').value    = COST_DEFAULTS.dosiFert;
   document.getElementById('v-amort').value        = COST_DEFAULTS.amort;
+  const elFT = document.getElementById('v-fixos-total');
+  if(elFT) elFT.value = 0;
+  calcFixosHa();
   renderCostos();
 }
 
 function loadCostVars() {
   // Carrega variables guardades (localStorage > PMP gasoil > defaults)
-  const VARS = ['v-gasoil','v-salari','v-fertilitzant','v-dosi-fert','v-amort','v-fixos'];
+  const VARS = ['v-gasoil','v-salari','v-fertilitzant','v-dosi-fert','v-amort','v-fixos-total'];
   VARS.forEach(function(k) {
     const saved = localStorage.getItem('cost_' + k);
     const el = document.getElementById(k);
@@ -3856,6 +3884,7 @@ function loadCostVars() {
       el.value = saved;
     }
   });
+  calcFixosHa(); // recalcular €/ha des del total
   // Aplica PMP gasoil automàticament si existeix
   const pmpG = calcPMP(getEstocGasoil());
   if(pmpG > 0) {
@@ -3870,7 +3899,7 @@ function loadCostVars() {
 }
 
 function saveCostVars() {
-  ['v-gasoil','v-salari','v-fertilitzant','v-dosi-fert','v-amort','v-fixos'].forEach(function(k) {
+  ['v-gasoil','v-salari','v-fertilitzant','v-dosi-fert','v-amort','v-fixos-total'].forEach(function(k) {
     const el = document.getElementById(k);
     if(el && el.value && el.value !== '') {
       localStorage.setItem('cost_' + k, el.value);
@@ -7716,6 +7745,9 @@ function buildComparativa() {
       }
 
       // Fallback: calcular des de ACCIONS_COST per cada parcel·la
+      // Només per labors i reg — fitosanitaris sense costTotal s'ignoren
+      // (evita valors absurds de c5 corrupte)
+      if(pt.tipo === 'fitosanitario') return; // skip — no tenim dades de cost fiables
       mpNoms(pt.parcela).forEach(function(nom) {
         const pInfo = PARCEL_DATA.find(function(x){ return x.nom === nom; });
         if(!pInfo) return;
@@ -7725,10 +7757,13 @@ function buildComparativa() {
           return d ? d.pct : 100;
         })();
         const sup = pInfo.sup * pct / 100;
-        if(sup === 0) return;
+        if(sup === 0 || sup > 200) return;
         let acc = TIPO_TO_ACCIO[pt.tipo];
         if(pt.tipo === 'labor' && pt.c1) acc = LABOR_TO_ACCIO[pt.c1] || null;
-        if(acc) costVar += getAccioCalcul(acc, v, pt) * sup;
+        if(!acc) return;
+        const costCalc = getAccioCalcul(acc, v, pt) * sup;
+        // Sanity check: cost per part no pot superar 5000€
+        if(costCalc > 0 && costCalc < 5000) costVar += costCalc;
       });
     });
     const costFix = (parseFloat(v.costFixHa)||0) * supTotal;
