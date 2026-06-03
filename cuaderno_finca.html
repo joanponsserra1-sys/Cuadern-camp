@@ -1762,6 +1762,7 @@ function enviarASheets(data) {
 }
 
 function editarASheets(part) {
+  // Enviar part complet amb fitProdsData i supTractada
   fetch(SCRIPT_URL, {
     method: 'POST',
     mode: 'no-cors',
@@ -2717,12 +2718,35 @@ async function syncTractamentsFromSheets() {
         }
       });
 
-      // Afegeix NOMÉS els parts de Sheets que NO estan esborrats i NO els tenim
-      data.parts.forEach(sp => {
+      // Afegeix parts nous i actualitza els existents si Sheets té fitProdsData nou
+      data.parts.forEach(function(sp) {
         const sid = String(sp.id);
-        if(!localIds.has(sid) && !deletedIds.has(sid)) {
+        if(deletedIds.has(sid)) return;
+
+        if(!localIds.has(sid)) {
+          // Part nou que no tenim localment
           localParts.push(sp);
           added++;
+        } else {
+          // Part que ja tenim — actualitzar si Sheets té fitProdsData que nosaltres no tenim
+          const idx = localParts.findIndex(function(p){ return String(p.id) === sid; });
+          if(idx >= 0) {
+            const local = localParts[idx];
+            var updated = false;
+            // Si Sheets té fitProdsData i nosaltres no (o el nostre és buit)
+            if(sp.fitProdsData && sp.fitProdsData.length > 0 &&
+               (!local.fitProdsData || local.fitProdsData.length === 0)) {
+              local.fitProdsData = sp.fitProdsData;
+              updated = true;
+            }
+            // Si Sheets té supTractada vàlida i nosaltres no
+            if(sp.supTractada && parseFloat(sp.supTractada) > 0 && parseFloat(sp.supTractada) < 200 &&
+               (!local.supTractada || parseFloat(local.supTractada) <= 0)) {
+              local.supTractada = sp.supTractada;
+              updated = true;
+            }
+            if(updated) added++;
+          }
         }
       });
 
