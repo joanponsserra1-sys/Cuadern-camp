@@ -2183,18 +2183,22 @@ document.addEventListener('DOMContentLoaded', function() {
             changed = true;
           }
         } else {
-          // 3. fitProdsData existeix però pot no tenir dosiHa
-          var needsDosiHa = p.fitProdsData.some(function(fp){ return !fp.dosiHa && fp.qtTotal > 0; });
-          if(needsDosiHa && supT > 0) {
+          // 3. fitProdsData existeix: recalcular dosiHa per tots els que tinguin qtTotal
+          // (inclou parts on dosiHa era 0 perquè no s'havia guardat)
+          var needsUpdate = p.fitProdsData.some(function(fp){
+            return parseFloat(fp.qtTotal) > 0 && (parseFloat(fp.dosiHa) <= 0 || !fp.dosiHa);
+          });
+          if(needsUpdate && supT > 0) {
             p.fitProdsData = p.fitProdsData.map(function(fp) {
-              if(!fp.dosiHa && parseFloat(fp.qtTotal) > 0) {
-                fp.dosiHa = parseFloat((parseFloat(fp.qtTotal) / supT).toFixed(2));
-                // Afegir unitat si manca
-                if(!fp.unitat) {
-                  var isPols2 = (fp.nom||'').toLowerCase().includes('sofre pols') ||
-                                (fp.nom||'').toLowerCase().includes('novazufre');
-                  fp.unitat = isPols2 ? 'kg' : 'L';
-                }
+              var qt = parseFloat(fp.qtTotal) || 0;
+              if(qt > 0 && supT > 0) {
+                fp.dosiHa = parseFloat((qt / supT).toFixed(2));
+              }
+              if(!fp.unitat) {
+                var isPols2 = (fp.nom||'').toLowerCase().includes('sofre pols') ||
+                              (fp.nom||'').toLowerCase().includes('novazufre') ||
+                              (fp.nom||'').toLowerCase().includes('soffre pa');
+                fp.unitat = isPols2 ? 'kg' : 'L';
               }
               return fp;
             });
