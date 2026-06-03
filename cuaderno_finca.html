@@ -5329,6 +5329,7 @@ function editRenderFitMixer() {
 }
 
 function editFitProdChange(i, field, val) {
+  console.log('[editFitProdChange] i=' + i + ' field=' + field + ' val=' + val);
   if(field === 'prodIdx') {
     if(val === '__custom__') return;
     editFitProds[i].prodIdx = val === '' ? '' : parseInt(val);
@@ -5822,6 +5823,7 @@ function guardarEdicio() {
       numRegistre: g('fit-num-registre'),
       eficacia: g('fit-eficacia'),
       fitProdsData: (function() {
+        console.log('[guardarEdicio] editFitProds:', JSON.stringify(editFitProds));
         const supG = editGetSupParceles();
         const prodsG = getProductes();
         return editFitProds.filter(function(fp){ return fp.nom||fp.prodIdx!==''; }).map(function(fp) {
